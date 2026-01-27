@@ -1,0 +1,151 @@
+// Prisma Schema for Magical Holidays
+// Travel planning app for theme park vacations
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER & AUTHENTICATION
+// ============================================
+
+model User {
+  id                 String        @id @default(cuid())
+  email              String        @unique
+  password           String
+  name               String?
+  favoriteCharacters String[]      // For Disney nuggets feature
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  // Relations
+  ownedTrips         Trip[]        @relation("TripOwner")
+  tripMemberships    TripMember[]
+  blogPosts          BlogPost[]    @relation("BlogAuthor")
+
+  @@map("users")
+}
+
+// ============================================
+// TRIPS & MEMBERS
+// ============================================
+
+model Trip {
+  id          String       @id @default(cuid())
+  name        String
+  destination String       // e.g., "Walt Disney World", "Disneyland"
+  startDate   DateTime
+  endDate     DateTime
+  notes       String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  ownerId     String
+  owner       User         @relation("TripOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     TripMember[]
+  reservations Reservation[]
+
+  @@map("trips")
+}
+
+enum TripRole {
+  OWNER
+  MEMBER
+}
+
+model TripMember {
+  id       String   @id @default(cuid())
+  role     TripRole @default(MEMBER)
+  joinedAt DateTime @default(now())
+
+  // Relations
+  tripId   String
+  trip     Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tripId, userId])
+  @@map("trip_members")
+}
+
+// ============================================
+// RESERVATIONS
+// ============================================
+
+enum ReservationType {
+  PARK      // Theme park entry reservation
+  RIDE      // Ride/attraction reservation (Lightning Lane, etc.)
+  HOTEL     // Hotel/resort reservation
+  CAR       // Car rental reservation
+  FLIGHT    // Airplane travel reservation
+}
+
+model Reservation {
+  id                 String          @id @default(cuid())
+  type               ReservationType
+  title              String          // e.g., "Magic Kingdom", "Space Mountain", "Grand Floridian"
+  startDateTime      DateTime
+  endDateTime        DateTime
+  location           String?         // Address or specific location
+  confirmationNumber String?
+  notes              String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  // Relations
+  tripId             String
+  trip               Trip            @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@map("reservations")
+}
+
+// ============================================
+// BLOG / NOTICES
+// ============================================
+
+enum BlogCategory {
+  PARK_UPDATE    // Changes to parks, new attractions
+  HOLIDAY_EVENT  // Seasonal events, special occasions
+  GENERAL        // General announcements
+  TIP            // Tips and tricks for visitors
+}
+
+model BlogPost {
+  id          String       @id @default(cuid())
+  title       String
+  slug        String       @unique
+  excerpt     String?      // Short summary for list view
+  content     String       // Full post content (markdown supported)
+  category    BlogCategory @default(GENERAL)
+  isPublished Boolean      @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  authorId    String
+  author      User         @relation("BlogAuthor", fields: [authorId], references: [id])
+
+  @@map("blog_posts")
+}
+
+// ============================================
+// DISNEY NUGGETS (for future seed data)
+// ============================================
+
+model DisneyNugget {
+  id         String   @id @default(cuid())
+  type       String   // "quote", "fact", "history"
+  content    String
+  source     String?  // Attribution if needed
+  characters String[] // Related characters for personalization
+  createdAt  DateTime @default(now())
+
+  @@map("disney_nuggets")
+}
