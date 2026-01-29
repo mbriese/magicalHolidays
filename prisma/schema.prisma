@@ -27,6 +27,7 @@ model User {
   ownedTrips         Trip[]        @relation("TripOwner")
   tripMemberships    TripMember[]
   blogPosts          BlogPost[]    @relation("BlogAuthor")
+  badges             UserBadge[]
 
   @@map("users")
 }
@@ -148,4 +149,57 @@ model DisneyNugget {
   createdAt  DateTime @default(now())
 
   @@map("disney_nuggets")
+}
+
+// ============================================
+// BADGES & ACHIEVEMENTS
+// ============================================
+
+enum BadgeCategory {
+  ADVENTURE    // Trip and travel milestones
+  EXPERIENCE   // Activity and reservation achievements
+  EXPLORER     // Discovery and variety badges
+  SPECIAL      // Limited time or seasonal badges
+}
+
+enum BadgeRarity {
+  COMMON       // Easy to earn
+  UNCOMMON     // Moderate effort
+  RARE         // Significant achievement
+  EPIC         // Major milestone
+  LEGENDARY    // Ultimate achievement
+}
+
+model Badge {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  description String
+  icon        String        // Emoji or icon identifier
+  category    BadgeCategory
+  rarity      BadgeRarity   @default(COMMON)
+  requirement String        // Human-readable requirement
+  threshold   Int           @default(1) // Numeric threshold for earning
+  createdAt   DateTime      @default(now())
+
+  // Relations
+  userBadges  UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  progress  Int      @default(0) // Current progress toward threshold
+  earnedAt  DateTime? // Null if not yet earned
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@map("user_badges")
 }

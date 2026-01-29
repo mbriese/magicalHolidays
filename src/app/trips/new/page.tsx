@@ -42,19 +42,26 @@ export default function NewTripPage() {
       return;
     }
 
-    // TODO: Implement actual trip creation with API
     try {
-      console.log("Create trip:", {
-        name,
-        destination: finalDestination,
-        startDate,
-        endDate,
-        notes,
+      const response = await fetch("/api/trips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          destination: finalDestination,
+          startDate,
+          endDate,
+          notes: notes || null,
+        }),
       });
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Redirect to trips page on success
-      window.location.href = "/trips";
+
+      if (response.ok) {
+        // Redirect to trips page on success
+        window.location.href = "/trips";
+      } else {
+        const data = await response.json();
+        setError(data.error || "Failed to create trip. Please try again.");
+      }
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {

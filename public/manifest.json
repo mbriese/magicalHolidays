@@ -1,0 +1,36 @@
+{
+  "name": "Magical Holidays",
+  "short_name": "MagicalHolidays",
+  "description": "Your enchanted travel planner for theme park vacations",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#faf5ff",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["travel", "lifestyle", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "description": "View your trip dashboard"
+    },
+    {
+      "name": "My Trips",
+      "url": "/trips",
+      "description": "View all your trips"
+    },
+    {
+      "name": "New Trip",
+      "url": "/trips/new",
+      "description": "Create a new trip"
+    }
+  ]
+}

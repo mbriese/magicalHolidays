@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed"/>
+      <stop offset="100%" style="stop-color:#5b21b6"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- Castle -->
+  <g fill="#fcd34d">
+    <!-- Main castle body -->
+    <rect x="156" y="280" width="200" height="140" rx="8"/>
+    <!-- Left tower -->
+    <rect x="136" y="220" width="60" height="200" rx="4"/>
+    <polygon points="166,220 136,160 196,160"/>
+    <!-- Right tower -->
+    <rect x="316" y="220" width="60" height="200" rx="4"/>
+    <polygon points="346,220 316,160 376,160"/>
+    <!-- Center tower -->
+    <rect x="216" y="180" width="80" height="240" rx="4"/>
+    <polygon points="256,180 206,100 306,100"/>
+    <!-- Door -->
+    <rect x="231" y="340" width="50" height="80" rx="25" fill="#5b21b6"/>
+    <!-- Windows -->
+    <circle cx="166" cy="280" r="12" fill="#5b21b6"/>
+    <circle cx="346" cy="280" r="12" fill="#5b21b6"/>
+    <circle cx="256" cy="260" r="15" fill="#5b21b6"/>
+  </g>
+  <!-- Sparkles -->
+  <g fill="#fff" opacity="0.9">
+    <polygon points="100,80 105,95 120,100 105,105 100,120 95,105 80,100 95,95"/>
+    <polygon points="400,120 403,130 413,133 403,136 400,146 397,136 387,133 397,130"/>
+    <polygon points="420,60 424,74 438,78 424,82 420,96 416,82 402,78 416,74"/>
+  </g>
+</svg>

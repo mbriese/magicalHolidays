@@ -9,6 +9,12 @@ export type TripRole = "OWNER" | "MEMBER";
 // Blog Categories
 export type BlogCategory = "PARK_UPDATE" | "HOLIDAY_EVENT" | "GENERAL" | "TIP";
 
+// Badge Categories
+export type BadgeCategory = "ADVENTURE" | "EXPERIENCE" | "EXPLORER" | "SPECIAL";
+
+// Badge Rarity
+export type BadgeRarity = "COMMON" | "UNCOMMON" | "RARE" | "EPIC" | "LEGENDARY";
+
 // Color mapping for reservation types
 export const reservationColors: Record<ReservationType, string> = {
   PARK: "#8b5cf6",    // Purple
@@ -148,3 +154,97 @@ export interface InviteMemberInput {
   tripId: string;
   email: string;
 }
+
+// Badge interfaces
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: BadgeCategory;
+  rarity: BadgeRarity;
+  requirement: string;
+  threshold: number;
+  createdAt: Date;
+}
+
+export interface UserBadge {
+  id: string;
+  userId: string;
+  badgeId: string;
+  progress: number;
+  earnedAt: Date | null;
+  createdAt: Date;
+  badge?: Badge;
+}
+
+// Combined badge with user progress (used across components)
+export interface BadgeWithProgress extends Badge {
+  userProgress?: number;
+  earnedAt?: Date | null;
+}
+
+// Badge display helpers
+export const badgeCategoryLabels: Record<BadgeCategory, string> = {
+  ADVENTURE: "Adventure",
+  EXPERIENCE: "Experience",
+  EXPLORER: "Explorer",
+  SPECIAL: "Special",
+};
+
+export const badgeCategoryIcons: Record<BadgeCategory, string> = {
+  ADVENTURE: "🏰",
+  EXPERIENCE: "⭐",
+  EXPLORER: "🧭",
+  SPECIAL: "✨",
+};
+
+export const badgeRarityLabels: Record<BadgeRarity, string> = {
+  COMMON: "Common",
+  UNCOMMON: "Uncommon",
+  RARE: "Rare",
+  EPIC: "Epic",
+  LEGENDARY: "Legendary",
+};
+
+// Progress bar colors for badges by rarity
+export const badgeProgressColors: Record<BadgeRarity, string> = {
+  COMMON: "bg-green-500",
+  UNCOMMON: "bg-green-500",
+  RARE: "bg-blue-500",
+  EPIC: "bg-purple-500",
+  LEGENDARY: "bg-linear-to-r from-amber-400 to-yellow-500",
+};
+
+export const badgeRarityColors: Record<BadgeRarity, { bg: string; border: string; text: string; glow: string }> = {
+  COMMON: {
+    bg: "bg-slate-100 dark:bg-slate-800",
+    border: "border-slate-300 dark:border-slate-600",
+    text: "text-slate-600 dark:text-slate-300",
+    glow: "",
+  },
+  UNCOMMON: {
+    bg: "bg-green-100 dark:bg-green-900/30",
+    border: "border-green-400 dark:border-green-600",
+    text: "text-green-700 dark:text-green-400",
+    glow: "",
+  },
+  RARE: {
+    bg: "bg-blue-100 dark:bg-blue-900/30",
+    border: "border-blue-400 dark:border-blue-500",
+    text: "text-blue-700 dark:text-blue-400",
+    glow: "shadow-blue-400/30",
+  },
+  EPIC: {
+    bg: "bg-purple-100 dark:bg-purple-900/30",
+    border: "border-purple-400 dark:border-purple-500",
+    text: "text-purple-700 dark:text-purple-400",
+    glow: "shadow-purple-400/40",
+  },
+  LEGENDARY: {
+    bg: "bg-linear-to-br from-amber-100 to-yellow-100 dark:from-amber-900/40 dark:to-yellow-900/40",
+    border: "border-amber-400 dark:border-amber-500",
+    text: "text-amber-700 dark:text-amber-400",
+    glow: "shadow-amber-400/50",
+  },
+};

@@ -1,10 +1,27 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import PWAProvider from "@/components/PWAProvider";
 
 export const metadata: Metadata = {
   title: "Magical Holidays - Your Enchanted Travel Planner",
   description: "Plan your magical theme park vacation with ease. Organize park reservations, rides, hotels, car rentals, and flights all in one place.",
   keywords: ["travel planner", "vacation", "theme park", "trip planning", "reservations"],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Magical Holidays",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#7c3aed",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
@@ -71,7 +88,9 @@ export default function RootLayout({
 
           {/* Main Content */}
           <main className="grow">
-            {children}
+            <PWAProvider>
+              {children}
+            </PWAProvider>
           </main>
 
           {/* Footer */}
