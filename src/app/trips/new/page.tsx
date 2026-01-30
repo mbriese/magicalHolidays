@@ -19,6 +19,8 @@ export default function NewTripPage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [notes, setNotes] = useState("");
+  const [budgetEnabled, setBudgetEnabled] = useState(false);
+  const [budgetAmount, setBudgetAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -52,6 +54,8 @@ export default function NewTripPage() {
           startDate,
           endDate,
           notes: notes || null,
+          budgetEnabled,
+          budgetAmount: budgetEnabled && budgetAmount ? parseFloat(budgetAmount) : null,
         }),
       });
 
@@ -191,6 +195,53 @@ export default function NewTripPage() {
                   className="input-magical"
                 />
               </div>
+            </div>
+
+            {/* Budget Setup */}
+            <div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={budgetEnabled}
+                  onChange={(e) => setBudgetEnabled(e.target.checked)}
+                  className="w-5 h-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                />
+                <div>
+                  <span className="font-medium text-slate-700 dark:text-slate-300">
+                    💰 Track Trip Budget
+                  </span>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Set a budget and track expenses throughout your trip
+                  </p>
+                </div>
+              </label>
+
+              {budgetEnabled && (
+                <div className="mt-4">
+                  <label
+                    htmlFor="budgetAmount"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                  >
+                    Budget Amount
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                    <input
+                      id="budgetAmount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={budgetAmount}
+                      onChange={(e) => setBudgetAmount(e.target.value)}
+                      className="input-magical pl-8"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    You can add expenses and track spending from your dashboard
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Notes */}

@@ -13,10 +13,23 @@ interface Trip {
   endDate: string;
 }
 
+interface Reservation {
+  id: string;
+  tripId: string;
+  type: ReservationType;
+  title: string;
+  startDateTime: string;
+  endDateTime: string;
+  location: string | null;
+  confirmationNumber: string | null;
+  notes: string | null;
+}
+
 interface AddReservationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  editReservation?: Reservation | null;
 }
 
 const reservationTypes: ReservationType[] = ["PARK", "RIDE", "HOTEL", "CAR", "FLIGHT"];
@@ -35,7 +48,10 @@ export default function AddReservationModal({
   isOpen,
   onClose,
   onSuccess,
+  editReservation,
 }: AddReservationModalProps) {
+  const isEditMode = !!editReservation;
+
   // Trip selection
   const [trips, setTrips] = useState<Trip[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<string>("");
@@ -62,12 +78,27 @@ export default function AddReservationModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch trips on mount
+  // Fetch trips on mount and populate form in edit mode
   useEffect(() => {
     if (isOpen) {
       fetchTrips();
+      if (editReservation) {
+        populateEditForm(editReservation);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, editReservation]);
+
+  const populateEditForm = (reservation: Reservation) => {
+    setSelectedTripId(reservation.tripId);
+    setType(reservation.type);
+    setTitle(reservation.title);
+    setStartDateTime(new Date(reservation.startDateTime));
+    setEndDateTime(new Date(reservation.endDateTime));
+    setLocation(reservation.location || "");
+    setConfirmationNumber(reservation.confirmationNumber || "");
+    setNotes(reservation.notes || "");
+    setIsCreatingTrip(false);
+  };
 
   const fetchTrips = async () => {
     setLoadingTrips(true);
@@ -155,20 +186,27 @@ export default function AddReservationModal({
         return;
       }
 
-      // Create reservation
-      const response = await fetch("/api/reservations", {
-        method: "POST",
+      const reservationData = {
+        tripId,
+        type,
+        title,
+        startDateTime: startDateTime.toISOString(),
+        endDateTime: endDateTime.toISOString(),
+        location: location || null,
+        confirmationNumber: confirmationNumber || null,
+        notes: notes || null,
+      };
+
+      // Create or update reservation
+      const url = isEditMode
+        ? `/api/reservations/${editReservation.id}`
+        : "/api/reservations";
+      const method = isEditMode ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tripId,
-          type,
-          title,
-          startDateTime: startDateTime.toISOString(),
-          endDateTime: endDateTime.toISOString(),
-          location: location || null,
-          confirmationNumber: confirmationNumber || null,
-          notes: notes || null,
-        }),
+        body: JSON.stringify(reservationData),
       });
 
       if (response.ok) {
@@ -178,7 +216,7 @@ export default function AddReservationModal({
         onClose();
       } else {
         const data = await response.json();
-        setError(data.error || "Failed to create reservation");
+        setError(data.error || `Failed to ${isEditMode ? "update" : "create"} reservation`);
       }
     } catch (err) {
       setError("Something went wrong. Please try again.");
@@ -213,7 +251,7 @@ export default function AddReservationModal({
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-lg w-full p-6 my-8 animate-fade-in">
         <div className="flex justify-between items-start mb-6">
           <h2 className="font-serif text-2xl font-bold text-purple-900 dark:text-white">
-            Add Reservation ✨
+            {isEditMode ? "Edit Reservation ✏️" : "Add Reservation ✨"}
           </h2>
           <button
             onClick={onClose}
@@ -244,13 +282,14 @@ export default function AddReservationModal({
                 value={isCreatingTrip ? "new" : selectedTripId}
                 onChange={(e) => handleTripChange(e.target.value)}
                 className="input-magical"
+                disabled={isEditMode}
               >
                 {trips.map((trip) => (
                   <option key={trip.id} value={trip.id}>
                     {trip.name} ({trip.destination})
                   </option>
                 ))}
-                <option value="new">+ Create New Trip</option>
+                {!isEditMode && <option value="new">+ Create New Trip</option>}
               </select>
             )}
           </div>
@@ -434,7 +473,7 @@ export default function AddReservationModal({
               disabled={isLoading}
               className="btn-magical flex-1 disabled:opacity-50"
             >
-              {isLoading ? "Saving..." : "Add Reservation"}
+              {isLoading ? "Saving..." : isEditMode ? "Save Changes" : "Add Reservation"}
             </button>
           </div>
         </form>

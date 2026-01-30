@@ -28,7 +28,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, destination, startDate, endDate, notes } = body;
+    const { name, destination, startDate, endDate, notes, budgetEnabled, budgetAmount } = body;
 
     // Validation
     if (!name || !destination || !startDate || !endDate) {
@@ -47,6 +47,8 @@ export async function POST(request: NextRequest) {
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         notes: notes || null,
+        budgetEnabled: budgetEnabled || false,
+        budgetAmount: budgetEnabled && budgetAmount ? parseFloat(budgetAmount) : null,
         ownerId: user.id,
       },
     });

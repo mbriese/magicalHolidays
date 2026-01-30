@@ -37,20 +37,25 @@ model User {
 // ============================================
 
 model Trip {
-  id          String       @id @default(cuid())
-  name        String
-  destination String       // e.g., "Walt Disney World", "Disneyland"
-  startDate   DateTime
-  endDate     DateTime
-  notes       String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id             String       @id @default(cuid())
+  name           String
+  destination    String       // e.g., "Walt Disney World", "Disneyland"
+  startDate      DateTime
+  endDate        DateTime
+  notes          String?
+  // Budget tracking
+  budgetEnabled  Boolean      @default(false)
+  budgetAmount   Float?       // Total budget for the trip
+  budgetCurrency String       @default("USD")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   // Relations
-  ownerId     String
-  owner       User         @relation("TripOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  members     TripMember[]
+  ownerId      String
+  owner        User         @relation("TripOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members      TripMember[]
   reservations Reservation[]
+  expenses     Expense[]
 
   @@map("trips")
 }
@@ -104,6 +109,39 @@ model Reservation {
   trip               Trip            @relation(fields: [tripId], references: [id], onDelete: Cascade)
 
   @@map("reservations")
+}
+
+// ============================================
+// EXPENSES & BUDGET TRACKING
+// ============================================
+
+enum ExpenseCategory {
+  TICKETS        // Park tickets, special events
+  HOTEL          // Accommodation
+  FOOD           // Dining, snacks, drinks
+  TRANSPORTATION // Flights, car rental, gas, parking
+  SOUVENIRS      // Merchandise, gifts
+  ENTERTAINMENT  // Shows, tours, special experiences
+  TIPS           // Gratuities
+  OTHER          // Miscellaneous
+}
+
+model Expense {
+  id          String          @id @default(cuid())
+  amount      Float
+  description String
+  category    ExpenseCategory
+  date        DateTime        @default(now())
+  notes       String?
+  isPaid      Boolean         @default(true) // Track if expense is paid or planned
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Relations
+  tripId      String
+  trip        Trip            @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@map("expenses")
 }
 
 // ============================================
