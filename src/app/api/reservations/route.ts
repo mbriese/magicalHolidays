@@ -40,6 +40,8 @@ export async function POST(request: NextRequest) {
       location,
       confirmationNumber,
       notes,
+      guests,
+      guestCount,
     } = body;
 
     // Validation
@@ -81,6 +83,8 @@ export async function POST(request: NextRequest) {
         location: location || null,
         confirmationNumber: confirmationNumber || null,
         notes: notes || null,
+        guests: guests || [],
+        guestCount: guestCount || null,
       },
     });
 

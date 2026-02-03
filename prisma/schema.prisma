@@ -43,6 +43,7 @@ model Trip {
   startDate      DateTime
   endDate        DateTime
   notes          String?
+  guests         String[]     // Guest names for this trip
   // Budget tracking
   budgetEnabled  Boolean      @default(false)
   budgetAmount   Float?       // Total budget for the trip
@@ -101,6 +102,8 @@ model Reservation {
   location           String?         // Address or specific location
   confirmationNumber String?
   notes              String?
+  guests             String[]        // Guest names for this reservation
+  guestCount         Int?            // Optional: number of guests (for capacity tracking)
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
 

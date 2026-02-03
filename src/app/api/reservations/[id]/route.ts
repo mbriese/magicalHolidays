@@ -49,6 +49,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       location,
       confirmationNumber,
       notes,
+      guests,
+      guestCount,
     } = body;
 
     // Check if reservation exists
@@ -84,6 +86,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         ...(location !== undefined && { location: location || null }),
         ...(confirmationNumber !== undefined && { confirmationNumber: confirmationNumber || null }),
         ...(notes !== undefined && { notes: notes || null }),
+        ...(guests !== undefined && { guests: guests || [] }),
+        ...(guestCount !== undefined && { guestCount: guestCount || null }),
       },
     });
 

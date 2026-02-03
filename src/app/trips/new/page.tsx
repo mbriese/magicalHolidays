@@ -1,16 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-const destinations = [
-  "Walt Disney World",
-  "Disneyland Resort",
-  "Tokyo Disney Resort",
-  "Disneyland Paris",
-  "Hong Kong Disneyland",
-  "Shanghai Disney Resort",
-  "Other",
-];
+import { DESTINATIONS } from "@/lib/constants";
 
 export default function NewTripPage() {
   const [name, setName] = useState("");
@@ -19,10 +10,32 @@ export default function NewTripPage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [notes, setNotes] = useState("");
+  const [guests, setGuests] = useState<string[]>([]);
+  const [newGuestName, setNewGuestName] = useState("");
   const [budgetEnabled, setBudgetEnabled] = useState(false);
   const [budgetAmount, setBudgetAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Guest management functions
+  const handleAddGuest = () => {
+    const trimmedName = newGuestName.trim();
+    if (trimmedName && !guests.includes(trimmedName)) {
+      setGuests([...guests, trimmedName]);
+      setNewGuestName("");
+    }
+  };
+
+  const handleRemoveGuest = (guestToRemove: string) => {
+    setGuests(guests.filter((g) => g !== guestToRemove));
+  };
+
+  const handleGuestKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddGuest();
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,14 +67,16 @@ export default function NewTripPage() {
           startDate,
           endDate,
           notes: notes || null,
+          guests,
           budgetEnabled,
           budgetAmount: budgetEnabled && budgetAmount ? parseFloat(budgetAmount) : null,
         }),
       });
 
       if (response.ok) {
-        // Redirect to trips page on success
-        window.location.href = "/trips";
+        // Redirect to trip detail page to add reservations
+        const trip = await response.json();
+        window.location.href = `/trips/${trip.id}`;
       } else {
         const data = await response.json();
         setError(data.error || "Failed to create trip. Please try again.");
@@ -131,7 +146,7 @@ export default function NewTripPage() {
                 className="input-magical"
               >
                 <option value="">Select a destination</option>
-                {destinations.map((dest) => (
+                {DESTINATIONS.map((dest) => (
                   <option key={dest} value={dest}>
                     {dest}
                   </option>
@@ -195,6 +210,55 @@ export default function NewTripPage() {
                   className="input-magical"
                 />
               </div>
+            </div>
+
+            {/* Guests Section */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                👥 Who&apos;s Going?
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newGuestName}
+                  onChange={(e) => setNewGuestName(e.target.value)}
+                  onKeyDown={handleGuestKeyDown}
+                  placeholder="Enter guest name..."
+                  className="input-magical flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddGuest}
+                  disabled={!newGuestName.trim()}
+                  className="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg font-medium hover:bg-purple-200 dark:hover:bg-purple-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Add
+                </button>
+              </div>
+              {guests.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {guests.map((guest) => (
+                    <span
+                      key={guest}
+                      className="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full text-sm"
+                    >
+                      👤 {guest}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveGuest(guest)}
+                        className="ml-1 text-slate-400 hover:text-red-500 transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Add the names of people joining this trip (press Enter or click Add)
+              </p>
             </div>
 
             {/* Budget Setup */}

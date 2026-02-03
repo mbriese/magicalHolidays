@@ -7,6 +7,10 @@ export const metadata: Metadata = {
   description: "Plan your magical theme park vacation with ease. Organize park reservations, rides, hotels, car rentals, and flights all in one place.",
   keywords: ["travel planner", "vacation", "theme park", "trip planning", "reservations"],
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icons/icon.svg",
+    apple: "/icons/icon.svg",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

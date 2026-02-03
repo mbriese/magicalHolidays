@@ -130,6 +130,56 @@ export interface CalendarEvent {
   };
 }
 
+// API Response interfaces (with string dates for JSON serialization)
+export interface TripApiResponse {
+  id: string;
+  name: string;
+  destination: string;
+  startDate: string;
+  endDate: string;
+  notes: string | null;
+  guests: string[];
+  budgetEnabled: boolean;
+  budgetAmount: number | null;
+  budgetCurrency: string;
+  _count?: {
+    reservations: number;
+    members: number;
+    expenses?: number;
+  };
+  reservations?: ReservationApiResponse[];
+}
+
+export interface ReservationApiResponse {
+  id: string;
+  tripId: string;
+  type: ReservationType;
+  title: string;
+  startDateTime: string;
+  endDateTime: string;
+  location: string | null;
+  confirmationNumber: string | null;
+  notes: string | null;
+  guests: string[];
+  guestCount: number | null;
+}
+
+// Reservation type configuration for UI display
+export interface ReservationTypeConfig {
+  icon: string;
+  label: string;
+  color: string;
+  bgColor: string;
+}
+
+export const reservationTypeConfig: Record<ReservationType, ReservationTypeConfig> = {
+  HOTEL: { icon: "🏨", label: "Hotel", color: "text-amber-600", bgColor: "bg-amber-100 dark:bg-amber-900/30" },
+  PARK: { icon: "🏰", label: "Park Days", color: "text-purple-600", bgColor: "bg-purple-100 dark:bg-purple-900/30" },
+  RIDE: { icon: "🎢", label: "Rides & Attractions", color: "text-blue-600", bgColor: "bg-blue-100 dark:bg-blue-900/30" },
+  FLIGHT: { icon: "✈️", label: "Flights", color: "text-sky-600", bgColor: "bg-sky-100 dark:bg-sky-900/30" },
+  CAR: { icon: "🚗", label: "Car Rental", color: "text-green-600", bgColor: "bg-green-100 dark:bg-green-900/30" },
+};
+
 // Form data interfaces
 export interface CreateTripInput {
   name: string;
@@ -137,6 +187,8 @@ export interface CreateTripInput {
   startDate: string;
   endDate: string;
   notes?: string;
+  budgetEnabled?: boolean;
+  budgetAmount?: number | null;
 }
 
 export interface CreateReservationInput {
