@@ -124,12 +124,12 @@ export default function TripDetailPage() {
   if (loading) {
     return (
       <div className="animate-fade-in">
-        <div className="bg-linear-to-r from-purple-600 to-purple-800 py-12">
+        <div className="bg-linear-to-r from-[#1F2A44] to-[#344262] py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="animate-pulse">
-              <div className="h-4 w-24 bg-purple-400/50 rounded mb-4" />
-              <div className="h-8 w-64 bg-purple-400/50 rounded mb-2" />
-              <div className="h-4 w-48 bg-purple-400/50 rounded" />
+              <div className="h-4 w-24 bg-[#FFB957]/50 rounded mb-4" />
+              <div className="h-8 w-64 bg-[#FFB957]/50 rounded mb-2" />
+              <div className="h-4 w-48 bg-[#FFB957]/50 rounded" />
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ export default function TripDetailPage() {
       <div className="animate-fade-in">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <span className="text-6xl mb-6 block">😕</span>
-          <h1 className="font-serif text-2xl font-bold text-purple-900 dark:text-white mb-3">
+          <h1 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white mb-3">
             {error || "Trip not found"}
           </h1>
           <a href="/trips" className="btn-magical">
@@ -162,34 +162,34 @@ export default function TripDetailPage() {
   return (
     <div className="animate-fade-in">
       {/* Page Header */}
-      <div className="bg-linear-to-r from-purple-600 to-purple-800 py-12">
+      <div className="bg-linear-to-r from-[#1F2A44] to-[#344262] py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <a
             href="/trips"
-            className="text-purple-200 hover:text-white text-sm mb-2 inline-block"
+            className="text-[#BDBDBD] hover:text-[#FFB957] text-sm mb-2 inline-block"
           >
             ← Back to Trips
           </a>
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
             {trip.name}
           </h1>
-          <p className="text-purple-100 mb-1">{trip.destination}</p>
-          <p className="text-purple-200 text-sm">
+          <p className="text-[#FFB957] mb-1">{trip.destination}</p>
+          <p className="text-[#E5E5E5] text-sm">
             {formatDateRange(trip.startDate, trip.endDate, { includeWeekday: true })}
           </p>
           {trip.budgetEnabled && trip.budgetAmount && (
-            <p className="text-purple-200 text-sm mt-2">
+            <p className="text-[#E5E5E5] text-sm mt-2">
               💰 Budget: ${trip.budgetAmount.toLocaleString()}
             </p>
           )}
           {trip.guests && trip.guests.length > 0 && (
             <div className="mt-3">
-              <p className="text-purple-200 text-sm mb-1">👥 Travelers:</p>
+              <p className="text-[#E5E5E5] text-sm mb-1">👥 Travelers:</p>
               <div className="flex flex-wrap gap-2">
                 {trip.guests.map((guest) => (
                   <span
                     key={guest}
-                    className="inline-block px-2 py-1 bg-white/20 text-white rounded-full text-xs"
+                    className="inline-block px-2 py-1 bg-[#FFB957]/20 text-[#FFB957] rounded-full text-xs"
                   >
                     {guest}
                   </span>
@@ -208,7 +208,7 @@ export default function TripDetailPage() {
             <div className="text-sm text-slate-600 dark:text-slate-400">Hotel</div>
           </div>
           <div className="card-magical p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">{parkReservations.length}</div>
+            <div className="text-2xl font-bold text-[#1F2A44]">{parkReservations.length}</div>
             <div className="text-sm text-slate-600 dark:text-slate-400">Park Days</div>
           </div>
           <div className="card-magical p-4 text-center">
@@ -278,8 +278,8 @@ export default function TripDetailPage() {
 
         {/* Trip Notes */}
         {trip.notes && (
-          <div className="mt-8 p-6 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
-            <h3 className="font-semibold text-purple-900 dark:text-purple-100 mb-2">
+          <div className="mt-8 p-6 bg-[#FAF4EF] dark:bg-[#1F2A44]/20 rounded-xl">
+            <h3 className="font-semibold text-[#1F2A44] dark:text-[#FAF4EF] mb-2">
               📝 Trip Notes
             </h3>
             <p className="text-slate-600 dark:text-slate-400">{trip.notes}</p>
@@ -338,7 +338,7 @@ function ReservationSection({
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-serif text-xl font-bold text-purple-900 dark:text-white flex items-center gap-2">
+        <h2 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-white flex items-center gap-2">
           <span>{config.icon}</span>
           {config.label}
         </h2>
@@ -382,7 +382,7 @@ function ReservationSection({
                   {config.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-purple-900 dark:text-white truncate">
+                  <h3 className="font-semibold text-[#1F2A44] dark:text-white truncate">
                     {reservation.title}
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
@@ -410,7 +410,7 @@ function ReservationSection({
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => onEdit(reservation)}
-                    className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                    className="p-2 text-slate-400 hover:text-[#1F2A44] hover:bg-[#FAF4EF] dark:hover:bg-[#1F2A44]/20 rounded-lg transition-colors"
                     title="Edit"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

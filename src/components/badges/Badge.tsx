@@ -93,7 +93,7 @@ export default function Badge({
               fill="none"
               stroke="currentColor"
               strokeWidth="4"
-              className="text-purple-300 dark:text-purple-700"
+              className="text-[#FFB957] dark:text-[#FFB957]/50"
               strokeDasharray={`${progressPercent * 2.89} 289`}
             />
           </svg>
@@ -142,7 +142,7 @@ export default function Badge({
         className={`
           absolute z-50 bottom-full mb-2 px-3 py-2
           bg-white dark:bg-slate-800 
-          rounded-lg shadow-xl border border-purple-100 dark:border-slate-700
+          rounded-lg shadow-xl border border-[#E5E5E5] dark:border-slate-700
           opacity-0 group-hover:opacity-100 
           transition-opacity duration-200 pointer-events-none
           max-w-[200px] text-center
@@ -155,10 +155,11 @@ export default function Badge({
         <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
           {badge.description}
         </p>
-        <p className="text-xs text-purple-600 dark:text-purple-400 mt-1 italic">
+        <p className="text-xs text-[#1F2A44] dark:text-[#FFB957] mt-1 italic">
           {badge.requirement}
         </p>
       </div>
     </div>
   );
 }
+

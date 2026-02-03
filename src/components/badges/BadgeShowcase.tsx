@@ -34,30 +34,30 @@ export default function BadgeShowcase({ badges, recentlyEarned = [] }: BadgeShow
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
           <span className="text-2xl">🎖️</span>
-          <h2 className="text-lg font-bold text-purple-900 dark:text-purple-100">
+          <h2 className="text-lg font-bold text-[#1F2A44] dark:text-[#E5E5E5]">
             Achievements
           </h2>
         </div>
         <Link
           href="/badges"
-          className="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 font-medium"
+          className="text-sm text-[#1F2A44] hover:text-[#FFB957] dark:text-[#FFB957] dark:hover:text-[#ffd175] font-medium"
         >
           View all →
         </Link>
       </div>
 
       {/* Stats row */}
-      <div className="flex items-center gap-4 mb-5 p-3 bg-purple-50 dark:bg-slate-800 rounded-lg">
+      <div className="flex items-center gap-4 mb-5 p-3 bg-[#FAF4EF] dark:bg-slate-800 rounded-lg">
         <div className="flex items-center gap-2">
           <span className="text-xl">🏆</span>
           <div>
-            <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+            <p className="text-2xl font-bold text-[#1F2A44] dark:text-[#FFB957]">
               {earnedBadges.length}
             </p>
             <p className="text-xs text-gray-600 dark:text-gray-400">Earned</p>
           </div>
         </div>
-        <div className="w-px h-10 bg-purple-200 dark:bg-slate-600" />
+        <div className="w-px h-10 bg-[#E5E5E5] dark:bg-slate-600" />
         <div className="flex items-center gap-2">
           <span className="text-xl">⏳</span>
           <div>
@@ -67,7 +67,7 @@ export default function BadgeShowcase({ badges, recentlyEarned = [] }: BadgeShow
             <p className="text-xs text-gray-600 dark:text-gray-400">In Progress</p>
           </div>
         </div>
-        <div className="w-px h-10 bg-purple-200 dark:bg-slate-600" />
+        <div className="w-px h-10 bg-[#E5E5E5] dark:bg-slate-600" />
         <div className="flex items-center gap-2">
           <span className="text-xl">🎯</span>
           <div>
@@ -147,7 +147,7 @@ export default function BadgeShowcase({ badges, recentlyEarned = [] }: BadgeShow
           <p className="text-gray-600 dark:text-gray-400 text-sm">
             Start your adventure to earn badges!
           </p>
-          <p className="text-purple-600 dark:text-purple-400 text-xs mt-1">
+          <p className="text-[#1F2A44] dark:text-[#FFB957] text-xs mt-1">
             Create a trip or add reservations to begin
           </p>
         </div>
@@ -155,3 +155,4 @@ export default function BadgeShowcase({ badges, recentlyEarned = [] }: BadgeShow
     </div>
   );
 }
+

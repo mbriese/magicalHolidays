@@ -115,7 +115,7 @@ export default function ItineraryBuilder({ onAddToTrip }: ItineraryBuilderProps)
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
           <span className="text-3xl">🗺️</span>
-          <h2 className="text-xl font-bold text-purple-900 dark:text-purple-100">
+          <h2 className="text-xl font-bold text-[#1F2A44] dark:text-[#E5E5E5]">
             Itinerary Builder
           </h2>
         </div>
@@ -147,13 +147,13 @@ export default function ItineraryBuilder({ onAddToTrip }: ItineraryBuilderProps)
                 className={`
                   p-4 rounded-xl border-2 transition-all text-center
                   ${isSelected
-                    ? `border-purple-500 bg-purple-50 dark:bg-purple-900/30 shadow-lg scale-105`
-                    : "border-slate-200 dark:border-slate-700 hover:border-purple-300 hover:bg-purple-50/50 dark:hover:bg-purple-900/10"
+                    ? `border-[#FFB957] bg-[#FAF4EF] dark:bg-[#1F2A44]/30 shadow-lg scale-105`
+                    : "border-slate-200 dark:border-slate-700 hover:border-[#FFB957] hover:bg-[#FAF4EF]/50 dark:hover:bg-[#1F2A44]/10"
                   }
                 `}
               >
                 <span className="text-3xl block mb-2">{info.icon}</span>
-                <span className={`font-semibold ${isSelected ? "text-purple-700 dark:text-purple-300" : "text-slate-700 dark:text-slate-300"}`}>
+                <span className={`font-semibold ${isSelected ? "text-[#1F2A44] dark:text-[#FFB957]" : "text-slate-700 dark:text-slate-300"}`}>
                   {info.label}
                 </span>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
@@ -228,7 +228,7 @@ export default function ItineraryBuilder({ onAddToTrip }: ItineraryBuilderProps)
               {attractions.map((attraction) => (
                 <div
                   key={attraction.id}
-                  className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors group"
+                  className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-[#FAF4EF] dark:hover:bg-[#1F2A44]/20 transition-colors group"
                 >
                   {/* Icon */}
                   <div className="text-2xl shrink-0">{attraction.icon}</div>
@@ -240,7 +240,7 @@ export default function ItineraryBuilder({ onAddToTrip }: ItineraryBuilderProps)
                         <h4 className="font-semibold text-slate-800 dark:text-slate-200">
                           {attraction.name}
                         </h4>
-                        <p className="text-xs text-purple-600 dark:text-purple-400">
+                        <p className="text-xs text-[#1F2A44] dark:text-[#FFB957]">
                           {attraction.park} • {attraction.location}
                         </p>
                       </div>
@@ -282,7 +282,7 @@ export default function ItineraryBuilder({ onAddToTrip }: ItineraryBuilderProps)
                   <button
                     onClick={() => handleAddToTrip(attraction)}
                     disabled={isAdding || !selectedTripId}
-                    className="shrink-0 p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                    className="shrink-0 p-2 rounded-lg bg-[#1F2A44]/10 dark:bg-[#1F2A44]/30 text-[#1F2A44] dark:text-[#FFB957] hover:bg-[#FFB957]/30 dark:hover:bg-[#FFB957]/30 transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
                     title="Add to trip"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -308,3 +308,4 @@ export default function ItineraryBuilder({ onAddToTrip }: ItineraryBuilderProps)
     </div>
   );
 }
+

@@ -91,12 +91,12 @@ export default function NewTripPage() {
   return (
     <div className="animate-fade-in">
       {/* Page Header */}
-      <div className="bg-linear-to-r from-purple-600 to-purple-800 py-12">
+      <div className="bg-linear-to-r from-[#1F2A44] to-[#344262] py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
             Create New Trip ✨
           </h1>
-          <p className="text-purple-100">
+          <p className="text-[#E5E5E5]">
             Start planning your next magical adventure
           </p>
         </div>
@@ -230,7 +230,7 @@ export default function NewTripPage() {
                   type="button"
                   onClick={handleAddGuest}
                   disabled={!newGuestName.trim()}
-                  className="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg font-medium hover:bg-purple-200 dark:hover:bg-purple-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 bg-[#1F2A44]/10 dark:bg-[#1F2A44]/30 text-[#1F2A44] dark:text-[#FFB957] rounded-lg font-medium hover:bg-[#FFB957]/30 dark:hover:bg-[#FFB957]/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Add
                 </button>
@@ -262,13 +262,13 @@ export default function NewTripPage() {
             </div>
 
             {/* Budget Setup */}
-            <div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+            <div className="p-4 rounded-xl bg-[#FAF4EF] dark:bg-[#1F2A44]/20 border border-[#E5E5E5] dark:border-[#41537b]">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={budgetEnabled}
                   onChange={(e) => setBudgetEnabled(e.target.checked)}
-                  className="w-5 h-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                  className="w-5 h-5 rounded border-slate-300 text-[#1F2A44] focus:ring-[#FFB957]"
                 />
                 <div>
                   <span className="font-medium text-slate-700 dark:text-slate-300">
@@ -372,8 +372,8 @@ export default function NewTripPage() {
         </div>
 
         {/* Tips */}
-        <div className="mt-8 p-6 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
-          <h3 className="font-semibold text-purple-900 dark:text-purple-100 mb-3">
+        <div className="mt-8 p-6 bg-[#FAF4EF] dark:bg-[#1F2A44]/20 rounded-xl">
+          <h3 className="font-semibold text-[#1F2A44] dark:text-[#E5E5E5] mb-3">
             💡 Planning Tips
           </h3>
           <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
@@ -394,3 +394,4 @@ export default function NewTripPage() {
     </div>
   );
 }
+

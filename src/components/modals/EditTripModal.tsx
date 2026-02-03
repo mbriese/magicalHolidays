@@ -139,7 +139,7 @@ export default function EditTripModal({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-lg w-full p-6 my-8 animate-fade-in">
         <div className="flex justify-between items-start mb-6">
-          <h2 className="font-serif text-2xl font-bold text-purple-900 dark:text-white">
+          <h2 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white">
             Edit Trip ✏️
           </h2>
           <button
@@ -258,7 +258,7 @@ export default function EditTripModal({
                 type="button"
                 onClick={handleAddGuest}
                 disabled={!newGuestName.trim()}
-                className="px-3 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg font-medium hover:bg-purple-200 dark:hover:bg-purple-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                className="px-3 py-2 bg-[#1F2A44]/10 dark:bg-[#1F2A44]/30 text-[#1F2A44] dark:text-[#FFB957] rounded-lg font-medium hover:bg-[#FFB957]/30 dark:hover:bg-[#FFB957]/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
               >
                 Add
               </button>
@@ -287,13 +287,13 @@ export default function EditTripModal({
           </div>
 
           {/* Budget */}
-          <div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+          <div className="p-4 rounded-xl bg-[#FAF4EF] dark:bg-[#1F2A44]/20 border border-[#E5E5E5] dark:border-[#41537b]">
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
                 checked={budgetEnabled}
                 onChange={(e) => setBudgetEnabled(e.target.checked)}
-                className="w-5 h-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                className="w-5 h-5 rounded border-slate-300 text-[#1F2A44] focus:ring-[#FFB957]"
               />
               <div>
                 <span className="font-medium text-slate-700 dark:text-slate-300">
@@ -359,3 +359,4 @@ export default function EditTripModal({
     </div>
   );
 }
+

@@ -369,7 +369,7 @@ export default function AddReservationModal({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-lg w-full p-6 my-8 animate-fade-in">
         <div className="flex justify-between items-start mb-6">
-          <h2 className="font-serif text-2xl font-bold text-purple-900 dark:text-white">
+          <h2 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white">
             {isEditMode ? "Edit Reservation ✏️" : "Add Reservation ✨"}
           </h2>
           <button
@@ -415,8 +415,8 @@ export default function AddReservationModal({
 
           {/* New Trip Fields */}
           {isCreatingTrip && (
-            <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg space-y-3">
-              <h3 className="font-medium text-purple-900 dark:text-purple-100">New Trip Details</h3>
+            <div className="p-4 bg-[#FAF4EF] dark:bg-[#1F2A44]/20 rounded-lg space-y-3">
+              <h3 className="font-medium text-[#1F2A44] dark:text-[#E5E5E5]">New Trip Details</h3>
               <input
                 type="text"
                 value={newTripName}
@@ -473,7 +473,7 @@ export default function AddReservationModal({
                     type="button"
                     onClick={handleAddTripGuest}
                     disabled={!newTripGuestName.trim()}
-                    className="px-3 py-1 bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300 rounded-lg text-sm font-medium hover:bg-purple-300 dark:hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-3 py-1 bg-[#FFB957]/30 dark:bg-[#FFB957]/20 text-[#1F2A44] dark:text-[#FFB957] rounded-lg text-sm font-medium hover:bg-[#FFB957]/50 dark:hover:bg-[#FFB957]/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Add
                   </button>
@@ -571,7 +571,7 @@ export default function AddReservationModal({
               <button
                 type="button"
                 onClick={() => setUseCustomTitle(true)}
-                className="text-sm text-purple-600 dark:text-purple-400 hover:underline"
+                className="text-sm text-[#1F2A44] dark:text-[#FFB957] hover:underline"
               >
                 Or enter a custom ride name...
               </button>
@@ -591,7 +591,7 @@ export default function AddReservationModal({
                       setTitle("");
                       setLocation("");
                     }}
-                    className="ml-2 text-xs text-purple-600 dark:text-purple-400 hover:underline"
+                    className="ml-2 text-xs text-[#1F2A44] dark:text-[#FFB957] hover:underline"
                   >
                     (Select from list instead)
                   </button>
@@ -620,7 +620,7 @@ export default function AddReservationModal({
               type="checkbox"
               checked={isAllDay}
               onChange={(e) => setIsAllDay(e.target.checked)}
-              className="w-4 h-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+              className="w-4 h-4 rounded border-[#E5E5E5] text-[#1F2A44] focus:ring-[#FFB957]"
             />
             <span className="text-sm text-slate-700 dark:text-slate-300">All day event</span>
           </label>
@@ -720,7 +720,7 @@ export default function AddReservationModal({
                 type="button"
                 onClick={handleAddGuest}
                 disabled={!newGuestName.trim()}
-                className="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg font-medium hover:bg-purple-200 dark:hover:bg-purple-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 bg-[#1F2A44]/10 dark:bg-[#1F2A44]/30 text-[#1F2A44] dark:text-[#FFB957] rounded-lg font-medium hover:bg-[#FFB957]/30 dark:hover:bg-[#FFB957]/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Add
               </button>
@@ -773,3 +773,4 @@ export default function AddReservationModal({
     </div>
   );
 }
+

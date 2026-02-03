@@ -33,7 +33,7 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <span className="text-5xl mb-4 block">✨</span>
-          <h1 className="font-serif text-3xl font-bold text-purple-900 dark:text-white mb-2">
+          <h1 className="font-serif text-3xl font-bold text-[#1F2A44] dark:text-white mb-2">
             Welcome Back
           </h1>
           <p className="text-slate-600 dark:text-slate-400">
@@ -90,7 +90,7 @@ export default function LoginPage() {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+                  className="w-4 h-4 rounded border-[#E5E5E5] text-[#1F2A44] focus:ring-[#FFB957]"
                 />
                 <span className="ml-2 text-sm text-slate-600 dark:text-slate-400">
                   Remember me
@@ -98,7 +98,7 @@ export default function LoginPage() {
               </label>
               <a
                 href="/forgot-password"
-                className="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400"
+                className="text-sm text-[#1F2A44] hover:text-purple-700 dark:text-[#FFB957]"
               >
                 Forgot password?
               </a>
@@ -144,7 +144,7 @@ export default function LoginPage() {
               Don&apos;t have an account?{" "}
               <a
                 href="/register"
-                className="text-purple-600 hover:text-purple-700 dark:text-purple-400 font-medium"
+                className="text-[#1F2A44] hover:text-[#FFB957] dark:text-[#FFB957] font-medium"
               >
                 Create one free
               </a>
@@ -155,3 +155,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

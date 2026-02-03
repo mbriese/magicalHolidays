@@ -53,7 +53,7 @@ export default function BadgeCollection({
         <div className="flex items-center gap-3">
           <span className="text-3xl">🏆</span>
           <div>
-            <h2 className="text-xl font-bold text-purple-900 dark:text-purple-100">
+            <h2 className="text-xl font-bold text-[#1F2A44] dark:text-[#E5E5E5]">
               {title}
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -66,11 +66,11 @@ export default function BadgeCollection({
         <div className="hidden sm:flex items-center gap-3">
           <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
-              className="h-full bg-linear-to-r from-purple-500 to-amber-500 transition-all duration-500"
+              className="h-full bg-linear-to-r from-[#1F2A44] to-[#FFB957] transition-all duration-500"
               style={{ width: `${(earnedCount / totalCount) * 100}%` }}
             />
           </div>
-          <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
+          <span className="text-sm font-medium text-[#1F2A44] dark:text-[#FFB957]">
             {Math.round((earnedCount / totalCount) * 100)}%
           </span>
         </div>
@@ -78,7 +78,7 @@ export default function BadgeCollection({
 
       {/* Filters */}
       {showFilters && (
-        <div className="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-purple-100 dark:border-slate-700">
+        <div className="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-[#E5E5E5] dark:border-slate-700">
           {/* Category filters */}
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
@@ -88,8 +88,8 @@ export default function BadgeCollection({
                 className={`
                   px-3 py-1.5 rounded-full text-sm font-medium transition-all
                   ${selectedCategory === category
-                    ? "bg-purple-600 text-white shadow-md"
-                    : "bg-purple-100 dark:bg-slate-700 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-slate-600"
+                    ? "bg-[#1F2A44] text-white shadow-md"
+                    : "bg-[#1F2A44]/10 dark:bg-slate-700 text-[#1F2A44] dark:text-[#FFB957] hover:bg-[#FFB957]/30 dark:hover:bg-slate-600"
                   }
                 `}
               >
@@ -108,7 +108,7 @@ export default function BadgeCollection({
               type="checkbox"
               checked={showEarnedOnly}
               onChange={(e) => setShowEarnedOnly(e.target.checked)}
-              className="w-4 h-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+              className="w-4 h-4 rounded border-[#E5E5E5] text-[#1F2A44] focus:ring-[#FFB957]"
             />
             <span className="text-sm text-gray-600 dark:text-gray-400">
               Earned only
@@ -133,7 +133,7 @@ export default function BadgeCollection({
             />
           ))}
           {filteredBadges.length > 6 && (
-            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-purple-100 dark:bg-slate-700 text-purple-600 dark:text-purple-400 font-semibold">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-[#1F2A44]/10 dark:bg-slate-700 text-[#1F2A44] dark:text-[#FFB957] font-semibold">
               +{filteredBadges.length - 6}
             </div>
           )}
@@ -143,7 +143,7 @@ export default function BadgeCollection({
         <div className="space-y-8">
           {Object.entries(groupedBadges).map(([category, categoryBadges]) => (
             <div key={category}>
-              <h3 className="flex items-center gap-2 text-lg font-semibold text-purple-800 dark:text-purple-200 mb-4">
+              <h3 className="flex items-center gap-2 text-lg font-semibold text-[#1F2A44] dark:text-[#BDBDBD] mb-4">
                 <span>{badgeCategoryIcons[category as BadgeCategory]}</span>
                 {badgeCategoryLabels[category as BadgeCategory]} Badges
                 <span className="text-sm font-normal text-gray-500">
@@ -176,3 +176,4 @@ export default function BadgeCollection({
     </div>
   );
 }
+

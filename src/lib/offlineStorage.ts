@@ -12,9 +12,16 @@ interface OfflineDB {
 }
 
 let dbPromise: Promise<IDBDatabase> | null = null;
+let dbInstance: IDBDatabase | null = null;
 
 // Initialize the database
 function initDB(): Promise<IDBDatabase> {
+  // If we have a cached promise but the db was closed, reset it
+  if (dbInstance && dbInstance.objectStoreNames.length === 0) {
+    dbPromise = null;
+    dbInstance = null;
+  }
+
   if (dbPromise) return dbPromise;
 
   dbPromise = new Promise((resolve, reject) => {
@@ -27,11 +34,27 @@ function initDB(): Promise<IDBDatabase> {
 
     request.onerror = () => {
       console.error('[OfflineStorage] Failed to open database');
+      dbPromise = null;
       reject(request.error);
     };
 
     request.onsuccess = () => {
       console.log('[OfflineStorage] Database opened successfully');
+      dbInstance = request.result;
+      
+      // Handle database being closed unexpectedly
+      dbInstance.onclose = () => {
+        console.log('[OfflineStorage] Database connection closed');
+        dbPromise = null;
+        dbInstance = null;
+      };
+      
+      dbInstance.onerror = () => {
+        console.error('[OfflineStorage] Database error');
+        dbPromise = null;
+        dbInstance = null;
+      };
+      
       resolve(request.result);
     };
 
@@ -65,12 +88,27 @@ async function getAllFromStore<T>(storeName: string): Promise<T[]> {
   try {
     const db = await initDB();
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction(storeName, 'readonly');
-      const store = transaction.objectStore(storeName);
-      const request = store.getAll();
+      try {
+        const transaction = db.transaction(storeName, 'readonly');
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
 
-      request.onsuccess = () => resolve(request.result || []);
-      request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = () => {
+          console.error(`[OfflineStorage] Request error in ${storeName}:`, request.error);
+          resolve([]);
+        };
+        transaction.onerror = () => {
+          console.error(`[OfflineStorage] Transaction error in ${storeName}`);
+          resolve([]);
+        };
+      } catch (txError) {
+        // Database was likely closed, reset and return empty
+        console.error(`[OfflineStorage] Transaction creation failed:`, txError);
+        dbPromise = null;
+        dbInstance = null;
+        resolve([]);
+      }
     });
   } catch (error) {
     console.error(`[OfflineStorage] Failed to get all from ${storeName}:`, error);
@@ -81,13 +119,23 @@ async function getAllFromStore<T>(storeName: string): Promise<T[]> {
 async function putInStore<T>(storeName: string, data: T): Promise<void> {
   try {
     const db = await initDB();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction(storeName, 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.put(data);
+    return new Promise((resolve) => {
+      try {
+        const transaction = db.transaction(storeName, 'readwrite');
+        const store = transaction.objectStore(storeName);
+        const request = store.put(data);
 
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve();
+        request.onerror = () => {
+          console.error(`[OfflineStorage] Put error in ${storeName}`);
+          resolve();
+        };
+      } catch (txError) {
+        console.error(`[OfflineStorage] Transaction creation failed:`, txError);
+        dbPromise = null;
+        dbInstance = null;
+        resolve();
+      }
     });
   } catch (error) {
     console.error(`[OfflineStorage] Failed to put in ${storeName}:`, error);
@@ -97,14 +145,24 @@ async function putInStore<T>(storeName: string, data: T): Promise<void> {
 async function putManyInStore<T>(storeName: string, items: T[]): Promise<void> {
   try {
     const db = await initDB();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction(storeName, 'readwrite');
-      const store = transaction.objectStore(storeName);
+    return new Promise((resolve) => {
+      try {
+        const transaction = db.transaction(storeName, 'readwrite');
+        const store = transaction.objectStore(storeName);
 
-      items.forEach((item) => store.put(item));
+        items.forEach((item) => store.put(item));
 
-      transaction.oncomplete = () => resolve();
-      transaction.onerror = () => reject(transaction.error);
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => {
+          console.error(`[OfflineStorage] Transaction error in ${storeName}`);
+          resolve();
+        };
+      } catch (txError) {
+        console.error(`[OfflineStorage] Transaction creation failed:`, txError);
+        dbPromise = null;
+        dbInstance = null;
+        resolve();
+      }
     });
   } catch (error) {
     console.error(`[OfflineStorage] Failed to put many in ${storeName}:`, error);
@@ -114,13 +172,23 @@ async function putManyInStore<T>(storeName: string, items: T[]): Promise<void> {
 async function clearStore(storeName: string): Promise<void> {
   try {
     const db = await initDB();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction(storeName, 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.clear();
+    return new Promise((resolve) => {
+      try {
+        const transaction = db.transaction(storeName, 'readwrite');
+        const store = transaction.objectStore(storeName);
+        const request = store.clear();
 
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve();
+        request.onerror = () => {
+          console.error(`[OfflineStorage] Clear error in ${storeName}`);
+          resolve();
+        };
+      } catch (txError) {
+        console.error(`[OfflineStorage] Transaction creation failed:`, txError);
+        dbPromise = null;
+        dbInstance = null;
+        resolve();
+      }
     });
   } catch (error) {
     console.error(`[OfflineStorage] Failed to clear ${storeName}:`, error);
@@ -171,15 +239,22 @@ async function setLastSyncTime(dataType: string): Promise<void> {
 export async function getLastSyncTime(dataType: string): Promise<number | null> {
   try {
     const db = await initDB();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction('metadata', 'readonly');
-      const store = transaction.objectStore('metadata');
-      const request = store.get(`lastSync_${dataType}`);
+    return new Promise((resolve) => {
+      try {
+        const transaction = db.transaction('metadata', 'readonly');
+        const store = transaction.objectStore('metadata');
+        const request = store.get(`lastSync_${dataType}`);
 
-      request.onsuccess = () => {
-        resolve(request.result?.timestamp || null);
-      };
-      request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          resolve(request.result?.timestamp || null);
+        };
+        request.onerror = () => resolve(null);
+      } catch (txError) {
+        console.error(`[OfflineStorage] Transaction creation failed:`, txError);
+        dbPromise = null;
+        dbInstance = null;
+        resolve(null);
+      }
     });
   } catch (error) {
     return null;

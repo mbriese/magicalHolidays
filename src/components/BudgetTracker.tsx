@@ -45,7 +45,7 @@ interface BudgetTrackerProps {
 }
 
 const categoryInfo: Record<ExpenseCategory, { icon: string; label: string; color: string }> = {
-  TICKETS: { icon: "🎟️", label: "Tickets", color: "bg-purple-500" },
+  TICKETS: { icon: "🎟️", label: "Tickets", color: "bg-[#FAF4EF]0" },
   HOTEL: { icon: "🏨", label: "Hotel", color: "bg-blue-500" },
   FOOD: { icon: "🍽️", label: "Food & Dining", color: "bg-orange-500" },
   TRANSPORTATION: { icon: "🚗", label: "Transportation", color: "bg-green-500" },
@@ -262,7 +262,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
         <div className="flex items-center gap-3">
           <span className="text-3xl">💰</span>
           <div>
-            <h2 className="text-xl font-bold text-purple-900 dark:text-purple-100">
+            <h2 className="text-xl font-bold text-[#1F2A44] dark:text-[#E5E5E5]">
               Budget Tracker
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-400">
@@ -273,7 +273,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
         {selectedTripId && (
           <button
             onClick={() => setShowBudgetSetup(true)}
-            className="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400"
+            className="text-sm text-[#1F2A44] hover:text-[#FFB957] dark:text-[#FFB957]"
           >
             ⚙️ {budget.enabled ? "Edit Budget" : "Set Budget"}
           </button>
@@ -306,9 +306,9 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
         <>
           {/* Budget Overview */}
           {budget.enabled && budget.amount && summary && (
-            <div className="mb-6 p-4 rounded-xl bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-800">
+            <div className="mb-6 p-4 rounded-xl bg-linear-to-r from-[#FAF4EF] to-[#F8AFA6]/20 dark:from-[#1F2A44]/20 dark:to-[#F8AFA6]/10 border border-[#E5E5E5] dark:border-[#41537b]">
               <div className="flex items-center justify-between mb-3">
-                <span className="font-semibold text-purple-900 dark:text-purple-100">
+                <span className="font-semibold text-[#1F2A44] dark:text-[#E5E5E5]">
                   Trip Budget
                 </span>
                 {budgetStatus && (
@@ -387,7 +387,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
               });
               setShowAddExpense(true);
             }}
-            className="w-full mb-4 py-3 rounded-xl border-2 border-dashed border-purple-300 dark:border-purple-700 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors flex items-center justify-center gap-2"
+            className="w-full mb-4 py-3 rounded-xl border-2 border-dashed border-purple-300 dark:border-purple-700 text-[#1F2A44] dark:text-[#FFB957] hover:bg-[#FAF4EF] dark:hover:bg-purple-900/20 transition-colors flex items-center justify-center gap-2"
           >
             <span>➕</span> Add Expense
           </button>
@@ -437,7 +437,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => handleEditExpense(expense)}
-                          className="p-1.5 text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded"
+                          className="p-1.5 text-slate-400 hover:text-[#1F2A44] hover:bg-[#FAF4EF] dark:hover:bg-[#1F2A44]/20 rounded"
                         >
                           ✏️
                         </button>
@@ -461,7 +461,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
       {showBudgetSetup && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-md">
-            <h3 className="text-xl font-bold text-purple-900 dark:text-purple-100 mb-4">
+            <h3 className="text-xl font-bold text-[#1F2A44] dark:text-[#E5E5E5] mb-4">
               💰 Set Trip Budget
             </h3>
 
@@ -471,7 +471,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
                   type="checkbox"
                   checked={budgetForm.enabled}
                   onChange={(e) => setBudgetForm({ ...budgetForm, enabled: e.target.checked })}
-                  className="w-5 h-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                  className="w-5 h-5 rounded border-slate-300 text-[#1F2A44] focus:ring-purple-500"
                 />
                 <span className="text-slate-700 dark:text-slate-300">
                   Enable budget tracking for this trip
@@ -506,7 +506,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
               </button>
               <button
                 onClick={handleSaveBudget}
-                className="flex-1 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700"
+                className="flex-1 py-2 rounded-lg bg-[#1F2A44] text-white hover:bg-[#344262]"
               >
                 Save Budget
               </button>
@@ -519,7 +519,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
       {showAddExpense && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold text-purple-900 dark:text-purple-100 mb-4">
+            <h3 className="text-xl font-bold text-[#1F2A44] dark:text-[#E5E5E5] mb-4">
               {editingExpense ? "✏️ Edit Expense" : "➕ Add Expense"}
             </h3>
 
@@ -572,7 +572,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
                         onClick={() => setExpenseForm({ ...expenseForm, category: cat })}
                         className={`p-2 rounded-lg text-center transition-all ${
                           isSelected
-                            ? "bg-purple-100 dark:bg-purple-900/30 border-2 border-purple-500"
+                            ? "bg-[#1F2A44]/10 dark:bg-[#1F2A44]/30 border-2 border-purple-500"
                             : "bg-slate-50 dark:bg-slate-700 border-2 border-transparent hover:border-slate-300"
                         }`}
                       >
@@ -604,7 +604,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
                     type="radio"
                     checked={expenseForm.isPaid}
                     onChange={() => setExpenseForm({ ...expenseForm, isPaid: true })}
-                    className="w-4 h-4 text-purple-600"
+                    className="w-4 h-4 text-[#1F2A44]"
                   />
                   <span className="text-slate-700 dark:text-slate-300">💳 Paid</span>
                 </label>
@@ -613,7 +613,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
                     type="radio"
                     checked={!expenseForm.isPaid}
                     onChange={() => setExpenseForm({ ...expenseForm, isPaid: false })}
-                    className="w-4 h-4 text-purple-600"
+                    className="w-4 h-4 text-[#1F2A44]"
                   />
                   <span className="text-slate-700 dark:text-slate-300">📋 Planned</span>
                 </label>
@@ -647,7 +647,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
               <button
                 onClick={handleAddExpense}
                 disabled={!expenseForm.amount || !expenseForm.description}
-                className="flex-1 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2 rounded-lg bg-[#1F2A44] text-white hover:bg-[#344262] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {editingExpense ? "Save Changes" : "Add Expense"}
               </button>
@@ -658,3 +658,4 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
     </div>
   );
 }
+

@@ -56,10 +56,10 @@ Stay tuned for more details as we get closer to the opening date!
 };
 
 const categoryColors: Record<string, string> = {
-  PARK_UPDATE: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-  HOLIDAY_EVENT: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  PARK_UPDATE: "bg-[#1F2A44]/10 text-[#1F2A44] dark:bg-[#1F2A44]/30 dark:text-[#FFB957]",
+  HOLIDAY_EVENT: "bg-[#FFB957]/20 text-[#1F2A44] dark:bg-[#FFB957]/30 dark:text-[#FFB957]",
   GENERAL: "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300",
-  TIP: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  TIP: "bg-[#A7D2B7]/30 text-[#1F2A44] dark:bg-[#A7D2B7]/20 dark:text-[#A7D2B7]",
 };
 
 export default function BlogPostPage() {
@@ -82,7 +82,7 @@ export default function BlogPostPage() {
         return (
           <h3
             key={index}
-            className="text-xl font-serif font-bold text-purple-900 dark:text-white mt-8 mb-4"
+            className="text-xl font-serif font-bold text-[#1F2A44] dark:text-white mt-8 mb-4"
           >
             {line.replace("### ", "")}
           </h3>
@@ -92,7 +92,7 @@ export default function BlogPostPage() {
         return (
           <h2
             key={index}
-            className="text-2xl font-serif font-bold text-purple-900 dark:text-white mt-10 mb-4"
+            className="text-2xl font-serif font-bold text-[#1F2A44] dark:text-white mt-10 mb-4"
           >
             {line.replace("## ", "")}
           </h2>
@@ -105,7 +105,7 @@ export default function BlogPostPage() {
         if (match) {
           return (
             <li key={index} className="mb-2">
-              <strong className="text-purple-900 dark:text-white">
+              <strong className="text-[#1F2A44] dark:text-white">
                 {match[1]}
               </strong>{" "}
               - {match[2]}
@@ -137,7 +137,7 @@ export default function BlogPostPage() {
           <p key={index} className="mb-4">
             {parts.map((part, i) =>
               i % 2 === 1 ? (
-                <strong key={i} className="text-purple-900 dark:text-white">
+                <strong key={i} className="text-[#1F2A44] dark:text-white">
                   {part}
                 </strong>
               ) : (
@@ -164,11 +164,11 @@ export default function BlogPostPage() {
   return (
     <div className="animate-fade-in">
       {/* Page Header */}
-      <div className="bg-linear-to-r from-purple-600 to-purple-800 py-12">
+      <div className="bg-linear-to-r from-[#1F2A44] to-[#344262] py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <a
             href="/blog"
-            className="text-purple-200 hover:text-white text-sm mb-4 inline-block"
+            className="text-[#BDBDBD] hover:text-[#FFB957] text-sm mb-4 inline-block"
           >
             ← Back to News & Updates
           </a>
@@ -180,7 +180,7 @@ export default function BlogPostPage() {
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-4">
             {post.title}
           </h1>
-          <p className="text-purple-200 text-sm">
+          <p className="text-[#E5E5E5] text-sm">
             Published on {post.publishedAt && formatDate(post.publishedAt)}
           </p>
         </div>
@@ -195,14 +195,14 @@ export default function BlogPostPage() {
         </article>
 
         {/* Share & Actions */}
-        <div className="mt-12 pt-8 border-t border-purple-100 dark:border-slate-700">
+        <div className="mt-12 pt-8 border-t border-[#E5E5E5] dark:border-slate-700">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
                 Found this helpful?
               </p>
               <div className="flex gap-2">
-                <button className="px-4 py-2 rounded-lg bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-400 text-sm font-medium transition-colors">
+                <button className="px-4 py-2 rounded-lg bg-[#1F2A44]/10 text-[#1F2A44] hover:bg-[#1F2A44]/20 dark:bg-[#1F2A44]/30 dark:text-[#FFB957] text-sm font-medium transition-colors">
                   👍 Helpful
                 </button>
                 <button className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 text-sm font-medium transition-colors">
@@ -218,7 +218,7 @@ export default function BlogPostPage() {
 
         {/* Related Posts Placeholder */}
         <div className="mt-12">
-          <h3 className="font-serif text-xl font-bold text-purple-900 dark:text-white mb-6">
+          <h3 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-white mb-6">
             Related Articles
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -226,7 +226,7 @@ export default function BlogPostPage() {
               href="/blog/spring-flower-festival-2026"
               className="card-magical p-4 hover:scale-[1.02] transition-transform"
             >
-              <h4 className="font-semibold text-purple-900 dark:text-white mb-1">
+              <h4 className="font-semibold text-[#1F2A44] dark:text-white mb-1">
                 Spring Flower Festival Returns
               </h4>
               <p className="text-sm text-slate-600 dark:text-slate-400">
@@ -237,7 +237,7 @@ export default function BlogPostPage() {
               href="/blog/tips-beating-crowds"
               className="card-magical p-4 hover:scale-[1.02] transition-transform"
             >
-              <h4 className="font-semibold text-purple-900 dark:text-white mb-1">
+              <h4 className="font-semibold text-[#1F2A44] dark:text-white mb-1">
                 5 Tips for Beating the Crowds
               </h4>
               <p className="text-sm text-slate-600 dark:text-slate-400">

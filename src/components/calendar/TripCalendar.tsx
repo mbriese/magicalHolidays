@@ -117,7 +117,7 @@ export default function TripCalendar({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-md w-full p-6 animate-fade-in">
             <div className="flex justify-between items-start mb-4">
-              <h3 className="font-serif text-xl font-bold text-purple-900 dark:text-white">
+              <h3 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-white">
                 {selectedEvent.title}
               </h3>
               <button
@@ -221,3 +221,4 @@ export default function TripCalendar({
     </div>
   );
 }
+

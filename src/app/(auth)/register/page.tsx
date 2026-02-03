@@ -48,7 +48,7 @@ export default function RegisterPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <span className="text-5xl mb-4 block">🌟</span>
-          <h1 className="font-serif text-3xl font-bold text-purple-900 dark:text-white mb-2">
+          <h1 className="font-serif text-3xl font-bold text-[#1F2A44] dark:text-white mb-2">
             Start Your Journey
           </h1>
           <p className="text-slate-600 dark:text-slate-400">
@@ -142,18 +142,18 @@ export default function RegisterPage() {
                 id="terms"
                 type="checkbox"
                 required
-                className="w-4 h-4 mt-0.5 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+                className="w-4 h-4 mt-0.5 rounded border-[#E5E5E5] text-[#1F2A44] focus:ring-[#FFB957]"
               />
               <label
                 htmlFor="terms"
                 className="ml-2 text-sm text-slate-600 dark:text-slate-400"
               >
                 I agree to the{" "}
-                <a href="/terms" className="text-purple-600 hover:text-purple-700">
+                <a href="/terms" className="text-[#1F2A44] hover:text-[#FFB957]">
                   Terms of Service
                 </a>{" "}
                 and{" "}
-                <a href="/privacy" className="text-purple-600 hover:text-purple-700">
+                <a href="/privacy" className="text-[#1F2A44] hover:text-purple-700">
                   Privacy Policy
                 </a>
               </label>
@@ -199,7 +199,7 @@ export default function RegisterPage() {
               Already have an account?{" "}
               <a
                 href="/login"
-                className="text-purple-600 hover:text-purple-700 dark:text-purple-400 font-medium"
+                className="text-[#1F2A44] hover:text-[#FFB957] dark:text-[#FFB957] font-medium"
               >
                 Sign in
               </a>
@@ -210,3 +210,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+

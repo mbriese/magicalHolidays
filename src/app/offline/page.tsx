@@ -23,9 +23,9 @@ export default function OfflinePage() {
       <div className="text-center max-w-md">
         {/* Offline icon */}
         <div className="mb-6">
-          <div className="w-24 h-24 mx-auto bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+          <div className="w-24 h-24 mx-auto bg-[#1F2A44]/10 dark:bg-[#1F2A44]/30 rounded-full flex items-center justify-center">
             <svg
-              className="w-12 h-12 text-purple-500"
+              className="w-12 h-12 text-[#1F2A44]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -41,7 +41,7 @@ export default function OfflinePage() {
         </div>
 
         {/* Title */}
-        <h1 className="font-serif text-3xl font-bold text-purple-900 dark:text-white mb-4">
+        <h1 className="font-serif text-3xl font-bold text-[#1F2A44] dark:text-white mb-4">
           You&apos;re Offline
         </h1>
 
@@ -80,3 +80,4 @@ export default function OfflinePage() {
     </div>
   );
 }
+

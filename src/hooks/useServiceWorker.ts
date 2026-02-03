@@ -14,6 +14,16 @@ export function useServiceWorker() {
 
     const registerSW = async () => {
       try {
+        // Skip service worker in development to avoid caching issues
+        if (process.env.NODE_ENV === "development") {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const registration of registrations) {
+            await registration.unregister();
+          }
+          console.log("[SW] Service Worker disabled in development");
+          return;
+        }
+
         const reg = await navigator.serviceWorker.register("/sw.js", {
           scope: "/",
         });

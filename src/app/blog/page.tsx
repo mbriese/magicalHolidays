@@ -61,7 +61,7 @@ const demoPosts: BlogPost[] = [
 ];
 
 const categoryColors: Record<BlogCategory, string> = {
-  PARK_UPDATE: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+  PARK_UPDATE: "bg-[#1F2A44]/10 text-[#1F2A44] dark:bg-[#1F2A44]/30 dark:text-[#FFB957]",
   HOLIDAY_EVENT: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
   GENERAL: "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300",
   TIP: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
@@ -87,12 +87,12 @@ export default function BlogPage() {
   return (
     <div className="animate-fade-in">
       {/* Page Header */}
-      <div className="bg-linear-to-r from-purple-600 to-purple-800 py-12">
+      <div className="bg-linear-to-r from-[#1F2A44] to-[#344262] py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
             News & Updates ✨
           </h1>
-          <p className="text-purple-100">
+          <p className="text-[#E5E5E5]">
             Stay informed about park changes, events, and travel tips
           </p>
         </div>
@@ -105,8 +105,8 @@ export default function BlogPage() {
             onClick={() => setSelectedCategory("ALL")}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               selectedCategory === "ALL"
-                ? "bg-purple-600 text-white"
-                : "bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-slate-700 dark:text-slate-300"
+                ? "bg-[#1F2A44] text-white"
+                : "bg-[#1F2A44]/10 text-[#1F2A44] hover:bg-[#FFB957]/30 dark:bg-slate-700 dark:text-slate-300"
             }`}
           >
             All Posts
@@ -117,7 +117,7 @@ export default function BlogPage() {
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 selectedCategory === category
-                  ? "bg-purple-600 text-white"
+                  ? "bg-[#1F2A44] text-white"
                   : `${categoryColors[category]} hover:opacity-80`
               }`}
             >
@@ -142,7 +142,7 @@ export default function BlogPage() {
               </div>
 
               <div className="p-6">
-                <h2 className="font-serif text-xl font-bold text-purple-900 dark:text-white mb-3 line-clamp-2">
+                <h2 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-white mb-3 line-clamp-2">
                   {post.title}
                 </h2>
                 <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-3">
@@ -152,7 +152,7 @@ export default function BlogPage() {
                   <span className="text-slate-500 dark:text-slate-500">
                     {post.publishedAt && formatDate(post.publishedAt)}
                   </span>
-                  <span className="text-purple-600 dark:text-purple-400 font-medium">
+                  <span className="text-[#1F2A44] dark:text-[#FFB957] font-medium">
                     Read more →
                   </span>
                 </div>
@@ -165,7 +165,7 @@ export default function BlogPage() {
         {filteredPosts.length === 0 && (
           <div className="text-center py-20">
             <span className="text-6xl mb-6 block">📰</span>
-            <h2 className="font-serif text-2xl font-bold text-purple-900 dark:text-white mb-3">
+            <h2 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white mb-3">
               No Posts Found
             </h2>
             <p className="text-slate-600 dark:text-slate-400">
@@ -175,9 +175,9 @@ export default function BlogPage() {
         )}
 
         {/* Newsletter Signup */}
-        <div className="mt-16 card-magical p-8 bg-linear-to-r from-purple-50 to-amber-50 dark:from-purple-900/20 dark:to-amber-900/20">
+        <div className="mt-16 card-magical p-8 bg-linear-to-r from-[#FAF4EF] to-[#fff8eb] dark:from-[#1F2A44]/20 dark:to-[#FFB957]/10">
           <div className="max-w-2xl mx-auto text-center">
-            <h3 className="font-serif text-2xl font-bold text-purple-900 dark:text-white mb-3">
+            <h3 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white mb-3">
               Never Miss an Update
             </h3>
             <p className="text-slate-600 dark:text-slate-400 mb-6">
@@ -200,3 +200,4 @@ export default function BlogPage() {
     </div>
   );
 }
+

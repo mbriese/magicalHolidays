@@ -109,12 +109,31 @@ export default function TripsPage() {
   if (loading) {
     return (
       <div className="animate-fade-in">
-        <div className="bg-linear-to-r from-purple-600 to-purple-800 py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
+        {/* Hero Section with Family Planning Background */}
+        <div className="relative overflow-hidden py-16 lg:py-20">
+          {/* Responsive Hero Background - Mobile */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat sm:hidden"
+            style={{ backgroundImage: 'url(/images/hero-trips-mobile.png)' }}
+          />
+          {/* Responsive Hero Background - Tablet */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden sm:block lg:hidden"
+            style={{ backgroundImage: 'url(/images/hero-trips-tablet.png)' }}
+          />
+          {/* Responsive Hero Background - Desktop */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden lg:block"
+            style={{ backgroundImage: 'url(/images/hero-trips-desktop.png)' }}
+          />
+          {/* Overlay for text readability */}
+          <div className="absolute inset-0 bg-linear-to-r from-[#1F2A44]/90 to-[#1F2A44]/70" />
+          
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-lg">
               My Trips ✨
             </h1>
-            <p className="text-purple-100">Loading your magical adventures...</p>
+            <p className="text-white/90 drop-shadow-md">Loading your magical adventures...</p>
           </div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -135,15 +154,33 @@ export default function TripsPage() {
 
   return (
     <div className="animate-fade-in">
-      {/* Page Header */}
-      <div className="bg-linear-to-r from-purple-600 to-purple-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Hero Section with Family Planning Background */}
+      <div className="relative overflow-hidden py-16 lg:py-20">
+        {/* Responsive Hero Background - Mobile */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat sm:hidden"
+          style={{ backgroundImage: 'url(/images/hero-trips-mobile.png)' }}
+        />
+        {/* Responsive Hero Background - Tablet */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden sm:block lg:hidden"
+          style={{ backgroundImage: 'url(/images/hero-trips-tablet.png)' }}
+        />
+        {/* Responsive Hero Background - Desktop */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden lg:block"
+          style={{ backgroundImage: 'url(/images/hero-trips-desktop.png)' }}
+        />
+        {/* Overlay for text readability */}
+        <div className="absolute inset-0 bg-linear-to-r from-[#1F2A44]/90 to-[#1F2A44]/70" />
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
+              <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-lg">
                 My Trips ✨
               </h1>
-              <p className="text-purple-100">
+              <p className="text-white/90 drop-shadow-md">
                 Plan, organize, and track all your magical adventures
               </p>
             </div>
@@ -185,7 +222,7 @@ export default function TripsPage() {
                     </button>
                     <button
                       onClick={(e) => handleEditClick(e, trip)}
-                      className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                      className="p-2 text-slate-400 hover:text-[#1F2A44] hover:bg-[#FAF4EF] dark:hover:bg-[#1F2A44]/20 rounded-lg transition-colors"
                       title="Edit trip"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,7 +249,7 @@ export default function TripsPage() {
                             ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                             : isPast
                             ? "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400"
-                            : "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
+                            : "bg-[#1F2A44]/10 text-[#1F2A44] dark:bg-[#1F2A44]/30 dark:text-[#FFB957]"
                         }`}
                       >
                         {!mounted
@@ -226,10 +263,10 @@ export default function TripsPage() {
                     </div>
 
                     {/* Trip Info */}
-                    <h3 className="font-serif text-xl font-bold text-purple-900 dark:text-white mb-1">
+                    <h3 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-white mb-1">
                       {trip.name}
                     </h3>
-                    <p className="text-purple-600 dark:text-purple-400 font-medium mb-3">
+                    <p className="text-[#1F2A44] dark:text-[#FFB957] font-medium mb-3">
                       {trip.destination}
                     </p>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
@@ -267,7 +304,7 @@ export default function TripsPage() {
                   {/* Add Reservation Button */}
                   <button
                     onClick={(e) => handleAddReservationClick(e, trip.id)}
-                    className="mt-4 w-full py-2 px-4 text-sm font-medium text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/40 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="mt-4 w-full py-2 px-4 text-sm font-medium text-[#1F2A44] dark:text-[#FFB957] bg-[#FAF4EF] dark:bg-[#1F2A44]/20 hover:bg-[#1F2A44]/10 dark:hover:bg-[#1F2A44]/40 rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -281,12 +318,12 @@ export default function TripsPage() {
             {/* Add New Trip Card */}
             <a
               href="/trips/new"
-              className="card-magical p-6 border-2 border-dashed border-purple-200 dark:border-purple-800 hover:border-purple-400 dark:hover:border-purple-600 flex flex-col items-center justify-center min-h-[250px] transition-colors"
+              className="card-magical p-6 border-2 border-dashed border-[#E5E5E5] dark:border-[#41537b] hover:border-[#FFB957] dark:hover:border-[#FFB957] flex flex-col items-center justify-center min-h-[250px] transition-colors"
             >
-              <div className="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-[#1F2A44]/10 dark:bg-[#1F2A44]/30 flex items-center justify-center mb-4">
                 <span className="text-3xl">+</span>
               </div>
-              <span className="font-medium text-purple-600 dark:text-purple-400">
+              <span className="font-medium text-[#1F2A44] dark:text-[#FFB957]">
                 Plan a New Adventure
               </span>
             </a>
@@ -295,7 +332,7 @@ export default function TripsPage() {
           // Empty State
           <div className="text-center py-20">
             <span className="text-6xl mb-6 block">🗺️</span>
-            <h2 className="font-serif text-2xl font-bold text-purple-900 dark:text-white mb-3">
+            <h2 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white mb-3">
               No Trips Yet
             </h2>
             <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
@@ -340,3 +377,4 @@ export default function TripsPage() {
     </div>
   );
 }
+

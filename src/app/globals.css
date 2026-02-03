@@ -1,40 +1,75 @@
 @import "tailwindcss";
 
+/* =====================================================
+   WARM MAGIC AT DUSK - Color Palette
+   =====================================================
+   Primary:      Enchanted Midnight  #1F2A44  - Deep navy blue
+   Secondary:    Golden Ember        #FFB957  - Warm sunset gold
+   Accent 1:     Whimsy Rose         #F8AFA6  - Soft nostalgic pink
+   Accent 2:     Storybook Sage      #A7D2B7  - Calm pastel green
+   Background:   Soft Glow           #FAF4EF  - Light parchment-beige
+   Text Dark:    Inkstone            #2B2B2B  - Clean readable text
+   Neutrals:     #E5E5E5 / #BDBDBD   - UI borders & inactive
+   ===================================================== */
+
 /* Custom Theme Configuration for Tailwind v4 */
 @theme {
-  /* Magical Color Palette */
-  --color-magical-purple-50: #f5f3ff;
-  --color-magical-purple-100: #ede9fe;
-  --color-magical-purple-200: #ddd6fe;
-  --color-magical-purple-300: #c4b5fd;
-  --color-magical-purple-400: #a78bfa;
-  --color-magical-purple-500: #8b5cf6;
-  --color-magical-purple-600: #7c3aed;
-  --color-magical-purple-700: #6d28d9;
-  --color-magical-purple-800: #5b21b6;
-  --color-magical-purple-900: #4c1d95;
+  /* Warm Magic at Dusk Color Palette */
+  --color-midnight-50: #f0f2f5;
+  --color-midnight-100: #d9dde5;
+  --color-midnight-200: #b3baca;
+  --color-midnight-300: #8d98b0;
+  --color-midnight-400: #677595;
+  --color-midnight-500: #41537b;
+  --color-midnight-600: #344262;
+  --color-midnight-700: #1F2A44;
+  --color-midnight-800: #1a2339;
+  --color-midnight-900: #141b2d;
   
-  --color-magical-gold-50: #fffbeb;
-  --color-magical-gold-100: #fef3c7;
-  --color-magical-gold-200: #fde68a;
-  --color-magical-gold-300: #fcd34d;
-  --color-magical-gold-400: #fbbf24;
-  --color-magical-gold-500: #f59e0b;
-  --color-magical-gold-600: #d97706;
-  --color-magical-gold-700: #b45309;
-  --color-magical-gold-800: #92400e;
-  --color-magical-gold-900: #78350f;
+  --color-ember-50: #fff8eb;
+  --color-ember-100: #ffedc7;
+  --color-ember-200: #ffdf9e;
+  --color-ember-300: #ffd175;
+  --color-ember-400: #FFB957;
+  --color-ember-500: #e6a64e;
+  --color-ember-600: #cc9345;
+  --color-ember-700: #b3803c;
+  --color-ember-800: #996d33;
+  --color-ember-900: #805a2a;
 
-  /* Reservation Colors */
-  --color-reservation-park: #8b5cf6;
-  --color-reservation-ride: #3b82f6;
-  --color-reservation-hotel: #f59e0b;
-  --color-reservation-car: #22c55e;
-  --color-reservation-flight: #0ea5e9;
+  --color-rose-50: #fef5f4;
+  --color-rose-100: #fce8e6;
+  --color-rose-200: #fad5d1;
+  --color-rose-300: #F8AFA6;
+  --color-rose-400: #f59085;
+  --color-rose-500: #f27164;
+  --color-rose-600: #d96459;
+  --color-rose-700: #bf574e;
+  --color-rose-800: #a64a43;
+  --color-rose-900: #8c3d38;
+
+  --color-sage-50: #f4f9f6;
+  --color-sage-100: #e5f2eb;
+  --color-sage-200: #d1e8db;
+  --color-sage-300: #A7D2B7;
+  --color-sage-400: #8cc4a0;
+  --color-sage-500: #71b689;
+  --color-sage-600: #64a37b;
+  --color-sage-700: #578f6c;
+  --color-sage-800: #4a7c5d;
+  --color-sage-900: #3d684e;
+
+  /* Reservation Type Colors */
+  --color-reservation-park: #1F2A44;
+  --color-reservation-ride: #FFB957;
+  --color-reservation-hotel: #F8AFA6;
+  --color-reservation-car: #A7D2B7;
+  --color-reservation-flight: #677595;
 
   /* Font Family */
-  --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-display: Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-serif: var(--font-playfair), Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-display: var(--font-playfair), Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
 
   /* Custom Animations */
   --animate-sparkle: sparkle 2s ease-in-out infinite;
@@ -58,34 +93,44 @@
 }
 
 :root {
+  /* Primary Colors */
+  --primary: #1F2A44;
+  --primary-light: #344262;
+  --primary-dark: #141b2d;
+  
+  /* Secondary Colors */
+  --secondary: #FFB957;
+  --secondary-light: #ffd175;
+  --secondary-dark: #e6a64e;
+  
+  /* Accent Colors */
+  --accent-rose: #F8AFA6;
+  --accent-rose-light: #fce8e6;
+  --accent-sage: #A7D2B7;
+  --accent-sage-light: #e5f2eb;
+  
   /* UI Colors */
-  --magical-purple: #8b5cf6;
-  --magical-purple-dark: #6d28d9;
-  --magical-gold: #f59e0b;
-  --magical-gold-light: #fcd34d;
-  --midnight-blue: #1e1b4b;
-  --starry-night: #0f172a;
+  --background: #FAF4EF;
+  --foreground: #2B2B2B;
+  --card-bg: #ffffff;
+  --border-color: #E5E5E5;
+  --border-muted: #BDBDBD;
   
   /* Reservation Colors */
-  --color-park: #8b5cf6;
-  --color-ride: #3b82f6;
-  --color-hotel: #f59e0b;
-  --color-car: #22c55e;
-  --color-flight: #0ea5e9;
-  
-  /* UI Colors */
-  --background: #faf5ff;
-  --foreground: #1e1b4b;
-  --card-bg: #ffffff;
-  --border-color: #e9d5ff;
+  --color-park: #1F2A44;
+  --color-ride: #FFB957;
+  --color-hotel: #F8AFA6;
+  --color-car: #A7D2B7;
+  --color-flight: #677595;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0f172a;
-    --foreground: #f5f3ff;
-    --card-bg: #1e293b;
-    --border-color: #334155;
+    --background: #1F2A44;
+    --foreground: #FAF4EF;
+    --card-bg: #2a3654;
+    --border-color: #41537b;
+    --border-muted: #677595;
   }
 }
 
@@ -93,16 +138,24 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.6;
 }
 
 /* Magical Gradient Background */
 .bg-magical {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1F2A44 0%, #344262 100%);
 }
 
 .bg-starry {
-  background: linear-gradient(to bottom, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+  background: linear-gradient(to bottom, #1F2A44 0%, #2a3654 50%, #41537b 100%);
+}
+
+/* Warm Dusk Gradient */
+.bg-dusk {
+  background: linear-gradient(135deg, #1F2A44 0%, #41537b 50%, #FFB957 100%);
 }
 
 /* Sparkle Effect */
@@ -115,7 +168,7 @@ body {
   content: "✦";
   position: absolute;
   font-size: 0.75rem;
-  color: var(--magical-gold);
+  color: var(--secondary);
   animation: sparkle 2s ease-in-out infinite;
 }
 
@@ -132,82 +185,197 @@ body {
 
 /* Magical Glow Effect */
 .glow {
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 15px rgba(31, 42, 68, 0.4);
 }
 
 .glow-gold {
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 15px rgba(255, 185, 87, 0.4);
 }
 
-/* Card Styles */
+/* Sparkle hover effect for interactive elements */
+.hover-sparkle {
+  position: relative;
+  overflow: hidden;
+}
+
+.hover-sparkle::after {
+  content: '✨';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  font-size: 1.25rem;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.hover-sparkle:hover::after {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0.6;
+  animation: sparkle-burst 0.6s ease-out;
+}
+
+@keyframes sparkle-burst {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+}
+
+/* Gentle glow on hover */
+.hover-glow {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 25px rgba(255, 185, 87, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Card Styles - Parchment/Storybook texture */
 .card-magical {
-  background-color: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  border: 1px solid #f3e8ff;
-  transition: box-shadow 0.3s;
+  background: linear-gradient(135deg, #FAF4EF 0%, #fffcf8 50%, #f5eee6 100%);
+  background-color: #FAF4EF;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px -2px rgba(31, 42, 68, 0.08);
+  border: 1px solid rgba(229, 229, 229, 0.6);
+  transition: all 0.3s ease;
 }
 
 .card-magical:hover {
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+  box-shadow: 
+    0 0 20px rgba(255, 185, 87, 0.25),
+    0 8px 20px -4px rgba(31, 42, 68, 0.12);
+  transform: translateY(-2px);
 }
 
 @media (prefers-color-scheme: dark) {
   .card-magical {
-    background-color: #1e293b;
-    border-color: #334155;
+    background: linear-gradient(135deg, #2a3654 0%, #323e5c 50%, #2a3654 100%);
+    background-color: #2a3654;
+    border-color: rgba(65, 83, 123, 0.5);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.2);
+  }
+  
+  .card-magical:hover {
+    box-shadow: 
+      0 0 20px rgba(255, 185, 87, 0.15),
+      0 8px 20px -4px rgba(0, 0, 0, 0.3);
   }
 }
 
-/* Button Styles */
+/* Button Styles - Primary (Enchanted Midnight) */
 .btn-magical {
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: 1rem;
   font-weight: 600;
-  transition: all 0.3s;
-  background: linear-gradient(to right, #7c3aed, #6d28d9);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  transition: all 0.3s ease;
+  background: linear-gradient(180deg, #344262 0%, #1F2A44 100%);
   color: white;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px -2px rgba(31, 42, 68, 0.4);
 }
 
 .btn-magical:hover {
-  background: linear-gradient(to right, #6d28d9, #5b21b6);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(180deg, #41537b 0%, #344262 100%);
+  box-shadow: 0 0 20px rgba(255, 185, 87, 0.3);
+  transform: translateY(-1px);
 }
 
 .btn-magical:focus {
-  outline: 2px solid #8b5cf6;
+  outline: 2px solid #FFB957;
   outline-offset: 2px;
 }
 
+.btn-magical:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px -2px rgba(31, 42, 68, 0.4);
+}
+
+/* Button Styles - Secondary (Golden Ember) */
 .btn-gold {
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: 1rem;
   font-weight: 600;
-  transition: all 0.3s;
-  background: linear-gradient(to right, #f59e0b, #d97706);
-  color: white;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  transition: all 0.3s ease;
+  background: linear-gradient(180deg, #ffd175 0%, #FFB957 50%, #e6a64e 100%);
+  color: #1F2A44;
+  box-shadow: 0 4px 12px -2px rgba(255, 185, 87, 0.5);
 }
 
 .btn-gold:hover {
-  background: linear-gradient(to right, #d97706, #b45309);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(180deg, #ffe4a3 0%, #ffd175 50%, #FFB957 100%);
+  box-shadow: 0 0 20px rgba(255, 185, 87, 0.5);
+  transform: translateY(-1px);
 }
 
+.btn-gold:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px -2px rgba(255, 185, 87, 0.4);
+}
+
+/* Button Styles - Outline */
 .btn-outline {
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: 1rem;
   font-weight: 600;
-  transition: all 0.3s;
-  border: 2px solid #7c3aed;
-  color: #7c3aed;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  transition: all 0.3s ease;
+  border: 2px solid #1F2A44;
+  color: #1F2A44;
   background: transparent;
 }
 
 .btn-outline:hover {
-  background-color: #7c3aed;
+  background-color: #1F2A44;
   color: white;
+  box-shadow: 0 0 15px rgba(31, 42, 68, 0.2);
+  transform: translateY(-1px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn-outline {
+    border-color: #FFB957;
+    color: #FFB957;
+  }
+  
+  .btn-outline:hover {
+    background-color: #FFB957;
+    color: #1F2A44;
+    box-shadow: 0 0 15px rgba(255, 185, 87, 0.3);
+  }
+}
+
+/* Button Styles - Outline Light (for dark backgrounds) */
+.btn-outline-light {
+  padding: 0.875rem 1.75rem;
+  border-radius: 1rem;
+  font-weight: 600;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  box-shadow: 
+    0 4px 12px -2px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.95);
+  color: #1F2A44;
+  border-color: white;
+  box-shadow: 
+    0 0 20px rgba(255, 185, 87, 0.4),
+    0 8px 20px -4px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-outline-light:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.2);
 }
 
 /* Input Styles */
@@ -215,44 +383,45 @@ body {
   width: 100%;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
-  border: 1px solid #ddd6fe;
+  border: 1px solid #E5E5E5;
   background-color: white;
   transition: all 0.2s;
+  color: #2B2B2B;
 }
 
 .input-magical:focus {
   outline: none;
   border-color: transparent;
-  box-shadow: 0 0 0 2px #8b5cf6;
+  box-shadow: 0 0 0 2px #FFB957;
 }
 
 .input-magical::placeholder {
-  color: #9ca3af;
+  color: #BDBDBD;
 }
 
 @media (prefers-color-scheme: dark) {
   .input-magical {
-    background-color: #1e293b;
-    border-color: #475569;
-    color: #f5f3ff;
+    background-color: #2a3654;
+    border-color: #41537b;
+    color: #FAF4EF;
   }
   
   .input-magical::placeholder {
-    color: #6b7280;
+    color: #677595;
   }
 }
 
 /* FullCalendar Custom Styles */
 .fc {
   --fc-border-color: var(--border-color);
-  --fc-button-bg-color: var(--magical-purple);
-  --fc-button-border-color: var(--magical-purple);
-  --fc-button-hover-bg-color: var(--magical-purple-dark);
-  --fc-button-hover-border-color: var(--magical-purple-dark);
-  --fc-button-active-bg-color: var(--magical-purple-dark);
-  --fc-today-bg-color: rgba(139, 92, 246, 0.1);
-  --fc-event-bg-color: var(--magical-purple);
-  --fc-event-border-color: var(--magical-purple);
+  --fc-button-bg-color: var(--primary);
+  --fc-button-border-color: var(--primary);
+  --fc-button-hover-bg-color: var(--primary-light);
+  --fc-button-hover-border-color: var(--primary-light);
+  --fc-button-active-bg-color: var(--primary-light);
+  --fc-today-bg-color: rgba(255, 185, 87, 0.15);
+  --fc-event-bg-color: var(--primary);
+  --fc-event-border-color: var(--primary);
 }
 
 .fc .fc-button {
@@ -261,36 +430,36 @@ body {
 }
 
 .fc .fc-toolbar-title {
-  font-family: Georgia, Cambria, serif;
+  font-family: var(--font-playfair), Georgia, Cambria, serif;
   font-size: 1.5rem;
-  color: #4c1d95;
+  color: #1F2A44;
 }
 
 @media (prefers-color-scheme: dark) {
   .fc .fc-toolbar-title {
-    color: #e9d5ff;
+    color: #FAF4EF;
   }
 }
 
 .fc .fc-daygrid-day-number {
   font-weight: 600;
-  color: #334155;
+  color: #2B2B2B;
 }
 
 @media (prefers-color-scheme: dark) {
   .fc .fc-daygrid-day-number {
-    color: #cbd5e1;
+    color: #FAF4EF;
   }
 }
 
 .fc .fc-col-header-cell-cushion {
   font-weight: 600;
-  color: #5b21b6;
+  color: #1F2A44;
 }
 
 @media (prefers-color-scheme: dark) {
   .fc .fc-col-header-cell-cushion {
-    color: #ddd6fe;
+    color: #FAF4EF;
   }
 }
 
@@ -303,16 +472,19 @@ body {
 .fc-event-ride {
   background-color: var(--color-ride) !important;
   border-color: var(--color-ride) !important;
+  color: #1F2A44 !important;
 }
 
 .fc-event-hotel {
   background-color: var(--color-hotel) !important;
   border-color: var(--color-hotel) !important;
+  color: #2B2B2B !important;
 }
 
 .fc-event-car {
   background-color: var(--color-car) !important;
   border-color: var(--color-car) !important;
+  color: #2B2B2B !important;
 }
 
 .fc-event-flight {
@@ -331,6 +503,11 @@ body {
 
 .animate-sparkle {
   animation: sparkle 2s ease-in-out infinite;
+}
+
+/* Display font for headers/logos */
+.font-display {
+  font-family: var(--font-playfair), Georgia, Cambria, serif;
 }
 
 /* Utility for truncating text */
@@ -356,14 +533,14 @@ body {
 }
 
 .react-datepicker {
-  font-family: Georgia, Cambria, serif;
-  border: 1px solid #ddd6fe;
+  font-family: var(--font-playfair), Georgia, Cambria, serif;
+  border: 1px solid #E5E5E5;
   border-radius: 0.75rem;
-  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 10px 25px rgba(31, 42, 68, 0.15);
 }
 
 .react-datepicker__header {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  background: linear-gradient(135deg, #1F2A44, #344262);
   border-bottom: none;
   border-top-left-radius: 0.75rem;
   border-top-right-radius: 0.75rem;
@@ -387,33 +564,33 @@ body {
 }
 
 .react-datepicker__day:hover {
-  background-color: #ede9fe;
-  color: #7c3aed;
+  background-color: #fff8eb;
+  color: #1F2A44;
 }
 
 .react-datepicker__day--selected,
 .react-datepicker__day--keyboard-selected {
-  background-color: #8b5cf6 !important;
-  color: white !important;
+  background-color: #FFB957 !important;
+  color: #1F2A44 !important;
 }
 
 .react-datepicker__day--today {
   font-weight: bold;
-  color: #8b5cf6;
+  color: #FFB957;
 }
 
 .react-datepicker__time-container {
-  border-left: 1px solid #ddd6fe;
+  border-left: 1px solid #E5E5E5;
 }
 
 .react-datepicker__time-list-item:hover {
-  background-color: #ede9fe !important;
-  color: #7c3aed;
+  background-color: #fff8eb !important;
+  color: #1F2A44;
 }
 
 .react-datepicker__time-list-item--selected {
-  background-color: #8b5cf6 !important;
-  color: white !important;
+  background-color: #FFB957 !important;
+  color: #1F2A44 !important;
 }
 
 .react-datepicker__navigation-icon::before {
@@ -421,27 +598,27 @@ body {
 }
 
 .react-datepicker__navigation:hover *::before {
-  border-color: #fcd34d;
+  border-color: #FFB957;
 }
 
 @media (prefers-color-scheme: dark) {
   .react-datepicker {
-    background-color: #1e293b;
-    border-color: #334155;
+    background-color: #2a3654;
+    border-color: #41537b;
   }
   
   .react-datepicker__day,
   .react-datepicker__time-list-item {
-    color: #e2e8f0;
+    color: #FAF4EF;
   }
   
   .react-datepicker__day:hover,
   .react-datepicker__time-list-item:hover {
-    background-color: #334155 !important;
-    color: #a78bfa;
+    background-color: #41537b !important;
+    color: #FFB957;
   }
   
   .react-datepicker__day--today {
-    color: #a78bfa;
+    color: #FFB957;
   }
 }

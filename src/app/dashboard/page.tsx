@@ -266,12 +266,12 @@ export default function DashboardPage() {
   return (
     <div className="animate-fade-in">
       {/* Page Header */}
-      <div className="bg-linear-to-r from-purple-600 to-purple-800 py-12">
+      <div className="bg-linear-to-r from-[#1F2A44] to-[#344262] py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
             Your Dashboard ✨
           </h1>
-          <p className="text-purple-100">
+          <p className="text-[#E5E5E5]">
             Welcome back! Here&apos;s your upcoming magical adventure.
           </p>
           {isOfflineData && (
@@ -292,7 +292,7 @@ export default function DashboardPage() {
           <div className="lg:col-span-2">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="card-magical p-4 text-center">
-                <div className="text-3xl font-bold text-purple-600">
+                <div className="text-3xl font-bold text-[#1F2A44]">
                   {loading ? "..." : stats.activeTrips}
                 </div>
                 <div className="text-sm text-slate-600 dark:text-slate-400">
@@ -346,7 +346,7 @@ export default function DashboardPage() {
         {!loading && events.length === 0 && (
           <div className="card-magical p-12 text-center mb-8">
             <span className="text-5xl mb-4 block">📅</span>
-            <h3 className="font-serif text-xl font-bold text-purple-900 dark:text-white mb-2">
+            <h3 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-white mb-2">
               No Reservations Yet
             </h3>
             <p className="text-slate-600 dark:text-slate-400 mb-4">
@@ -363,7 +363,7 @@ export default function DashboardPage() {
 
         {/* Calendar */}
         <div className="mb-8">
-          <h2 className="font-serif text-2xl font-bold text-purple-900 dark:text-white mb-4">
+          <h2 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white mb-4">
             Trip Calendar
           </h2>
           <TripCalendar
@@ -388,7 +388,7 @@ export default function DashboardPage() {
           {/* Upcoming Reservations List */}
           {reservations.length > 0 && (
             <div>
-              <h2 className="font-serif text-2xl font-bold text-purple-900 dark:text-white mb-4">
+              <h2 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white mb-4">
                 Upcoming Reservations
               </h2>
             <div className="space-y-3">
@@ -416,7 +416,7 @@ export default function DashboardPage() {
                       }}
                     />
                     <div className="grow min-w-0">
-                      <h3 className="font-semibold text-purple-900 dark:text-white truncate">
+                      <h3 className="font-semibold text-[#1F2A44] dark:text-white truncate">
                         {reservation.title}
                       </h3>
                       <p className="text-sm text-slate-600 dark:text-slate-400">
@@ -443,7 +443,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => handleEditReservation(reservation)}
-                        className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                        className="p-2 text-slate-400 hover:text-[#1F2A44] hover:bg-[#FAF4EF] dark:hover:bg-[#1F2A44]/20 rounded-lg transition-colors"
                         title="Edit reservation"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -491,3 +491,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
