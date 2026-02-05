@@ -1,5 +1,18 @@
 // Shared constants for Magical Holidays
 
+import type { ReservationType } from "@/types";
+
+/**
+ * Available reservation types
+ */
+export const RESERVATION_TYPES: ReservationType[] = [
+  "PARK",
+  "RIDE", 
+  "HOTEL",
+  "CAR",
+  "FLIGHT",
+];
+
 /**
  * Available Disney destinations for trip selection
  */

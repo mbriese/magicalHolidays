@@ -3,6 +3,12 @@
 import { useState } from "react";
 import { DESTINATIONS } from "@/lib/constants";
 
+interface CreatedTrip {
+  id: string;
+  name: string;
+  destination: string;
+}
+
 export default function NewTripPage() {
   const [name, setName] = useState("");
   const [destination, setDestination] = useState("");
@@ -16,6 +22,8 @@ export default function NewTripPage() {
   const [budgetAmount, setBudgetAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [createdTrip, setCreatedTrip] = useState<CreatedTrip | null>(null);
 
   // Guest management functions
   const handleAddGuest = () => {
@@ -74,9 +82,10 @@ export default function NewTripPage() {
       });
 
       if (response.ok) {
-        // Redirect to trip detail page to add reservations
+        // Show success modal with gentle account prompt
         const trip = await response.json();
-        window.location.href = `/trips/${trip.id}`;
+        setCreatedTrip(trip);
+        setShowSuccess(true);
       } else {
         const data = await response.json();
         setError(data.error || "Failed to create trip. Please try again.");
@@ -91,7 +100,7 @@ export default function NewTripPage() {
   return (
     <div className="animate-fade-in">
       {/* Page Header */}
-      <div className="bg-linear-to-r from-[#1F2A44] to-[#344262] py-12">
+      <div className="bg-linear-to-r from-[#1F2A44] to-midnight-600 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
             Create New Trip ✨
@@ -262,7 +271,7 @@ export default function NewTripPage() {
             </div>
 
             {/* Budget Setup */}
-            <div className="p-4 rounded-xl bg-[#FAF4EF] dark:bg-[#1F2A44]/20 border border-[#E5E5E5] dark:border-[#41537b]">
+            <div className="p-4 rounded-xl bg-[#FAF4EF] dark:bg-[#1F2A44]/20 border border-[#E5E5E5] dark:border-midnight-500">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -391,6 +400,51 @@ export default function NewTripPage() {
           </ul>
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccess && createdTrip && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="card-magical max-w-md w-full p-8 text-center animate-scale-in">
+            {/* Celebration */}
+            <div className="text-6xl mb-4">🎉</div>
+            <h2 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white mb-2">
+              Trip Created!
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 mb-6">
+              <span className="font-semibold text-[#1F2A44] dark:text-[#FFB957]">{createdTrip.name}</span> to {createdTrip.destination} is ready for planning!
+            </p>
+
+            {/* Primary Action - Continue to Trip */}
+            <a
+              href={`/trips/${createdTrip.id}`}
+              className="btn-gold w-full mb-4"
+            >
+              ✨ Add Reservations ✨
+            </a>
+
+            {/* Secondary Action - View All Trips */}
+            <a
+              href="/trips"
+              className="btn-outline w-full mb-6"
+            >
+              View My Trips
+            </a>
+
+            {/* Gentle Account Prompt */}
+            <div className="pt-6 border-t border-[#E5E5E5] dark:border-midnight-500">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
+                💡 Want to access your trips from any device?
+              </p>
+              <a
+                href="/register"
+                className="text-[#1F2A44] dark:text-[#FFB957] font-medium text-sm hover:underline"
+              >
+                Create a free account to save your data →
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
