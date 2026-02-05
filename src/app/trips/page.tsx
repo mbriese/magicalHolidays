@@ -109,37 +109,40 @@ export default function TripsPage() {
   if (loading) {
     return (
       <div className="animate-fade-in">
-        {/* Hero Section with Family Planning Background */}
-        <div className="relative overflow-hidden py-16 lg:py-20">
-          {/* Responsive Hero Background - Mobile */}
+        {/* Hero Image Section - Family Planning */}
+        <div className="relative overflow-hidden">
+          {/* Responsive Hero Image - Mobile */}
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat sm:hidden"
-            style={{ backgroundImage: 'url(/images/hero-trips-mobile.png)' }}
+            className="h-64 sm:hidden bg-cover bg-no-repeat"
+            style={{ backgroundImage: 'url(/images/hero-trips-mobile.png)', backgroundPosition: 'center 30%' }}
           />
-          {/* Responsive Hero Background - Tablet */}
+          {/* Responsive Hero Image - Tablet */}
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden sm:block lg:hidden"
-            style={{ backgroundImage: 'url(/images/hero-trips-tablet.png)' }}
+            className="h-72 hidden sm:block lg:hidden bg-cover bg-no-repeat"
+            style={{ backgroundImage: 'url(/images/hero-trips-tablet.png)', backgroundPosition: 'center 30%' }}
           />
-          {/* Responsive Hero Background - Desktop */}
+          {/* Responsive Hero Image - Desktop */}
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden lg:block"
-            style={{ backgroundImage: 'url(/images/hero-trips-desktop.png)' }}
+            className="h-96 hidden lg:block bg-cover bg-no-repeat"
+            style={{ backgroundImage: 'url(/images/hero-trips-desktop.png)', backgroundPosition: 'center 30%' }}
           />
-          {/* Overlay for text readability */}
-          <div className="absolute inset-0 bg-linear-to-r from-[#1F2A44]/90 to-[#1F2A44]/70" />
-          
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-lg">
+          {/* Subtle gradient fade at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-[#1F2A44] to-transparent" />
+        </div>
+        
+        {/* Banner Section */}
+        <div className="bg-linear-to-r from-[#1F2A44] to-midnight-600 py-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
               My Trips ✨
             </h1>
-            <p className="text-white/90 drop-shadow-md">Loading your magical adventures...</p>
+            <p className="text-[#E5E5E5]">Loading your magical adventures...</p>
           </div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="card-magical p-6 animate-pulse">
+              <div key={i} className="card-trip p-6 animate-pulse">
                 <div className="h-6 w-24 bg-slate-200 dark:bg-slate-700 rounded mb-4" />
                 <div className="h-6 w-48 bg-slate-200 dark:bg-slate-700 rounded mb-2" />
                 <div className="h-4 w-32 bg-slate-200 dark:bg-slate-700 rounded mb-3" />
@@ -154,33 +157,36 @@ export default function TripsPage() {
 
   return (
     <div className="animate-fade-in">
-      {/* Hero Section with Family Planning Background */}
-      <div className="relative overflow-hidden py-16 lg:py-20">
-        {/* Responsive Hero Background - Mobile */}
+      {/* Hero Image Section - Family Planning */}
+      <div className="relative overflow-hidden">
+        {/* Responsive Hero Image - Mobile */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat sm:hidden"
-          style={{ backgroundImage: 'url(/images/hero-trips-mobile.png)' }}
+          className="h-64 sm:hidden bg-cover bg-no-repeat"
+          style={{ backgroundImage: 'url(/images/hero-trips-mobile.png)', backgroundPosition: 'center 30%' }}
         />
-        {/* Responsive Hero Background - Tablet */}
+        {/* Responsive Hero Image - Tablet */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden sm:block lg:hidden"
-          style={{ backgroundImage: 'url(/images/hero-trips-tablet.png)' }}
+          className="h-72 hidden sm:block lg:hidden bg-cover bg-no-repeat"
+          style={{ backgroundImage: 'url(/images/hero-trips-tablet.png)', backgroundPosition: 'center 30%' }}
         />
-        {/* Responsive Hero Background - Desktop */}
+        {/* Responsive Hero Image - Desktop */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden lg:block"
-          style={{ backgroundImage: 'url(/images/hero-trips-desktop.png)' }}
+          className="h-96 hidden lg:block bg-cover bg-no-repeat"
+          style={{ backgroundImage: 'url(/images/hero-trips-desktop.png)', backgroundPosition: 'center 30%' }}
         />
-        {/* Overlay for text readability */}
-        <div className="absolute inset-0 bg-linear-to-r from-[#1F2A44]/90 to-[#1F2A44]/70" />
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Subtle gradient fade at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-[#1F2A44] to-transparent" />
+      </div>
+      
+      {/* Banner Section */}
+      <div className="bg-linear-to-r from-[#1F2A44] to-midnight-600 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-lg">
+              <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
                 My Trips ✨
               </h1>
-              <p className="text-white/90 drop-shadow-md">
+              <p className="text-[#E5E5E5]">
                 Plan, organize, and track all your magical adventures
               </p>
             </div>
@@ -196,7 +202,9 @@ export default function TripsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Trips Grid */}
         {trips.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="section-outlined">
+            <span className="section-title">Your Adventures</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
             {trips.map((trip) => {
               const daysUntil = mounted ? getDaysUntil(trip.startDate) : 0;
               const isPast = mounted ? daysUntil < 0 : false;
@@ -207,7 +215,7 @@ export default function TripsPage() {
               return (
                 <div
                   key={trip.id}
-                  className="card-magical p-6 hover:scale-[1.02] transition-transform group relative"
+                  className="card-trip p-6 group relative"
                 >
                   {/* Action Buttons */}
                   <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
@@ -318,7 +326,7 @@ export default function TripsPage() {
             {/* Add New Trip Card */}
             <a
               href="/trips/new"
-              className="card-magical p-6 border-2 border-dashed border-[#E5E5E5] dark:border-[#41537b] hover:border-[#FFB957] dark:hover:border-[#FFB957] flex flex-col items-center justify-center min-h-[250px] transition-colors"
+              className="card-trip p-6 border-dashed border-[#c4bdb5] dark:border-midnight-500 hover:border-[#FFB957] dark:hover:border-[#FFB957] flex flex-col items-center justify-center min-h-[250px]"
             >
               <div className="w-16 h-16 rounded-full bg-[#1F2A44]/10 dark:bg-[#1F2A44]/30 flex items-center justify-center mb-4">
                 <span className="text-3xl">+</span>
@@ -327,6 +335,7 @@ export default function TripsPage() {
                 Plan a New Adventure
               </span>
             </a>
+          </div>
           </div>
         ) : (
           // Empty State

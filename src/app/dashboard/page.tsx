@@ -266,7 +266,7 @@ export default function DashboardPage() {
   return (
     <div className="animate-fade-in">
       {/* Page Header */}
-      <div className="bg-linear-to-r from-[#1F2A44] to-[#344262] py-12">
+      <div className="bg-linear-to-r from-[#1F2A44] to-midnight-600 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
             Your Dashboard ✨
@@ -290,32 +290,35 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* Stats Section */}
           <div className="lg:col-span-2">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="card-magical p-4 text-center">
-                <div className="text-3xl font-bold text-[#1F2A44]">
-                  {loading ? "..." : stats.activeTrips}
+            <div className="section-outlined">
+              <span className="section-title">Trip Overview</span>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                <div className="card-stat stat-midnight p-4 text-center">
+                  <div className="text-3xl font-bold text-[#1F2A44] dark:text-white">
+                    {loading ? "..." : stats.activeTrips}
+                  </div>
+                  <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                    Active {stats.activeTrips === 1 ? "Trip" : "Trips"}
+                  </div>
                 </div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">
-                  Active {stats.activeTrips === 1 ? "Trip" : "Trips"}
+                <div className="card-stat stat-blue p-4 text-center">
+                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                    {loading ? "..." : stats.parkDays}
+                  </div>
+                  <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">Park Days</div>
                 </div>
-              </div>
-              <div className="card-magical p-4 text-center">
-                <div className="text-3xl font-bold text-blue-600">
-                  {loading ? "..." : stats.parkDays}
+                <div className="card-stat stat-amber p-4 text-center">
+                  <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">
+                    {loading ? "..." : stats.totalReservations}
+                  </div>
+                  <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">Reservations</div>
                 </div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">Park Days</div>
-              </div>
-              <div className="card-magical p-4 text-center">
-                <div className="text-3xl font-bold text-amber-600">
-                  {loading ? "..." : stats.totalReservations}
+                <div className="card-stat stat-green p-4 text-center">
+                  <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+                    {loading ? "..." : stats.daysUntilTrip || "—"}
+                  </div>
+                  <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">Days Until Trip</div>
                 </div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">Reservations</div>
-              </div>
-              <div className="card-magical p-4 text-center">
-                <div className="text-3xl font-bold text-green-600">
-                  {loading ? "..." : stats.daysUntilTrip || "—"}
-                </div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">Days Until Trip</div>
               </div>
             </div>
           </div>
@@ -362,16 +365,16 @@ export default function DashboardPage() {
         )}
 
         {/* Calendar */}
-        <div className="mb-8">
-          <h2 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white mb-4">
-            Trip Calendar
-          </h2>
-          <TripCalendar
-            events={events}
-            onEventClick={handleEventClick}
-            onDateSelect={handleDateSelect}
-            onEventDrop={handleEventDrop}
-          />
+        <div className="mb-8 section-outlined">
+          <span className="section-title">Trip Calendar</span>
+          <div className="pt-2">
+            <TripCalendar
+              events={events}
+              onEventClick={handleEventClick}
+              onDateSelect={handleDateSelect}
+              onEventDrop={handleEventDrop}
+            />
+          </div>
         </div>
 
         {/* Itinerary Builder & Upcoming Reservations */}
@@ -387,11 +390,9 @@ export default function DashboardPage() {
         <div className="mb-8">
           {/* Upcoming Reservations List */}
           {reservations.length > 0 && (
-            <div>
-              <h2 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white mb-4">
-                Upcoming Reservations
-              </h2>
-            <div className="space-y-3">
+            <div className="section-outlined">
+              <span className="section-title">Upcoming Reservations</span>
+            <div className="space-y-3 pt-2">
               {reservations
                 .sort((a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime())
                 .slice(0, 5)
@@ -464,7 +465,7 @@ export default function DashboardPage() {
                 ))}
             </div>
           </div>
-        )}
+          )}
         </div>
       </div>
 

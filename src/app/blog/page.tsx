@@ -87,7 +87,7 @@ export default function BlogPage() {
   return (
     <div className="animate-fade-in">
       {/* Page Header */}
-      <div className="bg-linear-to-r from-[#1F2A44] to-[#344262] py-12">
+      <div className="bg-linear-to-r from-[#1F2A44] to-midnight-600 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
             News & Updates ✨
@@ -100,34 +100,39 @@ export default function BlogPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Category Filter */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          <button
-            onClick={() => setSelectedCategory("ALL")}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              selectedCategory === "ALL"
-                ? "bg-[#1F2A44] text-white"
-                : "bg-[#1F2A44]/10 text-[#1F2A44] hover:bg-[#FFB957]/30 dark:bg-slate-700 dark:text-slate-300"
-            }`}
-          >
-            All Posts
-          </button>
-          {(Object.keys(blogCategoryLabels) as BlogCategory[]).map((category) => (
+        <div className="section-outlined mb-8">
+          <span className="section-title">Filter by Category</span>
+          <div className="flex flex-wrap gap-2 pt-2">
             <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => setSelectedCategory("ALL")}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                selectedCategory === category
+                selectedCategory === "ALL"
                   ? "bg-[#1F2A44] text-white"
-                  : `${categoryColors[category]} hover:opacity-80`
+                  : "bg-[#1F2A44]/10 text-[#1F2A44] hover:bg-[#FFB957]/30 dark:bg-slate-700 dark:text-slate-300"
               }`}
             >
-              {blogCategoryLabels[category]}
+              All Posts
             </button>
-          ))}
+            {(Object.keys(blogCategoryLabels) as BlogCategory[]).map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  selectedCategory === category
+                    ? "bg-[#1F2A44] text-white"
+                    : `${categoryColors[category]} hover:opacity-80`
+                }`}
+              >
+                {blogCategoryLabels[category]}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Posts Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="section-outlined mb-8">
+          <span className="section-title">Latest Posts</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
           {filteredPosts.map((post) => (
             <a
               key={post.id}
@@ -160,6 +165,7 @@ export default function BlogPage() {
             </a>
           ))}
         </div>
+        </div>
 
         {/* Empty State */}
         {filteredPosts.length === 0 && (
@@ -175,8 +181,9 @@ export default function BlogPage() {
         )}
 
         {/* Newsletter Signup */}
-        <div className="mt-16 card-magical p-8 bg-linear-to-r from-[#FAF4EF] to-[#fff8eb] dark:from-[#1F2A44]/20 dark:to-[#FFB957]/10">
-          <div className="max-w-2xl mx-auto text-center">
+        <div className="section-outlined mt-8 bg-linear-to-r from-[#FAF4EF]/50 to-ember-50/50 dark:from-[#1F2A44]/20 dark:to-[#FFB957]/10">
+          <span className="section-title">Stay Connected</span>
+          <div className="max-w-2xl mx-auto text-center pt-2">
             <h3 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white mb-3">
               Never Miss an Update
             </h3>

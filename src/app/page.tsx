@@ -22,10 +22,24 @@ export default function Home() {
         {/* Overlay for text readability */}
         <div className="absolute inset-0 bg-linear-to-t from-[#1F2A44]/80 via-[#1F2A44]/40 to-transparent" />
         
+        {/* Twinkling stars overlay */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute w-1 h-1 bg-white rounded-full animate-twinkle top-[10%] left-[15%] opacity-80" style={{ animationDelay: '0s' }} />
+          <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle top-[20%] left-[80%] opacity-70" style={{ animationDelay: '0.5s' }} />
+          <div className="absolute w-1 h-1 bg-white rounded-full animate-twinkle top-[35%] left-[25%] opacity-60" style={{ animationDelay: '1s' }} />
+          <div className="absolute w-2 h-2 bg-white rounded-full animate-twinkle top-[15%] left-[60%] opacity-80" style={{ animationDelay: '1.5s' }} />
+          <div className="absolute w-1 h-1 bg-white rounded-full animate-twinkle top-[45%] left-[90%] opacity-70" style={{ animationDelay: '2s' }} />
+          <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle top-[25%] left-[45%] opacity-60" style={{ animationDelay: '2.5s' }} />
+          <div className="absolute w-1 h-1 bg-white rounded-full animate-twinkle top-[55%] left-[10%] opacity-50" style={{ animationDelay: '0.8s' }} />
+          <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle top-[40%] left-[70%] opacity-70" style={{ animationDelay: '1.8s' }} />
+        </div>
+        
         {/* Floating sparkles */}
-        <div className="absolute top-20 left-10 text-4xl opacity-40 animate-float">✨</div>
-        <div className="absolute top-32 right-16 text-3xl opacity-30 animate-float [animation-delay:1s]">⭐</div>
-        <div className="absolute bottom-32 left-1/4 text-3xl opacity-30 animate-float [animation-delay:0.5s]">🌟</div>
+        <div className="absolute top-20 left-10 text-4xl opacity-40 animate-float-slow">✨</div>
+        <div className="absolute top-32 right-16 text-3xl opacity-30 animate-float-drift [animation-delay:1s]">⭐</div>
+        <div className="absolute bottom-32 left-1/4 text-3xl opacity-30 animate-float-slow [animation-delay:0.5s]">🌟</div>
+        <div className="absolute top-1/4 right-1/4 text-2xl opacity-25 animate-float-drift [animation-delay:2s]">✦</div>
+        <div className="absolute bottom-1/4 right-10 text-3xl opacity-35 animate-float-slow [animation-delay:1.5s]">💫</div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
           <div className="text-center">
@@ -41,8 +55,8 @@ export default function Home() {
               in one enchanted place. Make every moment count.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/register" className="btn-gold text-lg px-8 py-4">
-                Start Planning ✨
+              <a href="/plan" className="btn-gold text-lg px-8 py-4">
+                ✨ Start Planning ✨
               </a>
               <a href="/blog" className="btn-outline-light text-lg px-8 py-4">
                 Latest Updates
@@ -66,8 +80,8 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Park Reservations */}
-            <div className="card-magical p-6 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#1F2A44]/10 dark:bg-[#1F2A44] flex items-center justify-center">
+            <div className="card-magical p-6 text-center animate-slide-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#1F2A44]/10 dark:bg-[#1F2A44] flex items-center justify-center transition-transform hover:scale-110 hover:rotate-3">
                 <span className="text-3xl">🏰</span>
               </div>
               <h3 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-[#FAF4EF] mb-2">
@@ -79,8 +93,8 @@ export default function Home() {
             </div>
 
             {/* Ride Scheduling */}
-            <div className="card-magical p-6 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#FFB957]/20 dark:bg-[#FFB957]/30 flex items-center justify-center">
+            <div className="card-magical p-6 text-center animate-slide-up" style={{ animationDelay: '0.2s', opacity: 0 }}>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#FFB957]/20 dark:bg-[#FFB957]/30 flex items-center justify-center transition-transform hover:scale-110 hover:rotate-3">
                 <span className="text-3xl">🎢</span>
               </div>
               <h3 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-[#FAF4EF] mb-2">
@@ -92,8 +106,8 @@ export default function Home() {
             </div>
 
             {/* Hotel Bookings */}
-            <div className="card-magical p-6 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#F8AFA6]/30 dark:bg-[#F8AFA6]/20 flex items-center justify-center">
+            <div className="card-magical p-6 text-center animate-slide-up" style={{ animationDelay: '0.3s', opacity: 0 }}>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#F8AFA6]/30 dark:bg-[#F8AFA6]/20 flex items-center justify-center transition-transform hover:scale-110 hover:rotate-3">
                 <span className="text-3xl">🏨</span>
               </div>
               <h3 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-[#FAF4EF] mb-2">
@@ -105,8 +119,8 @@ export default function Home() {
             </div>
 
             {/* Car Rentals */}
-            <div className="card-magical p-6 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#A7D2B7]/30 dark:bg-[#A7D2B7]/20 flex items-center justify-center">
+            <div className="card-magical p-6 text-center animate-slide-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#A7D2B7]/30 dark:bg-[#A7D2B7]/20 flex items-center justify-center transition-transform hover:scale-110 hover:rotate-3">
                 <span className="text-3xl">🚗</span>
               </div>
               <h3 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-[#FAF4EF] mb-2">
@@ -118,8 +132,8 @@ export default function Home() {
             </div>
 
             {/* Flight Info */}
-            <div className="card-magical p-6 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#677595]/20 dark:bg-[#677595]/30 flex items-center justify-center">
+            <div className="card-magical p-6 text-center animate-slide-up" style={{ animationDelay: '0.5s', opacity: 0 }}>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#677595]/20 dark:bg-[#677595]/30 flex items-center justify-center transition-transform hover:scale-110 hover:rotate-3">
                 <span className="text-3xl">✈️</span>
               </div>
               <h3 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-[#FAF4EF] mb-2">
@@ -131,8 +145,8 @@ export default function Home() {
             </div>
 
             {/* Group Trips */}
-            <div className="card-magical p-6 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#F8AFA6]/30 dark:bg-[#F8AFA6]/20 flex items-center justify-center">
+            <div className="card-magical p-6 text-center animate-slide-up" style={{ animationDelay: '0.6s', opacity: 0 }}>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#F8AFA6]/30 dark:bg-[#F8AFA6]/20 flex items-center justify-center transition-transform hover:scale-110 hover:rotate-3">
                 <span className="text-3xl">👨‍👩‍👧‍👦</span>
               </div>
               <h3 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-[#FAF4EF] mb-2">
@@ -199,16 +213,23 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-linear-to-r from-[#1F2A44] to-midnight-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="relative py-20 bg-animated-gradient overflow-hidden">
+        {/* Animated background particles */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute w-2 h-2 bg-[#FFB957] rounded-full animate-float-drift opacity-30 top-[20%] left-[10%]" style={{ animationDelay: '0s' }} />
+          <div className="absolute w-3 h-3 bg-[#FFB957] rounded-full animate-float-slow opacity-20 top-[60%] right-[15%]" style={{ animationDelay: '1s' }} />
+          <div className="absolute w-2 h-2 bg-white rounded-full animate-twinkle opacity-40 top-[30%] right-[30%]" style={{ animationDelay: '0.5s' }} />
+          <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle opacity-30 bottom-[25%] left-[25%]" style={{ animationDelay: '1.5s' }} />
+        </div>
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#FAF4EF] mb-6">
             Ready to Make Magical Memories?
           </h2>
           <p className="text-[#E5E5E5] text-lg mb-8">
             Join Magical Holidays today and start planning your perfect vacation.
           </p>
-          <a href="/register" className="btn-gold text-lg px-10 py-4 inline-block">
-            Create Your Free Account ✨
+          <a href="/register" className="btn-gold text-lg px-10 py-4 inline-block animate-pulse-glow">
+            ✨ Create Your Free Account ✨
           </a>
         </div>
       </section>
