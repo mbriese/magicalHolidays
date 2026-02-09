@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import AddReservationModal from "@/components/modals/AddReservationModal";
 import ConfirmModal from "@/components/modals/ConfirmModal";
+import EmailItineraryModal from "@/components/modals/EmailItineraryModal";
+import { DownloadItineraryButton } from "@/components/pdf";
 import { formatDateRange } from "@/lib/formatters";
 import {
   reservationTypeConfig,
@@ -33,6 +35,9 @@ export default function TripDetailPage() {
   // Delete reservation state
   const [deleteReservation, setDeleteReservation] = useState<ReservationApiResponse | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Email modal state
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
 
   useEffect(() => {
     fetchTrip();
@@ -124,7 +129,7 @@ export default function TripDetailPage() {
   if (loading) {
     return (
       <div className="animate-fade-in">
-        <div className="bg-linear-to-r from-[#1F2A44] to-[#344262] py-12">
+        <div className="bg-linear-to-r from-[#1F2A44] to-midnight-600 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="animate-pulse">
               <div className="h-4 w-24 bg-[#FFB957]/50 rounded mb-4" />
@@ -162,7 +167,7 @@ export default function TripDetailPage() {
   return (
     <div className="animate-fade-in">
       {/* Page Header */}
-      <div className="bg-linear-to-r from-[#1F2A44] to-[#344262] py-12">
+      <div className="bg-linear-to-r from-[#1F2A44] to-midnight-600 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <a
             href="/trips"
@@ -197,6 +202,35 @@ export default function TripDetailPage() {
               </div>
             </div>
           )}
+          
+          {/* Itinerary Actions */}
+          <div className="mt-4 flex flex-wrap gap-3">
+            <DownloadItineraryButton 
+              trip={trip} 
+              includeParticipantPages={true}
+              className="bg-[#FFB957] hover:bg-ember-500 text-[#1F2A44]"
+            />
+            <button
+              onClick={() => setIsEmailModalOpen(true)}
+              className="btn-magical inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white border border-white/30"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              Email Itinerary
+            </button>
+          </div>
         </div>
       </div>
 
@@ -308,6 +342,13 @@ export default function TripDetailPage() {
         cancelText="Cancel"
         variant="danger"
         isLoading={isDeleting}
+      />
+
+      {/* Email Itinerary Modal */}
+      <EmailItineraryModal
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
+        trip={trip}
       />
     </div>
   );
