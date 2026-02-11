@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import PWAProvider from "@/components/PWAProvider";
+import PixieDust from "@/components/PixieDust";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -84,6 +85,7 @@ export default function RootLayout({
                   >
                     News & Updates
                   </a>
+                  <PixieDust />
                 </nav>
 
                 {/* Auth Buttons */}
