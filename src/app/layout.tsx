@@ -1,8 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Playfair_Display, Inter, Italianno } from "next/font/google";
 import "./globals.css";
 import PWAProvider from "@/components/PWAProvider";
 import PixieDust from "@/components/PixieDust";
+
+const brand = Italianno({
+  subsets: ["latin"],
+  weight: ["400"], // Italianno only has 400
+  variable: "--font-brand",
+  display: "swap",
+});
+
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -50,7 +58,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
+    <html lang="en" className={`${playfair.variable} ${inter.variable} ${brand.variable}`}>
       <body className="min-h-screen bg-[#FAF4EF] dark:bg-[#1F2A44]">
         <div className="flex flex-col min-h-screen">
           {/* Header */}
@@ -67,6 +75,7 @@ export default function RootLayout({
 
                 {/* Navigation */}
                 <nav className="hidden md:flex items-center space-x-6">
+                  
                   <a
                     href="/dashboard"
                     className="text-[#2B2B2B] dark:text-[#FAF4EF] hover:text-[#FFB957] transition-colors font-medium"

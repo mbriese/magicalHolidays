@@ -67,9 +67,9 @@
   --color-reservation-flight: #677595;
 
   /* Font Family */
-  --font-serif: var(--font-playfair), Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-display: var(--font-playfair), Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-family-sans: var(--font-inter);
+  --font-family-serif: var(--font-playfair);
+
 
   /* Custom Animations */
   --animate-sparkle: sparkle 2s ease-in-out infinite;
@@ -149,6 +149,8 @@
 }
 
 :root {
+  --font-heading: var(--font-playfair);
+  --font-body: var(--font-inter);
   /* Primary Colors */
   --primary: #1F2A44;
   --primary-light: #344262;
@@ -194,7 +196,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
   font-weight: 500;
   font-size: 18px;
   line-height: 1.6;

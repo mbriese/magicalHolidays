@@ -1,34 +1,15 @@
+import HeroCarousel from "@/components/HeroCarousel";
+import { heroSlides } from "@/data/heroSlides";
+
 export default function Home() {
   return (
     <div className="animate-fade-in">
-      {/* Hero Section with Magical Splash Image */}
-      <section className="relative overflow-hidden hero-section">
-        {/* Hero Image - displayed to show full design including text and buttons */}
-        <div 
-          className="w-full h-auto min-h-[500px] md:min-h-[600px] lg:min-h-[700px] bg-contain bg-center bg-no-repeat bg-[#1F2A44]"
-          style={{ backgroundImage: 'url(/images/magicalHolidaySplash.png)' }}
-        />
-        
-        {/* Clickable button overlays positioned where image buttons are */}
-        <div className="absolute inset-0 flex items-end justify-center pb-[4%] md:pb-[3%] lg:pb-[2%]">
-          <div className="flex flex-col sm:flex-row gap-3 justify-center" style={{ transform: 'translate(-253px, -5px)' }}>
-            <a 
-              href="/plan" 
-              className="rounded-full bg-transparent hover:bg-white/10 transition-colors cursor-pointer"
-              style={{ minWidth: '160px', minHeight: '40px' }}
-            >
-              <span className="sr-only">Start Planning</span>
-            </a>
-            <a 
-              href="/dashboard" 
-              className="rounded-full bg-transparent hover:bg-white/10 transition-colors cursor-pointer"
-              style={{ minWidth: '160px', minHeight: '40px' }}
-            >
-              <span className="sr-only">View Calendar</span>
-            </a>
-          </div>
-        </div>
-      </section>
+      {/* Hero Carousel Section */}
+      <HeroCarousel 
+        slides={heroSlides}
+        backgroundImage="/images/heroes/hero-milestones.jpg"
+        autoPlayInterval={6000}
+      />
 
       {/* Quick Start Section */}
       <section className="pt-8 pb-4 bg-white dark:bg-[#2a3654]">
