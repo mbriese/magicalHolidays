@@ -64,11 +64,11 @@ export default function RootLayout({
           {/* Header */}
           <header className="bg-white/90 dark:bg-[#1F2A44]/90 backdrop-blur-md border-b border-[#E5E5E5] dark:border-midnight-500 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center h-16">
+              <div className="flex justify-between items-center py-4">
                 {/* Logo */}
-                <a href="/" className="flex items-center space-x-2">
-                  <span className="text-2xl">✨</span>
-                  <span className="font-serif text-xl font-semibold text-[#1F2A44] dark:text-[#FAF4EF]">
+                <a href="/" className="flex items-center gap-3">
+                  <img src="/images/brand/lantern.svg" alt="Magical Holidays lantern logo" className="w-8 h-8 object-contain"/>
+                  <span   className="[font-family:var(--font-brand)] text-4xl leading-none text-[#1F2A44] dark:text-[#FAF4EF]">
                     Magical Holidays
                   </span>
                 </a>
