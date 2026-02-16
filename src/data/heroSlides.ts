@@ -1,36 +1,44 @@
 import type { HeroSlide } from "@/components/HeroCarousel";
 
-// Hero carousel slides - customize these with your own content and images
 export const heroSlides: HeroSlide[] = [
   {
-    id: "slide-1",
-    title: "Plan Your Perfect Vacation",
-    subtitle: "Organize every detail of your magical adventure - from park reservations to dining, all in one place.",
-    image: "/images/hero-trips-desktop.png",
-    imageAlt: "Family planning their Disney vacation",
+    id: "slide-family-arrival",
+    title: "Into The Magic",
+    subtitle:
+      "Where The Adventure Begins",
+    image: "/images/heroes/hero-family-arrival-v3.jpg",    
+    imageAlt: "Family walking toward a glowing fairytale castle at sunset",
   },
   {
-    id: "slide-2", 
-    title: "Track Every Moment",
-    subtitle: "Never miss a reservation. Keep your Lightning Lane bookings, dining reservations, and park tickets organized.",
-    image: "/images/hero-desktop.png",
-    imageAlt: "Calendar with trip reservations",
+    id: "slide-solo-glow",
+    title: "Solo Spark",
+    subtitle:
+      "Where Choosing Yourself Feels Luminous",
+    image: "/images/heroes/hero-solo-glow-v3.jpg",
+    imageAlt: "Confident woman smiling as she walks toward a castle at sunset",
   },
   {
-    id: "slide-3",
-    title: "Create Lasting Memories",
-    subtitle: "From your first park day to your farewell dinner, capture every magical moment of your journey.",
-    image: "/images/magicalHolidaySplash.png",
-    imageAlt: "Magical vacation memories",
+    id: "slide-magical-miles",
+    title: "Magical Miles",
+    subtitle:
+      "Where Every Mile Becomes A Memory",
+    image: "/images/heroes/hero-magical-miles-v3.jpg",
+    imageAlt: "Runner celebrating a magical race through a fairytale park",
+  },
+  {
+    id: "slide-generational-magic",
+    title: "Generations Legacy",
+    subtitle:
+      "Where Generations Walk Into Wonder",
+    image: "/images/heroes/hero-generational-magic-v3.jpg",
+    imageAlt: "Grandmother and granddaughter walking hand in hand toward a castle",
+  },
+  {
+    id: "slide-reunion-magic",
+    title: "Back Together",
+    subtitle:
+      "Where Distance Disappears",
+    image: "/images/heroes/hero-reunion-magic-v3.jpg",
+    imageAlt: "Family reunion hug in front of a glowing castle at sunset",
   },
 ];
-
-// You can add more slides here as you add more images
-// Example:
-// {
-//   id: "slide-4",
-//   title: "Your Title Here",
-//   subtitle: "Your description here",
-//   image: "/images/your-image.jpg",
-//   imageAlt: "Description of image",
-// },
