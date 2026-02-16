@@ -27,7 +27,7 @@ export const heroSlides: HeroSlide[] = [
   },
   {
     id: "slide-generational-magic",
-    title: "Generations Legacy",
+    title: "Generational Legacy",
     subtitle:
       "Where Generations Walk Into Wonder",
     image: "/images/heroes/hero-generational-magic-v3.jpg",
