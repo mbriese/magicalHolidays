@@ -21,7 +21,7 @@ export default function PWAProvider({ children }: PWAProviderProps) {
       {/* Update available banner */}
       {isUpdateAvailable && (
         <div className="fixed top-20 left-4 right-4 md:left-auto md:right-4 md:w-80 z-50 animate-fade-in">
-          <div className="bg-[#1F2A44]/10 dark:bg-[#1F2A44]/50 border border-[#E5E5E5] dark:border-[#41537b] rounded-lg shadow-lg p-4">
+          <div className="bg-[#1F2A44]/10 dark:bg-[#1F2A44]/50 border border-[#E5E5E5] dark:border-midnight-500 rounded-lg shadow-lg p-4">
             <div className="flex items-start gap-3">
               <div className="text-[#1F2A44] dark:text-[#FFB957]">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,7 +33,7 @@ export default function PWAProvider({ children }: PWAProviderProps) {
                   Update available!
                 </p>
                 <p className="text-xs text-[#1F2A44] dark:text-[#FFB957] mt-1">
-                  A new version of Magical Holidays is ready.
+                  A new version of Lamplight Holidays is ready.
                 </p>
                 <button
                   onClick={updateServiceWorker}

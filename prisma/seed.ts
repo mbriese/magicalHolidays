@@ -151,7 +151,7 @@ const badges = [
   // ============================================
   {
     name: "Early Bird",
-    description: "Joined the Magical Holidays family!",
+    description: "Joined the Lamplight Holidays family!",
     icon: "🐣",
     category: BadgeCategory.SPECIAL,
     rarity: BadgeRarity.RARE,
@@ -170,7 +170,7 @@ const badges = [
 ];
 
 async function main() {
-  console.log("🌟 Seeding Magical Holidays database...\n");
+  console.log("🌟 Seeding LamplightHolidays database...\n");
 
   // Create demo user if not exists
   const existingUser = await prisma.user.findFirst();

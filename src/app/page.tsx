@@ -7,7 +7,6 @@ export default function Home() {
       {/* Hero Carousel Section */}
       <HeroCarousel 
         slides={heroSlides}
-        backgroundImage="/images/heroes/hero-milestones.jpg"
         autoPlayInterval={6000}
       />
 
@@ -72,17 +71,7 @@ export default function Home() {
           <div className="absolute w-2 h-2 bg-white rounded-full animate-twinkle opacity-40 top-[30%] right-[30%]" style={{ animationDelay: '0.5s' }} />
           <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle opacity-30 bottom-[25%] left-[25%]" style={{ animationDelay: '1.5s' }} />
         </div>
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#FAF4EF] mb-3">
-            Ready to Make Magical Memories?
-          </h2>
-          <p className="text-[#E5E5E5] mb-4">
-            Join Magical Holidays today and start planning your perfect vacation.
-          </p>
-          <a href="/register" className="btn-gold px-8 py-3 inline-block animate-pulse-glow">
-            ✨ Create Your Free Account ✨
-          </a>
-        </div>
+      
       </section>
     </div>
   );

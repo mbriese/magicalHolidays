@@ -9,7 +9,7 @@ import React from "react";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Email from address
-const EMAIL_FROM = process.env.EMAIL_FROM || "Magical Holidays <onboarding@resend.dev>";
+const EMAIL_FROM = process.env.EMAIL_FROM || "Lamplight Holidays <onboarding@resend.dev>";
 
 interface EmailRequest {
   tripId: string;

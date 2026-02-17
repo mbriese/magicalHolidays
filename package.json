@@ -1,7 +1,7 @@
 {
-  "name": "magicalholidays",
+  "name": "lamplightholidays",
   "version": "1.0.0",
-  "description": "Magical Holidays - Your enchanted travel planner for theme park vacations",
+  "description": "Lamplight Holidays - Your enchanted travel planner for theme park vacations",
   "private": true,
   "scripts": {
     "dev": "next dev",

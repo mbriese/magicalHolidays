@@ -70,7 +70,7 @@ export default function HeroCarousel({
           />
 
           {/* Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/15 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-r from-black/40 via-black/15 to-transparent" />
 
           {/* ================= BRAND LOCKUP ================= */}
           <div className="absolute left-[8%] top-[6%] flex items-center gap-4 z-20">
@@ -94,7 +94,7 @@ export default function HeroCarousel({
                 [font-family:var(--font-brand)]
                 text-4xl md:text-5xl lg:text-6xl
                 leading-none
-                text-white
+                text-[#F6D58A]
                 drop-shadow-[0_8px_30px_rgba(0,0,0,0.6)]
                 whitespace-nowrap
               "

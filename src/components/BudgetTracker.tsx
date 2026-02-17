@@ -306,7 +306,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
         <>
           {/* Budget Overview */}
           {budget.enabled && budget.amount && summary && (
-            <div className="mb-6 p-4 rounded-xl bg-linear-to-r from-[#FAF4EF] to-[#F8AFA6]/20 dark:from-[#1F2A44]/20 dark:to-[#F8AFA6]/10 border border-[#E5E5E5] dark:border-[#41537b]">
+            <div className="mb-6 p-4 rounded-xl bg-linear-to-r from-[#FAF4EF] to-[#F8AFA6]/20 dark:from-[#1F2A44]/20 dark:to-[#F8AFA6]/10 border border-[#E5E5E5] dark:border-midnight-50">
               <div className="flex items-center justify-between mb-3">
                 <span className="font-semibold text-[#1F2A44] dark:text-[#E5E5E5]">
                   Trip Budget
@@ -506,7 +506,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
               </button>
               <button
                 onClick={handleSaveBudget}
-                className="flex-1 py-2 rounded-lg bg-[#1F2A44] text-white hover:bg-[#344262]"
+                className="flex-1 py-2 rounded-lg bg-[#1F2A44] text-white hover:bg-midnight-600"
               >
                 Save Budget
               </button>
@@ -647,7 +647,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
               <button
                 onClick={handleAddExpense}
                 disabled={!expenseForm.amount || !expenseForm.description}
-                className="flex-1 py-2 rounded-lg bg-[#1F2A44] text-white hover:bg-[#344262] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2 rounded-lg bg-[#1F2A44] text-white hover:bg-midnight-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {editingExpense ? "Save Changes" : "Add Expense"}
               </button>

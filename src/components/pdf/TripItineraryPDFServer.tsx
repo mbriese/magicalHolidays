@@ -8,7 +8,7 @@ import {
 } from "@react-pdf/renderer";
 import type { TripApiResponse, ReservationApiResponse } from "@/types";
 
-// Magical Holidays color palette
+// Lamplight Holidays color palette
 const colors = {
   midnight: "#1F2A44",
   midnightLight: "#344262",

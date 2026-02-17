@@ -27,8 +27,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Magical Holidays - Your Enchanted Travel Planner",
-  description: "Plan your magical theme park vacation with ease. Organize park reservations, rides, hotels, car rentals, and flights all in one place.",
+  title: "Lamplight Holidays - Your Enchanted Travel Planner",
+  description: "Where magical trips become effortless. Organize reservations, experiences, and travel details in one beautifully simple place.",
   keywords: ["travel planner", "vacation", "theme park", "trip planning", "reservations"],
   manifest: "/manifest.json",
   icons: {
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Magical Holidays",
+    title: "Lamplight Holidays",
   },
   formatDetection: {
     telephone: false,
@@ -67,9 +67,9 @@ export default function RootLayout({
               <div className="flex justify-between items-center py-4">
                 {/* Logo */}
                 <a href="/" className="flex items-center gap-3">
-                  <img src="/images/brand/lantern.svg" alt="Magical Holidays lantern logo" className="w-8 h-8 object-contain"/>
+                  <img src="/images/brand/lantern.svg" alt="Lamplight Holidays lantern logo" className="w-8 h-8 object-contain"/>
                   <span   className="[font-family:var(--font-brand)] text-4xl leading-none text-[#1F2A44] dark:text-[#FAF4EF]">
-                    Magical Holidays
+                    LamplightHolidays
                   </span>
                 </a>
 
@@ -132,7 +132,7 @@ export default function RootLayout({
                   <div className="flex items-center space-x-2 mb-4">
                     <span className="text-2xl">✨</span>
                     <span className="font-serif text-xl font-semibold text-[#FFB957]">
-                      Magical Holidays
+                      Lamplight Holidays
                     </span>
                   </div>
                   <p className="text-sm text-[#BDBDBD]">
@@ -166,14 +166,14 @@ export default function RootLayout({
                 <div>
                   <h3 className="font-semibold text-[#FFB957] mb-4">Disclaimer</h3>
                   <p className="text-sm text-[#BDBDBD]">
-                    Magical Holidays is an independent travel planning tool. 
+                    Lamplight Holidays is an independent travel planning tool. 
                     We are not affiliated with, endorsed by, or connected to any theme park or entertainment company.
                   </p>
                 </div>
               </div>
 
               <div className="border-t border-midnight-500 mt-8 pt-8 text-center text-sm text-[#BDBDBD]">
-                <p>© 2026 Magical Holidays. All rights reserved.</p>
+                <p>© 2026 Lamplight Holidays. All rights reserved.</p>
               </div>
             </div>
           </footer>
