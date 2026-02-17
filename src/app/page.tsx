@@ -5,10 +5,7 @@ export default function Home() {
   return (
     <div className="animate-fade-in">
       {/* Hero Carousel Section */}
-      <HeroCarousel 
-        slides={heroSlides}
-        autoPlayInterval={6000}
-      />
+      <HeroCarousel slides={heroSlides} autoPlayInterval={6000} />
 
       {/* Quick Start Section */}
       <section className="pt-8 pb-4 bg-white dark:bg-[#2a3654]">
@@ -19,10 +16,10 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* Hotels */}
-            <a 
-              href="/plan?type=HOTEL" 
+            <a
+              href="/plan/hotels"
               className="card-trip p-3 text-center group cursor-pointer"
             >
               <div className="w-14 h-14 mx-auto mb-2 rounded-full bg-[#F8AFA6]/30 dark:bg-[#F8AFA6]/20 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
@@ -33,22 +30,35 @@ export default function Home() {
               </h3>
             </a>
 
-            {/* Transportation */}
-            <a 
-              href="/plan?type=FLIGHT" 
+            {/* Flights */}
+            <a
+              href="/plan/flights"
               className="card-trip p-3 text-center group cursor-pointer"
             >
               <div className="w-14 h-14 mx-auto mb-2 rounded-full bg-[#A7D2B7]/30 dark:bg-[#A7D2B7]/20 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
-                <span className="text-2xl">✈️🚗</span>
+                <span className="text-2xl">✈️</span>
               </div>
               <h3 className="font-serif text-base font-bold text-[#1F2A44] dark:text-[#FAF4EF]">
-                Transportation
+                Flights
+              </h3>
+            </a>
+
+            {/* Cars */}
+            <a
+              href="/plan/cars"
+              className="card-trip p-3 text-center group cursor-pointer"
+            >
+              <div className="w-14 h-14 mx-auto mb-2 rounded-full bg-[#FFB957]/25 dark:bg-[#FFB957]/20 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
+                <span className="text-2xl">🚗</span>
+              </div>
+              <h3 className="font-serif text-base font-bold text-[#1F2A44] dark:text-[#FAF4EF]">
+                Cars
               </h3>
             </a>
 
             {/* Attractions */}
-            <a 
-              href="/plan?type=PARK" 
+            <a
+              href="/plan/parks"
               className="card-trip p-3 text-center group cursor-pointer"
             >
               <div className="w-14 h-14 mx-auto mb-2 rounded-full bg-[#1F2A44]/10 dark:bg-[#1F2A44] flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
@@ -66,14 +76,24 @@ export default function Home() {
       <section className="relative py-10 bg-animated-gradient overflow-hidden">
         {/* Animated background particles */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute w-2 h-2 bg-[#FFB957] rounded-full animate-float-drift opacity-30 top-[20%] left-[10%]" style={{ animationDelay: '0s' }} />
-          <div className="absolute w-3 h-3 bg-[#FFB957] rounded-full animate-float-slow opacity-20 top-[60%] right-[15%]" style={{ animationDelay: '1s' }} />
-          <div className="absolute w-2 h-2 bg-white rounded-full animate-twinkle opacity-40 top-[30%] right-[30%]" style={{ animationDelay: '0.5s' }} />
-          <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle opacity-30 bottom-[25%] left-[25%]" style={{ animationDelay: '1.5s' }} />
+          <div
+            className="absolute w-2 h-2 bg-[#FFB957] rounded-full animate-float-drift opacity-30 top-[20%] left-[10%]"
+            style={{ animationDelay: "0s" }}
+          />
+          <div
+            className="absolute w-3 h-3 bg-[#FFB957] rounded-full animate-float-slow opacity-20 top-[60%] right-[15%]"
+            style={{ animationDelay: "1s" }}
+          />
+          <div
+            className="absolute w-2 h-2 bg-white rounded-full animate-twinkle opacity-40 top-[30%] right-[30%]"
+            style={{ animationDelay: "0.5s" }}
+          />
+          <div
+            className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle opacity-30 bottom-[25%] left-[25%]"
+            style={{ animationDelay: "1.5s" }}
+          />
         </div>
-      
       </section>
     </div>
   );
 }
-
