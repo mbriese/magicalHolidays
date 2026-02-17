@@ -140,28 +140,7 @@ export default function RootLayout({
                   </p>
                 </div>
 
-                {/* Quick Links */}
-                <div>
-                  <h3 className="font-semibold text-[#FFB957] mb-4">Quick Links</h3>
-                  <ul className="space-y-2 text-sm">
-                    <li>
-                      <a href="/dashboard" className="hover:text-[#FFB957] transition-colors">
-                        Dashboard
-                      </a>
-                    </li>
-                    <li>
-                      <a href="/trips" className="hover:text-[#FFB957] transition-colors">
-                        My Trips
-                      </a>
-                    </li>
-                    <li>
-                      <a href="/blog" className="hover:text-[#FFB957] transition-colors">
-                        News & Updates
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
+                
                 {/* Disclaimer */}
                 <div>
                   <h3 className="font-semibold text-[#FFB957] mb-4">Disclaimer</h3>
