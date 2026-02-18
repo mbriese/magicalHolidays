@@ -29,6 +29,8 @@ interface ApiReservation {
   location: string | null;
   confirmationNumber: string | null;
   notes: string | null;
+  guests: string[];
+  guestCount: number | null;
   trip: { name: string };
 }
 

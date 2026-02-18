@@ -97,7 +97,7 @@ import type {
     async searchCars(params: CarSearchParams): Promise<ProviderResult<CarOption>> {
       return {
         meta: { provider: this.name, warnings: ["Stub data (no live provider connected yet)."] },
-        results: [
+        results: ([
           {
             id: "stub-car-1",
             company: "Star Rentals",
@@ -105,7 +105,7 @@ import type {
             price: money(59.99),
             seats: 5,
             bags: 3,
-            transmission: "Automatic",
+            transmission: "Automatic" as const,
           },
           {
             id: "stub-car-2",
@@ -114,9 +114,9 @@ import type {
             price: money(39.99),
             seats: 4,
             bags: 2,
-            transmission: "Automatic",
+            transmission: "Automatic" as const,
           },
-        ].slice(0, params.maxResults ?? 20),
+        ] satisfies CarOption[]).slice(0, params.maxResults ?? 20),
       };
     }
   }
