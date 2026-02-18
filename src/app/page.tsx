@@ -72,28 +72,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative py-10 bg-animated-gradient overflow-hidden">
-        {/* Animated background particles */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div
-            className="absolute w-2 h-2 bg-[#FFB957] rounded-full animate-float-drift opacity-30 top-[20%] left-[10%]"
-            style={{ animationDelay: "0s" }}
-          />
-          <div
-            className="absolute w-3 h-3 bg-[#FFB957] rounded-full animate-float-slow opacity-20 top-[60%] right-[15%]"
-            style={{ animationDelay: "1s" }}
-          />
-          <div
-            className="absolute w-2 h-2 bg-white rounded-full animate-twinkle opacity-40 top-[30%] right-[30%]"
-            style={{ animationDelay: "0.5s" }}
-          />
-          <div
-            className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle opacity-30 bottom-[25%] left-[25%]"
-            style={{ animationDelay: "1.5s" }}
-          />
-        </div>
-      </section>
     </div>
   );
 }

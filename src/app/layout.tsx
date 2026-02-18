@@ -123,39 +123,21 @@ export default function RootLayout({
             </PWAProvider>
           </main>
 
-          {/* Footer */}
-          <footer className="bg-[#1F2A44] text-[#FAF4EF] py-12 mt-auto">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Brand */}
-                <div>
-                  <div className="flex items-center space-x-2 mb-4">
-                    <span className="text-2xl">✨</span>
-                    <span className="font-serif text-xl font-semibold text-[#FFB957]">
-                      Lamplight Holidays
-                    </span>
-                  </div>
-                  <p className="text-sm text-[#BDBDBD]">
-                    Your enchanted travel companion for planning unforgettable theme park adventures.
-                  </p>
-                </div>
+{/* Footer */}
+<footer className="bg-[#1F2A44] text-[#FAF4EF] py-8 mt-auto">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs sm:text-sm">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span className="text-[#FFB957] font-semibold">© 2026 Lamplight Holidays</span>
+        <span className="opacity-70">All rights reserved.</span>
+      </div>
 
-                
-                {/* Disclaimer */}
-                <div>
-                  <h3 className="font-semibold text-[#FFB957] mb-4">Disclaimer</h3>
-                  <p className="text-sm text-[#BDBDBD]">
-                    Lamplight Holidays is an independent travel planning tool. 
-                    We are not affiliated with, endorsed by, or connected to any theme park or entertainment company.
-                  </p>
-                </div>
-              </div>
-
-              <div className="border-t border-midnight-500 mt-8 pt-8 text-center text-sm text-[#BDBDBD]">
-                <p>© 2026 Lamplight Holidays. All rights reserved.</p>
-              </div>
-            </div>
-          </footer>
+      <p className="leading-snug text-[#BDBDBD]/90">
+        Lamplight Holidays is an independent travel planning tool. Not affiliated with any theme park or entertainment company.
+      </p>
+    </div>
+  </div>
+</footer>
         </div>
       </body>
     </html>
