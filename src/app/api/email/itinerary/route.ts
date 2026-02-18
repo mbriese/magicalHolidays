@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     // Generate PDF buffer
     console.log("Generating PDF for trip:", trip.name);
     const pdfBuffer = await renderToBuffer(
-      React.createElement(TripItineraryPDFServer, { trip: tripData })
+      React.createElement(TripItineraryPDFServer, { trip: tripData }) as React.ReactElement<import("@react-pdf/renderer").DocumentProps>
     );
     console.log("PDF generated, size:", pdfBuffer.length, "bytes");
 

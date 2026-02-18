@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { pdf } from "@react-pdf/renderer";
 import { TripItineraryPDF } from "./TripItineraryPDF";
 import type { TripApiResponse, ReservationApiResponse } from "@/types";
@@ -27,10 +27,10 @@ export const DownloadItineraryButton = ({
       
       // Generate the PDF blob
       const pdfDoc = pdf(
-        <TripItineraryPDF
+        (<TripItineraryPDF
           trip={trip}
           includeParticipantPages={includeParticipantPages}
-        />
+        />) as React.ReactElement<import("@react-pdf/renderer").DocumentProps>
       );
       
       console.log("PDF document created, generating blob...");
