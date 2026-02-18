@@ -5,11 +5,18 @@ import { TripItineraryPDFServer } from "@/components/pdf/TripItineraryPDFServer"
 import { prisma } from "@/lib/prisma";
 import React from "react";
 
-// Initialize Resend client
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 // Email from address
 const EMAIL_FROM = process.env.EMAIL_FROM || "Lamplight Holidays <onboarding@resend.dev>";
+
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "RESEND_API_KEY environment variable is not set. Add it to your environment to enable email sending."
+    );
+  }
+  return new Resend(apiKey);
+}
 
 interface EmailRequest {
   tripId: string;
@@ -206,6 +213,7 @@ export async function POST(request: NextRequest) {
 
     // Send email via Resend
     console.log("Sending email to:", recipients.join(", "));
+    const resend = getResendClient();
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: recipients,
