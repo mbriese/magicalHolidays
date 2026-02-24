@@ -6,7 +6,7 @@ export const heroSlides: HeroSlide[] = [
     title: "Into The Magic",
     subtitle:
       "Where The Adventure Begins",
-    image: "/images/heroes/hero-family-arrival-v3.jpg",    
+    image: "/images/heroes/hero-family-arrival-v4.jpg",    
     imageAlt: "Family walking toward a glowing fairytale castle at sunset",
   },
   {
@@ -22,7 +22,7 @@ export const heroSlides: HeroSlide[] = [
     title: "Magical Miles",
     subtitle:
       "Where Every Mile Becomes A Memory",
-    image: "/images/heroes/hero-magical-miles-v3.jpg",
+    image: "/images/heroes/hero-magical-miles-v4.jpg",
     imageAlt: "Runner celebrating a magical race through a fairytale park",
   },
   {
@@ -38,7 +38,7 @@ export const heroSlides: HeroSlide[] = [
     title: "Back Together",
     subtitle:
       "Where Distance Disappears",
-    image: "/images/heroes/hero-reunion-magic-v3.jpg",
+    image: "/images/heroes/hero-reunion-magic-v4.jpg",
     imageAlt: "Family reunion hug in front of a glowing castle at sunset",
   },
 ];
