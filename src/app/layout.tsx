@@ -96,19 +96,23 @@ export default function RootLayout({
                 </nav>
 
                 {/* Auth Buttons + PixieDust */}
-                <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+                <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
                   <PixieDust />
                   <a
                     href="/login"
-                    className="text-sm sm:text-base text-[#1F2A44] dark:text-[#FFB957] hover:text-[#FFB957] dark:hover:text-ember-300 font-medium transition-colors whitespace-nowrap"
+                    className="text-[#1F2A44] dark:text-[#FFB957] hover:text-[#FFB957] dark:hover:text-ember-300 font-medium transition-colors whitespace-nowrap"
+                    title="Sign In"
                   >
-                    Sign In
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:hidden"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span className="hidden sm:inline text-sm sm:text-base">Sign In</span>
                   </a>
                   <a
                     href="/register"
                     className="btn-gold text-xs sm:text-sm py-1.5 px-3 sm:py-2 sm:px-4 whitespace-nowrap"
+                    title="Get Started"
                   >
-                    Get Started
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:hidden"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                    <span className="hidden sm:inline">Get Started</span>
                   </a>
                 </div>
               </div>

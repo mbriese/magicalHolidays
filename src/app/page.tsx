@@ -16,56 +16,53 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 max-w-2xl gap-4">
-            {/* Hotels */}
+          <div className="grid grid-cols-4 max-w-2xl gap-2 sm:gap-4">
             <a
               href="/plan/hotels"
-              className="card-trip p-3 text-center group cursor-pointer"
+              className="card-trip p-2 sm:p-3 text-center group cursor-pointer"
             >
-              <div className="w-14 h-14 mx-auto mb-2 rounded-full bg-[#F8AFA6]/30 dark:bg-[#F8AFA6]/20 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
-                <span className="text-2xl">🏨</span>
+              <div className="w-10 h-10 sm:w-14 sm:h-14 mx-auto mb-1 sm:mb-2 rounded-full bg-[#F8AFA6]/30 dark:bg-[#F8AFA6]/20 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
+                <span className="text-lg sm:text-2xl">🏨</span>
               </div>
-              <h3 className="font-serif text-base font-bold text-[#1F2A44] dark:text-[#FAF4EF]">
+              <h3 className="font-serif text-xs sm:text-base font-bold text-[#1F2A44] dark:text-[#FAF4EF]">
                 Hotels
               </h3>
             </a>
 
-            {/* Flights */}
             <a
               href="/plan/flights"
-              className="card-trip p-3 text-center group cursor-pointer"
+              className="card-trip p-2 sm:p-3 text-center group cursor-pointer"
             >
-              <div className="w-14 h-14 mx-auto mb-2 rounded-full bg-[#A7D2B7]/30 dark:bg-[#A7D2B7]/20 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
-                <span className="text-2xl">✈️</span>
+              <div className="w-10 h-10 sm:w-14 sm:h-14 mx-auto mb-1 sm:mb-2 rounded-full bg-[#A7D2B7]/30 dark:bg-[#A7D2B7]/20 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
+                <span className="text-lg sm:text-2xl">✈️</span>
               </div>
-              <h3 className="font-serif text-base font-bold text-[#1F2A44] dark:text-[#FAF4EF]">
+              <h3 className="font-serif text-xs sm:text-base font-bold text-[#1F2A44] dark:text-[#FAF4EF]">
                 Flights
               </h3>
             </a>
 
-            {/* Cars */}
             <a
               href="/plan/cars"
-              className="card-trip p-3 text-center group cursor-pointer"
+              className="card-trip p-2 sm:p-3 text-center group cursor-pointer"
             >
-              <div className="w-14 h-14 mx-auto mb-2 rounded-full bg-[#FFB957]/25 dark:bg-[#FFB957]/20 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
-                <span className="text-2xl">🚗</span>
+              <div className="w-10 h-10 sm:w-14 sm:h-14 mx-auto mb-1 sm:mb-2 rounded-full bg-[#FFB957]/25 dark:bg-[#FFB957]/20 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
+                <span className="text-lg sm:text-2xl">🚗</span>
               </div>
-              <h3 className="font-serif text-base font-bold text-[#1F2A44] dark:text-[#FAF4EF]">
+              <h3 className="font-serif text-xs sm:text-base font-bold text-[#1F2A44] dark:text-[#FAF4EF]">
                 Cars
               </h3>
             </a>
 
-            {/* Attractions */}
             <a
               href="/plan/parks"
-              className="card-trip p-3 text-center group cursor-pointer"
+              className="card-trip p-2 sm:p-3 text-center group cursor-pointer"
             >
-              <div className="w-14 h-14 mx-auto mb-2 rounded-full bg-[#1F2A44]/10 dark:bg-[#1F2A44] flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
-                <span className="text-2xl">🏰🎢</span>
+              <div className="w-10 h-10 sm:w-14 sm:h-14 mx-auto mb-1 sm:mb-2 rounded-full bg-[#1F2A44]/10 dark:bg-[#1F2A44] flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
+                <span className="text-lg sm:text-2xl">🏰🎢</span>
               </div>
-              <h3 className="font-serif text-base font-bold text-[#1F2A44] dark:text-[#FAF4EF]">
-                Attractions
+              <h3 className="font-serif text-xs sm:text-base font-bold text-[#1F2A44] dark:text-[#FAF4EF]">
+                <span className="sm:hidden">Parks</span>
+                <span className="hidden sm:inline">Attractions</span>
               </h3>
             </a>
           </div>
