@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   getRandomPixieDust,
   categoryConfig,
@@ -70,15 +71,14 @@ export default function PixieDust() {
         <span className="absolute -top-1 -right-1 text-xs animate-ping">✨</span>
       </button>
 
-      {/* Modal Backdrop */}
-      {isOpen && (
+      {/* Modal — portalled to body so it escapes the header's backdrop-blur stacking context */}
+      {isOpen && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-100 flex items-center justify-center p-4"
           onClick={handleClose}
         >
           {/* Backdrop with sparkles */}
           <div className="absolute inset-0 bg-midnight-900/60 backdrop-blur-sm">
-            {/* Floating sparkles */}
             {[...Array(12)].map((_, i) => (
               <span
                 key={i}
@@ -100,7 +100,6 @@ export default function PixieDust() {
             className="relative w-full max-w-md transform animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Magic wand decoration */}
             <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-4xl animate-bounce">
               🪄
             </div>
@@ -146,7 +145,6 @@ export default function PixieDust() {
                   {pixieDust?.content}
                 </p>
 
-                {/* Location badge for Hidden Mickeys */}
                 {pixieDust?.location && (
                   <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 rounded-full text-sm text-purple-700 dark:text-purple-300">
                     <span>📍</span>
@@ -154,7 +152,6 @@ export default function PixieDust() {
                   </div>
                 )}
 
-                {/* Source for quotes */}
                 {pixieDust?.source && (
                   <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 italic">
                     — {pixieDust.source}
@@ -180,14 +177,14 @@ export default function PixieDust() {
               </div>
             </div>
 
-            {/* Bottom sparkle */}
             <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
               <span className="text-xl animate-twinkle" style={{ animationDelay: "0s" }}>⭐</span>
               <span className="text-xl animate-twinkle" style={{ animationDelay: "0.3s" }}>✨</span>
               <span className="text-xl animate-twinkle" style={{ animationDelay: "0.6s" }}>⭐</span>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
