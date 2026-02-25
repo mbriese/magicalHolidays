@@ -93,11 +93,11 @@ export default function RootLayout({
                   >
                     News & Updates
                   </a>
-                  <PixieDust />
                 </nav>
 
-                {/* Auth Buttons */}
+                {/* Auth Buttons + PixieDust */}
                 <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+                  <PixieDust />
                   <a
                     href="/login"
                     className="text-sm sm:text-base text-[#1F2A44] dark:text-[#FFB957] hover:text-[#FFB957] dark:hover:text-ember-300 font-medium transition-colors whitespace-nowrap"
