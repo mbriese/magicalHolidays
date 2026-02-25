@@ -24,6 +24,7 @@ export const heroSlides: HeroSlide[] = [
       "Where Every Mile Becomes A Memory",
     image: "/images/heroes/hero-magical-miles-v4.jpg",
     imageAlt: "Runner celebrating a magical race through a fairytale park",
+    objectPosition: "center 25%",
   },
   {
     id: "slide-generational-magic",

@@ -11,6 +11,7 @@ export interface HeroSlide {
   subtitle: string;
   image: string;
   imageAlt: string;
+  objectPosition?: string;
 }
 
 interface HeroCarouselProps {
@@ -93,7 +94,10 @@ export default function HeroCarousel({
               fill
               priority={index === 0}
               sizes="100vw"
-              className="object-cover object-center sm:object-[center_55%]"
+              className="object-cover"
+              style={{
+                objectPosition: slide.objectPosition ?? "center 55%",
+              }}
             />
 
             {/* Left readability gradient */}
