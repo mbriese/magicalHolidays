@@ -8,15 +8,15 @@ export default function Home() {
       <HeroCarousel slides={heroSlides} autoPlayInterval={6000} />
 
       {/* Quick Start Section */}
-      <section className="pt-8 pb-4 bg-white dark:bg-[#2a3654]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-2">
-            <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#1F2A44] dark:text-[#FAF4EF]">
+      <section className="pt-5 sm:pt-8 pb-4 bg-white dark:bg-[#2a3654]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-2">
+            <h2 className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-[#1F2A44] dark:text-[#FAF4EF]">
               What are you planning?
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 max-w-2xl gap-4">
             {/* Hotels */}
             <a
               href="/plan/hotels"

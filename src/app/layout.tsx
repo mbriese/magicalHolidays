@@ -64,18 +64,17 @@ export default function RootLayout({
           {/* Header */}
           <header className="bg-white/90 dark:bg-[#1F2A44]/90 backdrop-blur-md border-b border-[#E5E5E5] dark:border-midnight-500 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center py-4">
+              <div className="flex justify-between items-center py-3 sm:py-4">
                 {/* Logo */}
-                <a href="/" className="flex items-center gap-3">
-                  <img src="/images/brand/lantern.svg" alt="Lamplight Holidays lantern logo" className="w-8 h-8 object-contain"/>
-                  <span   className="[font-family:var(--font-brand)] text-4xl leading-none text-[#1F2A44] dark:text-[#FAF4EF]">
-                    LamplightHolidays
+                <a href="/" className="flex items-center gap-2 sm:gap-3 min-w-0 shrink">
+                  <img src="/images/brand/lantern.svg" alt="Lamplight Holidays lantern logo" className="w-7 h-7 sm:w-8 sm:h-8 object-contain shrink-0"/>
+                  <span className="[font-family:var(--font-brand)] text-xl sm:text-2xl md:text-4xl leading-none text-[#1F2A44] dark:text-[#FAF4EF] truncate">
+                    Lamplight Holidays
                   </span>
                 </a>
 
                 {/* Navigation */}
                 <nav className="hidden md:flex items-center space-x-6">
-                  
                   <a
                     href="/dashboard"
                     className="text-[#2B2B2B] dark:text-[#FAF4EF] hover:text-[#FFB957] transition-colors font-medium"
@@ -98,16 +97,16 @@ export default function RootLayout({
                 </nav>
 
                 {/* Auth Buttons */}
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
                   <a
                     href="/login"
-                    className="text-[#1F2A44] dark:text-[#FFB957] hover:text-[#FFB957] dark:hover:text-ember-300 font-medium transition-colors"
+                    className="text-sm sm:text-base text-[#1F2A44] dark:text-[#FFB957] hover:text-[#FFB957] dark:hover:text-ember-300 font-medium transition-colors whitespace-nowrap"
                   >
                     Sign In
                   </a>
                   <a
                     href="/register"
-                    className="btn-gold text-sm py-2 px-4"
+                    className="btn-gold text-xs sm:text-sm py-1.5 px-3 sm:py-2 sm:px-4 whitespace-nowrap"
                   >
                     Get Started
                   </a>
