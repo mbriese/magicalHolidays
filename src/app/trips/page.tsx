@@ -1,16 +1,59 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import AddReservationModal from "@/components/modals/AddReservationModal";
 import EditTripModal from "@/components/modals/EditTripModal";
 import { formatDateRange, getDaysUntil } from "@/lib/formatters";
 import type { TripApiResponse } from "@/types";
 
+interface TripConflict {
+  type: "date-overlap" | "duplicate-name";
+  otherTripName: string;
+}
+
+function getConflicts(trips: TripApiResponse[]): Map<string, TripConflict[]> {
+  const conflicts = new Map<string, TripConflict[]>();
+
+  const ensure = (id: string) => {
+    if (!conflicts.has(id)) conflicts.set(id, []);
+  };
+
+  for (let i = 0; i < trips.length; i++) {
+    for (let j = i + 1; j < trips.length; j++) {
+      const a = trips[i];
+      const b = trips[j];
+
+      const aStart = new Date(a.startDate).getTime();
+      const aEnd = new Date(a.endDate).getTime();
+      const bStart = new Date(b.startDate).getTime();
+      const bEnd = new Date(b.endDate).getTime();
+
+      if (aStart <= bEnd && bStart <= aEnd) {
+        ensure(a.id);
+        ensure(b.id);
+        conflicts.get(a.id)!.push({ type: "date-overlap", otherTripName: b.name });
+        conflicts.get(b.id)!.push({ type: "date-overlap", otherTripName: a.name });
+      }
+
+      if (a.name.trim().toLowerCase() === b.name.trim().toLowerCase()) {
+        ensure(a.id);
+        ensure(b.id);
+        conflicts.get(a.id)!.push({ type: "duplicate-name", otherTripName: b.name });
+        conflicts.get(b.id)!.push({ type: "duplicate-name", otherTripName: a.name });
+      }
+    }
+  }
+
+  return conflicts;
+}
+
 export default function TripsPage() {
   const [trips, setTrips] = useState<TripApiResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+
+  const conflicts = useMemo(() => getConflicts(trips), [trips]);
 
   // Edit modal state
   const [editingTrip, setEditingTrip] = useState<TripApiResponse | null>(null);
@@ -308,6 +351,32 @@ export default function TripsPage() {
                       </p>
                     )}
                   </a>
+
+                  {/* Conflict Warnings */}
+                  {conflicts.has(trip.id) && (() => {
+                    const tripConflicts = conflicts.get(trip.id)!;
+                    const dateOverlaps = tripConflicts.filter(c => c.type === "date-overlap");
+                    const dupeNames = tripConflicts.filter(c => c.type === "duplicate-name");
+                    return (
+                      <div className="mt-3 space-y-1.5">
+                        {dupeNames.length > 0 && (
+                          <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+                            <span className="shrink-0 mt-px">⚠️</span>
+                            <span>Duplicate name &mdash; another trip is also called &ldquo;{dupeNames[0].otherTripName}&rdquo;</span>
+                          </div>
+                        )}
+                        {dateOverlaps.length > 0 && (
+                          <div className="flex items-start gap-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-3 py-2 text-xs text-red-700 dark:text-red-400">
+                            <span className="shrink-0 mt-px">📅</span>
+                            <span>
+                              Date overlap with{" "}
+                              {dateOverlaps.map(c => `"${c.otherTripName}"`).filter((v, i, a) => a.indexOf(v) === i).join(", ")}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
 
                   {/* Add Reservation Button */}
                   <button
