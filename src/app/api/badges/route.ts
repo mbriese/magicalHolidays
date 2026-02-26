@@ -103,46 +103,36 @@ export async function POST(request: NextRequest) {
 
     const newlyEarned: string[] = [];
 
-    // Update progress for each badge
     for (const badge of badges) {
       const progress = statMappings[badge.name.toLowerCase().replace(/\s+/g, "-")] || 0;
-      
-      // Find or create user badge
-      let userBadge = await prisma.userBadge.findUnique({
+      const isEarned = progress >= badge.threshold;
+
+      const existing = await prisma.userBadge.findUnique({
         where: {
-          userId_badgeId: {
-            userId: user.id,
-            badgeId: badge.id,
-          },
+          userId_badgeId: { userId: user.id, badgeId: badge.id },
         },
       });
 
-      const isEarned = progress >= badge.threshold;
-      const wasEarned = userBadge?.earnedAt != null;
+      const wasEarned = existing?.earnedAt != null;
 
-      if (!userBadge) {
-        userBadge = await prisma.userBadge.create({
-          data: {
-            userId: user.id,
-            badgeId: badge.id,
-            progress,
-            earnedAt: isEarned ? new Date() : null,
-          },
-        });
-        if (isEarned) {
-          newlyEarned.push(badge.name);
-        }
-      } else {
-        await prisma.userBadge.update({
-          where: { id: userBadge.id },
-          data: {
-            progress,
-            earnedAt: isEarned && !wasEarned ? new Date() : userBadge.earnedAt,
-          },
-        });
-        if (isEarned && !wasEarned) {
-          newlyEarned.push(badge.name);
-        }
+      const userBadge = await prisma.userBadge.upsert({
+        where: {
+          userId_badgeId: { userId: user.id, badgeId: badge.id },
+        },
+        create: {
+          userId: user.id,
+          badgeId: badge.id,
+          progress,
+          earnedAt: isEarned ? new Date() : null,
+        },
+        update: {
+          progress,
+          earnedAt: isEarned && !wasEarned ? new Date() : undefined,
+        },
+      });
+
+      if (isEarned && !wasEarned) {
+        newlyEarned.push(badge.name);
       }
     }
 

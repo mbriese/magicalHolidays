@@ -16,13 +16,20 @@ export async function GET(request: NextRequest) {
     if (!tripId) {
       return NextResponse.json(
         { error: "Trip ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const trip = await prisma.trip.findUnique({
       where: { id: tripId, ownerId: user.id },
+      select: {
+        id: true,
+        budgetEnabled: true,
+        budgetAmount: true,
+        budgetCurrency: true,
+      },
     });
+
     if (!trip) {
       return NextResponse.json({ error: "Trip not found" }, { status: 404 });
     }
@@ -32,22 +39,13 @@ export async function GET(request: NextRequest) {
       orderBy: { date: "desc" },
     });
 
-    // Also get the trip's budget info
-    const trip = await prisma.trip.findUnique({
-      where: { id: tripId },
-      select: {
-        id: true,
-        budgetEnabled: true,
-        budgetAmount: true,
-        budgetCurrency: true,
+    const categoryTotals = expenses.reduce(
+      (acc, expense) => {
+        acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
+        return acc;
       },
-    });
-
-    // Calculate totals by category
-    const categoryTotals = expenses.reduce((acc, expense) => {
-      acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
-      return acc;
-    }, {} as Record<string, number>);
+      {} as Record<string, number>,
+    );
 
     const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0);
     const paidExpenses = expenses.filter((e) => e.isPaid);
@@ -63,8 +61,8 @@ export async function GET(request: NextRequest) {
         totalPaid,
         totalPlanned,
         categoryTotals,
-        remaining: trip?.budgetAmount ? trip.budgetAmount - totalSpent : null,
-        percentUsed: trip?.budgetAmount
+        remaining: trip.budgetAmount ? trip.budgetAmount - totalSpent : null,
+        percentUsed: trip.budgetAmount
           ? Math.round((totalSpent / trip.budgetAmount) * 100)
           : null,
       },
@@ -73,7 +71,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching expenses:", error);
     return NextResponse.json(
       { error: "Failed to fetch expenses" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -92,7 +90,7 @@ export async function POST(request: NextRequest) {
     if (!tripId || !amount || !description || !category) {
       return NextResponse.json(
         { error: "Trip ID, amount, description, and category are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -121,7 +119,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating expense:", error);
     return NextResponse.json(
       { error: "Failed to create expense" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
