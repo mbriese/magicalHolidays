@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getAuthUser } from "@/lib/auth";
 
 // GET /api/reservations - Fetch reservations (optionally by tripId)
 export async function GET(request: NextRequest) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const tripId = searchParams.get("tripId");
 
     const reservations = await prisma.reservation.findMany({
-      where: tripId ? { tripId } : undefined,
+      where: tripId
+        ? { tripId, trip: { ownerId: user.id } }
+        : { trip: { ownerId: user.id } },
       orderBy: { startDateTime: "asc" },
       include: {
         trip: {
@@ -30,6 +38,11 @@ export async function GET(request: NextRequest) {
 // POST /api/reservations - Create a new reservation
 export async function POST(request: NextRequest) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const {
       tripId,
@@ -44,7 +57,6 @@ export async function POST(request: NextRequest) {
       guestCount,
     } = body;
 
-    // Validation
     if (!tripId || !type || !title || !startDateTime || !endDateTime) {
       return NextResponse.json(
         { error: "Trip, type, title, start date, and end date are required" },
@@ -52,7 +64,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate reservation type
     const validTypes = ["PARK", "RIDE", "HOTEL", "CAR", "FLIGHT"];
     if (!validTypes.includes(type)) {
       return NextResponse.json(
@@ -61,9 +72,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify trip exists
     const trip = await prisma.trip.findUnique({
-      where: { id: tripId },
+      where: { id: tripId, ownerId: user.id },
     });
 
     if (!trip) {

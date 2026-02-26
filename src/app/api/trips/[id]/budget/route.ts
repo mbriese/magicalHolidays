@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthUser } from "@/lib/auth";
 
 // PUT /api/trips/[id]/budget - Update trip budget settings
 export async function PUT(
@@ -7,9 +8,21 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     const body = await request.json();
     const { budgetEnabled, budgetAmount, budgetCurrency } = body;
+
+    const existing = await prisma.trip.findUnique({
+      where: { id, ownerId: user.id },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+    }
 
     const trip = await prisma.trip.update({
       where: { id },
@@ -36,10 +49,15 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
 
     const trip = await prisma.trip.findUnique({
-      where: { id },
+      where: { id, ownerId: user.id },
       select: {
         id: true,
         name: true,

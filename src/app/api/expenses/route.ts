@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getOrCreateDemoUser } from "@/lib/user";
+import { getAuthUser } from "@/lib/auth";
 
 // GET /api/expenses?tripId=xxx - Get all expenses for a trip
 export async function GET(request: NextRequest) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const tripId = searchParams.get("tripId");
 
@@ -13,6 +18,13 @@ export async function GET(request: NextRequest) {
         { error: "Trip ID is required" },
         { status: 400 }
       );
+    }
+
+    const trip = await prisma.trip.findUnique({
+      where: { id: tripId, ownerId: user.id },
+    });
+    if (!trip) {
+      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
     }
 
     const expenses = await prisma.expense.findMany({
@@ -69,6 +81,11 @@ export async function GET(request: NextRequest) {
 // POST /api/expenses - Create a new expense
 export async function POST(request: NextRequest) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { tripId, amount, description, category, date, notes, isPaid } = body;
 
@@ -79,9 +96,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify the trip exists
     const trip = await prisma.trip.findUnique({
-      where: { id: tripId },
+      where: { id: tripId, ownerId: user.id },
     });
 
     if (!trip) {

@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -13,15 +16,21 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
-    // TODO: Implement actual login with NextAuth
     try {
-      console.log("Login attempt:", { email, password });
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Redirect to dashboard on success
-      window.location.href = "/dashboard";
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("Invalid email or password. Please try again.");
+      } else {
+        router.push("/dashboard");
+        router.refresh();
+      }
     } catch {
-      setError("Invalid email or password. Please try again.");
+      setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }

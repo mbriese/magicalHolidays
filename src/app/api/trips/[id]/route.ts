@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getAuthUser } from "@/lib/auth";
 
 // GET /api/trips/[id] - Get a single trip
 export async function GET(
@@ -7,10 +8,15 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
 
     const trip = await prisma.trip.findUnique({
-      where: { id },
+      where: { id, ownerId: user.id },
       include: {
         _count: {
           select: { reservations: true, members: true, expenses: true },
@@ -41,20 +47,23 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     const body = await request.json();
     const { name, destination, startDate, endDate, notes, guests, budgetEnabled, budgetAmount } = body;
 
-    // Check if trip exists
     const existingTrip = await prisma.trip.findUnique({
-      where: { id },
+      where: { id, ownerId: user.id },
     });
 
     if (!existingTrip) {
       return NextResponse.json({ error: "Trip not found" }, { status: 404 });
     }
 
-    // Validation
     if (!name || !destination || !startDate || !endDate) {
       return NextResponse.json(
         { error: "Name, destination, start date, and end date are required" },
@@ -92,18 +101,21 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
 
-    // Check if trip exists
     const existingTrip = await prisma.trip.findUnique({
-      where: { id },
+      where: { id, ownerId: user.id },
     });
 
     if (!existingTrip) {
       return NextResponse.json({ error: "Trip not found" }, { status: 404 });
     }
 
-    // Delete trip (cascades to reservations, members, expenses)
     await prisma.trip.delete({
       where: { id },
     });

@@ -9,15 +9,13 @@ export default function CarsPlanPage() {
   const [pickup, setPickup] = useState("");
   const [dropoff, setDropoff] = useState("");
   const [carType, setCarType] = useState<CarType>("any");
-  const [budgetMax, setBudgetMax] = useState<number>(150);
-
   const canSubmit = useMemo(() => {
     return city.trim().length > 0 && pickup && dropoff;
   }, [city, pickup, dropoff]);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const payload = { city, pickup, dropoff, carType, budgetMax };
+    const payload = { city, pickup, dropoff, carType };
     console.log("CAR SEARCH:", payload);
   }
 
@@ -32,7 +30,7 @@ export default function CarsPlanPage() {
           Car Rental Search
         </h1>
         <p className="mt-2 text-[#2B2B2B] dark:text-[#E5E5E5]">
-          Pick a city, dates, type, and budget.
+          Pick a city, dates, and type.
         </p>
 
         <form onSubmit={onSubmit} className="mt-6 rounded-2xl border border-[#E5E5E5] dark:border-white/10 bg-white/80 dark:bg-white/5 backdrop-blur p-5 md:p-6 shadow-sm space-y-5">
@@ -83,20 +81,6 @@ export default function CarsPlanPage() {
               />
             </div>
 
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#1F2A44] dark:text-[#FAF4EF]">
-                Budget max (per day): <span className="font-semibold">${budgetMax}</span>
-              </label>
-              <input
-                type="range"
-                min={25}
-                max={400}
-                step={5}
-                value={budgetMax}
-                onChange={(e) => setBudgetMax(Number(e.target.value))}
-                className="mt-2 w-full"
-              />
-            </div>
           </div>
 
           <button

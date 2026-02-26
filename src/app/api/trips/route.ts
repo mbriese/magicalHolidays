@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getOrCreateDemoUser } from "@/lib/user";
+import { getAuthUser } from "@/lib/auth";
 
-// GET /api/trips - Fetch all trips (for demo, no auth check)
+// GET /api/trips - Fetch all trips for the authenticated user
 export async function GET() {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const trips = await prisma.trip.findMany({
+      where: { ownerId: user.id },
       orderBy: { startDate: "asc" },
       include: {
         _count: {
@@ -27,18 +33,20 @@ export async function GET() {
 // POST /api/trips - Create a new trip
 export async function POST(request: NextRequest) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { name, destination, startDate, endDate, notes, guests, budgetEnabled, budgetAmount } = body;
 
-    // Validation
     if (!name || !destination || !startDate || !endDate) {
       return NextResponse.json(
         { error: "Name, destination, start date, and end date are required" },
         { status: 400 }
       );
     }
-
-    const user = await getOrCreateDemoUser();
 
     const trip = await prisma.trip.create({
       data: {

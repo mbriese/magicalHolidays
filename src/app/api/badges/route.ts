@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getOrCreateDemoUser } from "@/lib/user";
+import { getAuthUser } from "@/lib/auth";
 
 // GET /api/badges - Fetch all badges with user progress
 export async function GET() {
   try {
-    const user = await getOrCreateDemoUser();
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     // Get all badges
     const badges = await prisma.badge.findMany({
@@ -44,7 +47,10 @@ export async function GET() {
 // POST /api/badges/check - Check and update badge progress for user
 export async function POST(request: NextRequest) {
   try {
-    const user = await getOrCreateDemoUser();
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     // Calculate user stats
     const [tripCount, reservationCount, parkDays] = await Promise.all([

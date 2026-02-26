@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getAuthUser } from "@/lib/auth";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -8,10 +9,15 @@ interface RouteParams {
 // GET /api/reservations/[id] - Fetch a single reservation
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
 
-    const reservation = await prisma.reservation.findUnique({
-      where: { id },
+    const reservation = await prisma.reservation.findFirst({
+      where: { id, trip: { ownerId: user.id } },
       include: {
         trip: {
           select: { name: true, destination: true },
@@ -39,6 +45,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // PUT /api/reservations/[id] - Update a reservation
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     const body = await request.json();
     const {
@@ -53,9 +64,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       guestCount,
     } = body;
 
-    // Check if reservation exists
-    const existing = await prisma.reservation.findUnique({
-      where: { id },
+    const existing = await prisma.reservation.findFirst({
+      where: { id, trip: { ownerId: user.id } },
     });
 
     if (!existing) {
@@ -104,11 +114,15 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 // DELETE /api/reservations/[id] - Delete a reservation
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
 
-    // Check if reservation exists
-    const existing = await prisma.reservation.findUnique({
-      where: { id },
+    const existing = await prisma.reservation.findFirst({
+      where: { id, trip: { ownerId: user.id } },
     });
 
     if (!existing) {

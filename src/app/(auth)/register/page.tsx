@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +18,6 @@ export default function RegisterPage() {
     setIsLoading(true);
     setError("");
 
-    // Validation
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       setIsLoading(false);
@@ -28,13 +30,32 @@ export default function RegisterPage() {
       return;
     }
 
-    // TODO: Implement actual registration with API
     try {
-      console.log("Register attempt:", { name, email, password });
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Redirect to dashboard on success
-      window.location.href = "/dashboard";
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Something went wrong. Please try again.");
+        return;
+      }
+
+      const signInResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (signInResult?.error) {
+        router.push("/login");
+      } else {
+        router.push("/dashboard");
+        router.refresh();
+      }
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
