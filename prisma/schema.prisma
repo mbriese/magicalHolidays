@@ -18,18 +18,35 @@ model User {
   id                 String        @id @default(cuid())
   email              String        @unique
   password           String
-  name               String?
+  name               String?       // Full name (legacy / fallback)
+  firstName          String?       // For casual: "Can I call you Firstname?"
+  lastName           String?       // For formal: Mr./Ms. Lastname
+  title              String?       // Mr., Ms., Mrs., Mx., Dr. (used when formal)
+  displayPreference  String?       @default("formal") // "formal" = title + lastName; "casual" = firstName
   favoriteCharacters String[]      // For Disney nuggets feature
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
   // Relations
-  ownedTrips         Trip[]        @relation("TripOwner")
-  tripMemberships    TripMember[]
-  blogPosts          BlogPost[]    @relation("BlogAuthor")
-  badges             UserBadge[]
+  ownedTrips            Trip[]                 @relation("TripOwner")
+  tripMemberships       TripMember[]
+  blogPosts             BlogPost[]             @relation("BlogAuthor")
+  badges                UserBadge[]
+  newsletterSubscriptions NewsletterSubscriber[]
+  reservations          Reservation[]
 
   @@map("users")
+}
+
+// Newsletter: supports both guests (email only) and logged-in users (email + userId)
+model NewsletterSubscriber {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  subscribedAt DateTime @default(now())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("newsletter_subscribers")
 }
 
 // ============================================
@@ -43,7 +60,8 @@ model Trip {
   startDate      DateTime
   endDate        DateTime
   notes          String?
-  guests         String[]     // Guest names for this trip
+  guests         String[]     // Guest names for this trip (display; derived from guestDetails when set)
+  guestDetails   Json?        // Structured: [{ firstName, lastName, type: "adult"|"child", childAge? }]
   // Budget tracking
   budgetEnabled  Boolean      @default(false)
   budgetAmount   Float?       // Total budget for the trip
@@ -107,9 +125,11 @@ model Reservation {
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
 
-  // Relations
-  tripId             String
-  trip               Trip            @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  // Relations - every reservation belongs to a user; optionally linked to a trip
+  userId             String
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tripId             String?
+  trip               Trip?           @relation(fields: [tripId], references: [id], onDelete: SetNull)
 
   @@map("reservations")
 }

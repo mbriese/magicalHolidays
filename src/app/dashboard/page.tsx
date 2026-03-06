@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
 import TripCalendar from "@/components/calendar/TripCalendar";
 import AddReservationModal from "@/components/modals/AddReservationModal";
 import ConfirmModal from "@/components/modals/ConfirmModal";
@@ -21,7 +22,7 @@ import {
 
 interface ApiReservation {
   id: string;
-  tripId: string;
+  tripId: string | null;
   type: ReservationType;
   title: string;
   startDateTime: string;
@@ -31,7 +32,7 @@ interface ApiReservation {
   notes: string | null;
   guests: string[];
   guestCount: number | null;
-  trip: { name: string };
+  trip?: { name: string } | null;
 }
 
 interface ApiTrip {
@@ -47,6 +48,10 @@ interface ApiTrip {
 }
 
 export default function DashboardPage() {
+  const { data: session, status } = useSession();
+  const pageTitle = session?.user?.name ? `${session.user.name}'s Dashboard` : "Your Dashboard";
+  const [apiSaysUnauthenticated, setApiSaysUnauthenticated] = useState(false);
+  const isUnauthenticated = status === "unauthenticated" || apiSaysUnauthenticated;
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [reservations, setReservations] = useState<ApiReservation[]>([]);
   const [trips, setTrips] = useState<ApiTrip[]>([]);
@@ -131,17 +136,24 @@ export default function DashboardPage() {
           fetch("/api/reservations"),
         ]);
 
-        if (tripsRes.ok && reservationsRes.ok) {
+        const isJson = (r: Response) => r.headers.get("content-type")?.includes("application/json");
+        if (tripsRes.ok && reservationsRes.ok && isJson(tripsRes) && isJson(reservationsRes)) {
           const tripsData: ApiTrip[] = await tripsRes.json();
           const reservationsData: ApiReservation[] = await reservationsRes.json();
 
-          // Save to offline storage for later
           await Promise.all([
             saveTripsOffline(tripsData),
             saveReservationsOffline(reservationsData),
           ]);
 
           processData(tripsData, reservationsData);
+        } else if (tripsRes.status === 401 || reservationsRes.status === 401 || !isJson(tripsRes) || !isJson(reservationsRes)) {
+          setApiSaysUnauthenticated(true);
+          processData([], []);
+          await Promise.all([saveTripsOffline([]), saveReservationsOffline([])]);
+          if (tripsRes.status === 401 || reservationsRes.status === 401) {
+            signOut({ redirect: false });
+          }
         } else {
           throw new Error("API request failed");
         }
@@ -179,13 +191,13 @@ export default function DashboardPage() {
       if (isOnline()) {
         // First, check/update badge progress
         await fetch("/api/badges", { method: "POST" });
-        
+
         // Then fetch badges with progress
         const res = await fetch("/api/badges");
-        if (res.ok) {
+        const isJson = res.headers.get("content-type")?.includes("application/json");
+        if (res.ok && isJson) {
           const badgesData = await res.json();
           setBadges(badgesData);
-          // Save to offline storage
           await saveBadgesOffline(badgesData);
         }
       } else {
@@ -271,12 +283,19 @@ export default function DashboardPage() {
       <div className="bg-linear-to-r from-[#1F2A44] to-midnight-600 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
-            Your Dashboard ✨
+            {pageTitle} ✨
           </h1>
           <p className="text-[#E5E5E5]">
-            Welcome back! Here&apos;s your upcoming magical adventure.
+            {isUnauthenticated
+              ? "Let's start planning your magical adventure!"
+              : "Welcome back! Here's your upcoming magical adventure."}
           </p>
-          {isOfflineData && (
+          {isUnauthenticated && (
+            <p className="text-[#E5E5E5]/90 text-sm mt-1">
+              Sign in to save your plans and see them across devices.
+            </p>
+          )}
+          {isOfflineData && !isUnauthenticated && (
             <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/20 rounded-full">
               <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
               <span className="text-sm text-amber-100">
@@ -288,9 +307,9 @@ export default function DashboardPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Quick Stats & Achievements */}
+        {/* Trip Overview & Achievements – only when signed in */}
+        {!isUnauthenticated && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Stats Section */}
           <div className="lg:col-span-2">
             <div className="section-outlined">
               <span className="section-title">Trip Overview</span>
@@ -325,13 +344,13 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Achievements Section */}
           <div className="lg:col-span-1">
             <BadgeShowcase badges={badges} />
           </div>
         </div>
+        )}
 
-        {/* Quick Actions */}
+        {/* Quick Actions – always show New Trip & Add Reservation; View All Trips only when we have trips */}
         <div className="flex flex-wrap gap-3 mb-8">
           <a href="/trips/new" className="btn-magical text-sm py-2 px-4">
             + New Trip
@@ -342,13 +361,15 @@ export default function DashboardPage() {
           >
             + Add Reservation
           </button>
+          {trips.length > 0 && (
           <a href="/trips" className="btn-outline text-sm py-2 px-4">
             View All Trips
           </a>
+          )}
         </div>
 
-        {/* Empty State */}
-        {!loading && events.length === 0 && (
+        {/* Empty State (signed-in users with no data) */}
+        {!isUnauthenticated && !loading && events.length === 0 && (
           <div className="card-magical p-12 text-center mb-8">
             <span className="text-5xl mb-4 block">📅</span>
             <h3 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-white mb-2">
@@ -366,7 +387,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Calendar */}
+        {/* Calendar – always show */}
         <div className="mb-8 section-outlined">
           <span className="section-title">Trip Calendar</span>
           <div className="pt-2">
@@ -379,19 +400,16 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Itinerary Builder & Upcoming Reservations */}
+        {/* Itinerary Builder & Budget Tracker – only when signed in */}
+        {!isUnauthenticated && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Itinerary Builder */}
           <ItineraryBuilder onAddToTrip={() => { fetchData(); fetchBadges(); }} />
-
-          {/* Budget Tracker */}
           <BudgetTracker onExpenseAdded={() => fetchData()} />
         </div>
+        )}
 
-        {/* Upcoming Reservations Section */}
-        <div className="mb-8">
-          {/* Upcoming Reservations List */}
-          {reservations.length > 0 && (
+        {/* Upcoming Reservations – only when signed in and has reservations */}
+        {!isUnauthenticated && reservations.length > 0 && (
             <div className="section-outlined">
               <span className="section-title">Upcoming Reservations</span>
             <div className="space-y-3 pt-2">
@@ -467,8 +485,8 @@ export default function DashboardPage() {
                 ))}
             </div>
           </div>
-          )}
-        </div>
+        )}
+
       </div>
 
       {/* Add/Edit Reservation Modal */}

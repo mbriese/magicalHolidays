@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useSession } from "next-auth/react";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import AddReservationModal from "@/components/modals/AddReservationModal";
 import EditTripModal from "@/components/modals/EditTripModal";
@@ -49,9 +50,11 @@ function getConflicts(trips: TripApiResponse[]): Map<string, TripConflict[]> {
 }
 
 export default function TripsPage() {
+  const { data: session } = useSession();
   const [trips, setTrips] = useState<TripApiResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const pageTitle = session?.user?.name ? `${session.user.name}'s Trips` : "My Trips";
 
   const conflicts = useMemo(() => getConflicts(trips), [trips]);
 
@@ -177,7 +180,7 @@ export default function TripsPage() {
         <div className="bg-linear-to-r from-[#1F2A44] to-midnight-600 py-6">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
-              My Trips ✨
+              {pageTitle} ✨
             </h1>
             <p className="text-[#E5E5E5]">Loading your magical adventures...</p>
           </div>
@@ -227,7 +230,7 @@ export default function TripsPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
-                My Trips ✨
+                {pageTitle} ✨
               </h1>
               <p className="text-[#E5E5E5]">
                 Plan, organize, and track all your magical adventures

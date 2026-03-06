@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+const CREATE_TRIP_VALUE = "__create__";
 
 type ExpenseCategory =
   | "TICKETS"
@@ -67,8 +70,17 @@ const categories: ExpenseCategory[] = [
 ];
 
 export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerProps) {
+  const router = useRouter();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<string>(tripId || "");
+
+  const handleTripSelectChange = (value: string) => {
+    if (value === CREATE_TRIP_VALUE) {
+      router.push("/trips/new");
+      return;
+    }
+    setSelectedTripId(value);
+  };
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [summary, setSummary] = useState<BudgetSummary | null>(null);
   const [budget, setBudget] = useState<{ enabled: boolean; amount: number | null }>({
@@ -287,18 +299,16 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
         </label>
         <select
           value={selectedTripId}
-          onChange={(e) => setSelectedTripId(e.target.value)}
+          onChange={(e) => handleTripSelectChange(e.target.value)}
           className="input-magical w-full"
         >
-          {trips.length === 0 ? (
-            <option value="">No trips - create one first</option>
-          ) : (
-            trips.map((trip) => (
-              <option key={trip.id} value={trip.id}>
-                {trip.name}
-              </option>
-            ))
-          )}
+          <option value="">No trips yet</option>
+          <option value={CREATE_TRIP_VALUE}>Click here to create a new trip</option>
+          {trips.map((trip) => (
+            <option key={trip.id} value={trip.id}>
+              {trip.name}
+            </option>
+          ))}
         </select>
       </div>
 

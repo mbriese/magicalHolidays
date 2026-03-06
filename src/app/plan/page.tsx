@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { DESTINATIONS, RESERVATION_TYPES } from "@/lib/constants";
 import type { ReservationType } from "@/types";
+
+const QUICK_PLAN_DRAFT_KEY = "quickPlanDraft";
 
 interface PlannedItem {
   id: string;
@@ -32,6 +35,7 @@ const typeLabels: Record<ReservationType, string> = {
 };
 
 export default function QuickPlanPage() {
+  const { status } = useSession();
   const [items, setItems] = useState<PlannedItem[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedType, setSelectedType] = useState<ReservationType | null>(null);
@@ -52,6 +56,47 @@ export default function QuickPlanPage() {
   const [tripNotes, setTripNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [draftJustRestored, setDraftJustRestored] = useState(false);
+
+  // Restore draft from sessionStorage when returning from registration (or new tab)
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(QUICK_PLAN_DRAFT_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as unknown;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const restored = parsed.filter(
+            (p): p is PlannedItem =>
+              p &&
+              typeof p === "object" &&
+              typeof (p as PlannedItem).type === "string" &&
+              typeof (p as PlannedItem).title === "string" &&
+              typeof (p as PlannedItem).startDateTime === "string" &&
+              typeof (p as PlannedItem).endDateTime === "string"
+          );
+          if (restored.length > 0) {
+            setItems(restored);
+            setDraftJustRestored(true);
+            sessionStorage.removeItem(QUICK_PLAN_DRAFT_KEY);
+          } else {
+            sessionStorage.removeItem(QUICK_PLAN_DRAFT_KEY);
+          }
+        } else {
+          sessionStorage.removeItem(QUICK_PLAN_DRAFT_KEY);
+        }
+      }
+    } catch {
+      sessionStorage.removeItem(QUICK_PLAN_DRAFT_KEY);
+    }
+  }, []);
+
+  // When user becomes authenticated after a draft was restored, open save modal so they can save the trip
+  useEffect(() => {
+    if (status === "authenticated" && draftJustRestored && items.length > 0) {
+      setShowSaveModal(true);
+      setDraftJustRestored(false);
+    }
+  }, [status, draftJustRestored, items.length]);
 
   const resetItemForm = () => {
     setItemTitle("");
@@ -86,7 +131,31 @@ export default function QuickPlanPage() {
     setItems(items.filter((item) => item.id !== id));
   };
 
+  const openSaveModalOrRedirectToRegister = () => {
+    if (status === "unauthenticated") {
+      try {
+        sessionStorage.setItem(QUICK_PLAN_DRAFT_KEY, JSON.stringify(items));
+      } catch {
+        /* ignore */
+      }
+      window.location.href = "/register?callbackUrl=/plan";
+      return;
+    }
+    setSaveError("");
+    setShowSaveModal(true);
+  };
+
   const handleSaveTrip = async () => {
+    if (status === "unauthenticated") {
+      try {
+        sessionStorage.setItem(QUICK_PLAN_DRAFT_KEY, JSON.stringify(items));
+      } catch {
+        /* ignore */
+      }
+      window.location.href = "/register?callbackUrl=/plan";
+      return;
+    }
+
     if (!tripName.trim()) {
       setSaveError("Please give your trip a name");
       return;
@@ -264,7 +333,7 @@ export default function QuickPlanPage() {
             {/* Save Trip Button */}
             <div className="mt-6 pt-4 border-t border-[#E5E5E5] dark:border-midnight-500">
               <button
-                onClick={() => setShowSaveModal(true)}
+                onClick={openSaveModalOrRedirectToRegister}
                 className="btn-gold w-full"
               >
                 ✨ Save as Trip ✨

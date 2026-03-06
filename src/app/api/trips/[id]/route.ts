@@ -54,7 +54,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { name, destination, startDate, endDate, notes, guests, budgetEnabled, budgetAmount } = body;
+    const { name, destination, startDate, endDate, notes, guests, guestDetails, budgetEnabled, budgetAmount } = body;
 
     const existingTrip = await prisma.trip.findUnique({
       where: { id, ownerId: user.id },
@@ -71,6 +71,11 @@ export async function PUT(
       );
     }
 
+    const details = Array.isArray(guestDetails) ? guestDetails : null;
+    const guestNames = details && details.length > 0
+      ? details.map((g: { firstName?: string; lastName?: string }) => `${(g.firstName ?? "").trim()} ${(g.lastName ?? "").trim()}`.trim()).filter(Boolean)
+      : (details && details.length === 0) ? [] : (guests ?? existingTrip.guests);
+
     const trip = await prisma.trip.update({
       where: { id },
       data: {
@@ -79,7 +84,8 @@ export async function PUT(
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         notes: notes || null,
-        guests: guests || [],
+        guests: guestNames,
+        ...(details !== undefined && { guestDetails: details }),
         budgetEnabled: budgetEnabled ?? existingTrip.budgetEnabled,
         budgetAmount: budgetEnabled && budgetAmount ? parseFloat(budgetAmount) : null,
       },

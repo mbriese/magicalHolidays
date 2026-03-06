@@ -56,11 +56,11 @@ export async function POST(request: NextRequest) {
     const [tripCount, reservationCount, parkDays] = await Promise.all([
       prisma.trip.count({ where: { ownerId: user.id } }),
       prisma.reservation.count({
-        where: { trip: { ownerId: user.id } },
+        where: { userId: user.id },
       }),
       prisma.reservation.count({
         where: {
-          trip: { ownerId: user.id },
+          userId: user.id,
           type: "PARK",
         },
       }),
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     // Get unique reservation types used
     const reservationTypes = await prisma.reservation.findMany({
-      where: { trip: { ownerId: user.id } },
+      where: { userId: user.id },
       select: { type: true },
       distinct: ["type"],
     });

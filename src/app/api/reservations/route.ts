@@ -15,8 +15,8 @@ export async function GET(request: NextRequest) {
 
     const reservations = await prisma.reservation.findMany({
       where: tripId
-        ? { tripId, trip: { ownerId: user.id } }
-        : { trip: { ownerId: user.id } },
+        ? { tripId, userId: user.id }
+        : { userId: user.id },
       orderBy: { startDateTime: "asc" },
       include: {
         trip: {
@@ -57,9 +57,9 @@ export async function POST(request: NextRequest) {
       guestCount,
     } = body;
 
-    if (!tripId || !type || !title || !startDateTime || !endDateTime) {
+    if (!type || !title || !startDateTime || !endDateTime) {
       return NextResponse.json(
-        { error: "Trip, type, title, start date, and end date are required" },
+        { error: "Type, title, start date, and end date are required" },
         { status: 400 }
       );
     }
@@ -72,20 +72,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const trip = await prisma.trip.findUnique({
-      where: { id: tripId, ownerId: user.id },
-    });
-
-    if (!trip) {
-      return NextResponse.json(
-        { error: "Trip not found" },
-        { status: 404 }
-      );
+    if (tripId) {
+      const trip = await prisma.trip.findUnique({
+        where: { id: tripId, ownerId: user.id },
+      });
+      if (!trip) {
+        return NextResponse.json(
+          { error: "Trip not found" },
+          { status: 404 }
+        );
+      }
     }
 
     const reservation = await prisma.reservation.create({
       data: {
-        tripId,
+        userId: user.id,
+        tripId: tripId || null,
         type,
         title,
         startDateTime: new Date(startDateTime),

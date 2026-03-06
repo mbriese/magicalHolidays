@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+
+const NEWSLETTER_SUBSCRIBED_KEY = "lamplight-newsletter-subscribed";
 import type { BlogPost, BlogCategory } from "@/types";
 import { blogCategoryLabels } from "@/types";
 
@@ -68,8 +71,80 @@ const categoryColors: Record<BlogCategory, string> = {
 };
 
 export default function BlogPage() {
+  const { data: session } = useSession();
   const [posts] = useState(demoPosts);
   const [selectedCategory, setSelectedCategory] = useState<BlogCategory | "ALL">("ALL");
+  const curatedFor = session?.user?.name ? ` curated for ${session.user.name}` : "";
+
+  const [subscribed, setSubscribed] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
+  const [subscribeEmail, setSubscribeEmail] = useState("");
+  const [subscribeAgreed, setSubscribeAgreed] = useState(false);
+  const [subscribeLoading, setSubscribeLoading] = useState(false);
+  const [subscribeMessage, setSubscribeMessage] = useState("");
+  const THANK_YOU_DURATION_MS = 2500;
+
+  // Logged-in: use DB. Guest: use localStorage.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if (session?.user?.email) {
+      fetch("/api/newsletter/subscribe", { method: "GET" })
+        .then((res) => (res.ok ? res.json() : { subscribed: false }))
+        .then((data) => setSubscribed(!!data.subscribed))
+        .catch(() => setSubscribed(false));
+    } else {
+      try {
+        setSubscribed(localStorage.getItem(NEWSLETTER_SUBSCRIBED_KEY) === "true");
+      } catch {
+        setSubscribed(false);
+      }
+    }
+  }, [session?.user?.email]);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubscribeMessage("");
+    if (!subscribeEmail.trim()) {
+      setSubscribeMessage("Please enter your email address.");
+      return;
+    }
+    if (!subscribeAgreed) {
+      setSubscribeMessage("Please agree to subscribe and receive emails from Lamplight Holidays.");
+      return;
+    }
+    setSubscribeLoading(true);
+    const email = subscribeEmail.trim();
+    try {
+      const res = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setSubscribeMessage(data.error || "Something went wrong. Please try again.");
+        return;
+      }
+
+      setSubscribed(true);
+      setShowThankYou(true);
+      try {
+        localStorage.setItem(NEWSLETTER_SUBSCRIBED_KEY, "true");
+      } catch {
+        // ignore
+      }
+      setSubscribeEmail("");
+      setSubscribeAgreed(false);
+      setTimeout(() => setShowThankYou(false), THANK_YOU_DURATION_MS);
+    } catch {
+      setSubscribed(false);
+      setSubscribeMessage("Something went wrong. Please try again.");
+    } finally {
+      setSubscribeLoading(false);
+    }
+  };
 
   const filteredPosts =
     selectedCategory === "ALL"
@@ -90,7 +165,7 @@ export default function BlogPage() {
       <div className="bg-linear-to-r from-[#1F2A44] to-midnight-600 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
-            News & Updates ✨
+            Travel News and Updates{curatedFor} ✨
           </h1>
           <p className="text-[#E5E5E5]">
             Stay informed about park changes, events, and travel tips
@@ -180,29 +255,63 @@ export default function BlogPage() {
           </div>
         )}
 
-        {/* Newsletter Signup */}
-        <div className="section-outlined mt-8 bg-linear-to-r from-[#FAF4EF]/50 to-ember-50/50 dark:from-[#1F2A44]/20 dark:to-[#FFB957]/10">
-          <span className="section-title">Stay Connected</span>
-          <div className="max-w-2xl mx-auto text-center pt-2">
-            <h3 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white mb-3">
-              Never Miss an Update
-            </h3>
-            <p className="text-slate-600 dark:text-slate-400 mb-6">
-              Subscribe to our newsletter for the latest park news, tips, and
-              exclusive planning insights.
+        {/* Thank you message - brief flash after subscribing */}
+        {showThankYou && (
+          <div className="section-outlined mt-8 bg-linear-to-r from-[#FAF4EF]/50 to-ember-50/50 dark:from-[#1F2A44]/20 dark:to-[#FFB957]/10 animate-fade-in">
+            <p className="text-center font-serif text-xl md:text-2xl font-bold text-[#1F2A44] dark:text-white py-6">
+              Thank you for your subscription!
             </p>
-            <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="your@email.com"
-                className="input-magical grow"
-              />
-              <button type="submit" className="btn-magical whitespace-nowrap">
-                Subscribe ✨
-              </button>
-            </form>
           </div>
-        </div>
+        )}
+
+        {/* Newsletter Signup - hidden once subscribed (and thank you has faded) */}
+        {!subscribed && !showThankYou && (
+          <div className="section-outlined mt-8 bg-linear-to-r from-[#FAF4EF]/50 to-ember-50/50 dark:from-[#1F2A44]/20 dark:to-[#FFB957]/10">
+            <span className="section-title">Stay Connected</span>
+            <div className="max-w-2xl mx-auto text-center pt-2">
+              <h3 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white mb-3">
+                Never Miss an Update
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-6">
+                Subscribe to our newsletter for the latest park news, tips, and
+                exclusive planning insights.
+              </p>
+              <form onSubmit={handleSubscribe} className="flex flex-col gap-4 max-w-md mx-auto">
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={subscribeEmail}
+                  onChange={(e) => setSubscribeEmail(e.target.value)}
+                  className="input-magical w-full"
+                  required
+                />
+                <label className="flex items-start gap-3 cursor-pointer text-left">
+                  <input
+                    type="checkbox"
+                    checked={subscribeAgreed}
+                    onChange={(e) => setSubscribeAgreed(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded border-[#E5E5E5] text-[#1F2A44] focus:ring-[#FFB957]"
+                  />
+                  <span className="text-sm text-slate-700 dark:text-slate-300">
+                    I agree to subscribe and receive emails from Lamplight Holidays.
+                  </span>
+                </label>
+                {subscribeMessage && (
+                  <p className={`text-sm ${subscribeMessage.startsWith("You're") ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                    {subscribeMessage}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={subscribeLoading || !subscribeAgreed}
+                  className="btn-magical whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {subscribeLoading ? "Subscribing…" : "Subscribe ✨"}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

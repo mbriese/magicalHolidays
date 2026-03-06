@@ -23,10 +23,12 @@ export default function HeaderAuth() {
           </span>
         </a>
         <button
+          type="button"
           onClick={() => signOut({ callbackUrl: "/" })}
           className="text-xs sm:text-sm py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl font-semibold border border-[#E5E5E5] dark:border-white/20 text-[#1F2A44] dark:text-[#FAF4EF] hover:bg-[#FFB957]/10 transition-colors whitespace-nowrap"
+          aria-label="Sign out"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:hidden"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:hidden" aria-hidden><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           <span className="hidden sm:inline">Sign Out</span>
         </button>
       </div>

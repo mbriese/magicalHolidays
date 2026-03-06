@@ -17,7 +17,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
 
     const reservation = await prisma.reservation.findFirst({
-      where: { id, trip: { ownerId: user.id } },
+      where: { id, userId: user.id },
       include: {
         trip: {
           select: { name: true, destination: true },
@@ -53,6 +53,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const body = await request.json();
     const {
+      tripId: bodyTripId,
       type,
       title,
       startDateTime,
@@ -65,7 +66,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     } = body;
 
     const existing = await prisma.reservation.findFirst({
-      where: { id, trip: { ownerId: user.id } },
+      where: { id, userId: user.id },
     });
 
     if (!existing) {
@@ -86,19 +87,30 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       }
     }
 
+    const updateData: Record<string, unknown> = {
+      ...(type && { type }),
+      ...(title && { title }),
+      ...(startDateTime && { startDateTime: new Date(startDateTime) }),
+      ...(endDateTime && { endDateTime: new Date(endDateTime) }),
+      ...(location !== undefined && { location: location || null }),
+      ...(confirmationNumber !== undefined && { confirmationNumber: confirmationNumber || null }),
+      ...(notes !== undefined && { notes: notes || null }),
+      ...(guests !== undefined && { guests: guests || [] }),
+      ...(guestCount !== undefined && { guestCount: guestCount || null }),
+    };
+    if (bodyTripId !== undefined) {
+      if (bodyTripId === null || bodyTripId === "") {
+        updateData.tripId = null;
+      } else {
+        const trip = await prisma.trip.findFirst({ where: { id: bodyTripId, ownerId: user.id } });
+        if (!trip) return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+        updateData.tripId = bodyTripId;
+      }
+    }
+
     const reservation = await prisma.reservation.update({
       where: { id },
-      data: {
-        ...(type && { type }),
-        ...(title && { title }),
-        ...(startDateTime && { startDateTime: new Date(startDateTime) }),
-        ...(endDateTime && { endDateTime: new Date(endDateTime) }),
-        ...(location !== undefined && { location: location || null }),
-        ...(confirmationNumber !== undefined && { confirmationNumber: confirmationNumber || null }),
-        ...(notes !== undefined && { notes: notes || null }),
-        ...(guests !== undefined && { guests: guests || [] }),
-        ...(guestCount !== undefined && { guestCount: guestCount || null }),
-      },
+      data: updateData,
     });
 
     return NextResponse.json(reservation);
@@ -122,7 +134,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
 
     const existing = await prisma.reservation.findFirst({
-      where: { id, trip: { ownerId: user.id } },
+      where: { id, userId: user.id },
     });
 
     if (!existing) {

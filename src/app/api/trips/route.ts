@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, destination, startDate, endDate, notes, guests, budgetEnabled, budgetAmount } = body;
+    const { name, destination, startDate, endDate, notes, guests, guestDetails, budgetEnabled, budgetAmount } = body;
 
     if (!name || !destination || !startDate || !endDate) {
       return NextResponse.json(
@@ -48,6 +48,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const details = Array.isArray(guestDetails) ? guestDetails : null;
+    const guestNames = details?.length
+      ? details.map((g: { firstName?: string; lastName?: string }) => `${(g.firstName ?? "").trim()} ${(g.lastName ?? "").trim()}`.trim()).filter(Boolean)
+      : guests || [];
+
     const trip = await prisma.trip.create({
       data: {
         name,
@@ -55,7 +60,8 @@ export async function POST(request: NextRequest) {
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         notes: notes || null,
-        guests: guests || [],
+        guests: guestNames,
+        guestDetails: details ?? undefined,
         budgetEnabled: budgetEnabled || false,
         budgetAmount: budgetEnabled && budgetAmount ? parseFloat(budgetAmount) : null,
         ownerId: user.id,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { reservationLabels, type ReservationType, type ReservationApiResponse, type TripApiResponse } from "@/types";
@@ -26,6 +27,7 @@ interface TripOption {
 }
 
 const reservationTypes: ReservationType[] = ["PARK", "RIDE", "HOTEL", "CAR", "FLIGHT"];
+const CREATE_TRIP_VALUE = "__create__";
 
 export default function AddReservationModal({
   isOpen,
@@ -35,12 +37,14 @@ export default function AddReservationModal({
   defaultTripId,
   defaultType,
 }: AddReservationModalProps) {
+  const router = useRouter();
   const isEditMode = !!editReservation;
 
-  // Trip selection
+  // Trip selection: one of none | existing | new (radio)
+  type TripChoice = "none" | "existing" | "new";
   const [trips, setTrips] = useState<TripOption[]>([]);
+  const [tripChoice, setTripChoice] = useState<TripChoice>("none");
   const [selectedTripId, setSelectedTripId] = useState<string>("");
-  const [isCreatingTrip, setIsCreatingTrip] = useState(false);
   const [loadingTrips, setLoadingTrips] = useState(true);
 
   // New trip fields
@@ -160,7 +164,9 @@ export default function AddReservationModal({
   }, [isOpen, editReservation, defaultTripId]);
 
   const populateEditForm = (reservation: ReservationApiResponse) => {
-    setSelectedTripId(reservation.tripId);
+    const hasTrip = !!reservation.tripId;
+    setTripChoice(hasTrip ? "existing" : "none");
+    setSelectedTripId(reservation.tripId || "");
     setType(reservation.type);
     setTitle(reservation.title);
     setStartDateTime(new Date(reservation.startDateTime));
@@ -200,13 +206,14 @@ export default function AddReservationModal({
         const data = await response.json();
         setTrips(data);
         if (data.length === 0) {
-          setIsCreatingTrip(true);
+          setSelectedTripId("");
+          setTripChoice("none");
         } else if (defaultTripId) {
-          // Use the provided default trip ID if available
           setSelectedTripId(defaultTripId);
-          setIsCreatingTrip(false);
+          setTripChoice("existing");
         } else {
-          setSelectedTripId(data[0].id);
+          setSelectedTripId("");
+          setTripChoice("none");
         }
       }
     } catch (err) {
@@ -216,14 +223,19 @@ export default function AddReservationModal({
     }
   };
 
-  const handleTripChange = (value: string) => {
-    if (value === "new") {
-      setIsCreatingTrip(true);
-      setSelectedTripId("");
-    } else {
-      setIsCreatingTrip(false);
-      setSelectedTripId(value);
+  const handleTripChoiceChange = (choice: TripChoice) => {
+    setTripChoice(choice);
+    if (choice === "existing" && trips.length > 0 && !selectedTripId) setSelectedTripId(trips[0].id);
+    if (choice !== "existing") setSelectedTripId("");
+  };
+
+  const handleTripDropdownChange = (value: string) => {
+    if (value === CREATE_TRIP_VALUE) {
+      onClose();
+      router.push("/trips/new");
+      return;
     }
+    setSelectedTripId(value);
   };
 
   const createTrip = async (): Promise<string | null> => {
@@ -258,10 +270,14 @@ export default function AddReservationModal({
     setIsLoading(true);
 
     try {
-      let tripId = selectedTripId;
+      let tripId: string | null = null;
+      if (tripChoice === "new") {
+        tripId = null; // set after create
+      } else if (tripChoice === "existing" && selectedTripId) {
+        tripId = selectedTripId;
+      }
 
-      // Create new trip if needed
-      if (isCreatingTrip) {
+      if (tripChoice === "new") {
         if (!newTripName || !newTripDestination || !newTripStartDate || !newTripEndDate) {
           setError("Please fill in all trip details");
           setIsLoading(false);
@@ -276,15 +292,20 @@ export default function AddReservationModal({
         tripId = newTripId;
       }
 
-      // Validate reservation fields
-      if (!tripId || !title || !startDateTime || !endDateTime) {
-        setError("Please fill in all required fields");
+      if (!title || !startDateTime || !endDateTime) {
+        setError("Please fill in reservation title and dates");
+        setIsLoading(false);
+        return;
+      }
+
+      if (tripChoice === "existing" && !selectedTripId) {
+        setError("Please select a trip to associate with.");
         setIsLoading(false);
         return;
       }
 
       const reservationData = {
-        tripId,
+        tripId: tripId || undefined,
         type,
         title,
         startDateTime: startDateTime.toISOString(),
@@ -328,10 +349,10 @@ export default function AddReservationModal({
   const resetForm = () => {
     if (defaultTripId) {
       setSelectedTripId(defaultTripId);
-      setIsCreatingTrip(false);
+      setTripChoice("existing");
     } else {
-      setSelectedTripId(trips.length > 0 ? trips[0].id : "");
-      setIsCreatingTrip(trips.length === 0);
+      setSelectedTripId("");
+      setTripChoice("none");
     }
     setNewTripName("");
     setNewTripDestination("");
@@ -389,32 +410,94 @@ export default function AddReservationModal({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Trip Selection */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Trip *
-            </label>
-            {loadingTrips ? (
-              <div className="text-slate-500">Loading trips...</div>
-            ) : (
-              <select
-                value={isCreatingTrip ? "new" : selectedTripId}
-                onChange={(e) => handleTripChange(e.target.value)}
-                className="input-magical"
-                disabled={isEditMode}
-              >
-                {trips.map((trip) => (
-                  <option key={trip.id} value={trip.id}>
-                    {trip.name} ({trip.destination})
-                  </option>
-                ))}
-                {!isEditMode && <option value="new">+ Create New Trip</option>}
-              </select>
-            )}
-          </div>
+          {/* Trip association: radio buttons */}
+          {!isEditMode && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Link to a trip</p>
+              {loadingTrips ? (
+                <div className="text-slate-500">Loading trips...</div>
+              ) : trips.length === 0 ? (
+                <div className="space-y-2" role="radiogroup" aria-label="Link to a trip">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="tripChoice"
+                      checked={tripChoice === "none"}
+                      onChange={() => handleTripChoiceChange("none")}
+                      className="border-[#c4bdb5] dark:border-slate-500 text-[#1F2A44] focus:ring-[#FFB957]"
+                    />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">Add to calendar only (no trip)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="tripChoice"
+                      checked={tripChoice === "new"}
+                      onChange={() => handleTripChoiceChange("new")}
+                      className="border-[#c4bdb5] dark:border-slate-500 text-[#1F2A44] focus:ring-[#FFB957]"
+                    />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">Create A New Trip</span>
+                  </label>
+                </div>
+              ) : (
+                <div className="space-y-2" role="radiogroup" aria-label="Link to a trip">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="tripChoice"
+                      checked={tripChoice === "none"}
+                      onChange={() => handleTripChoiceChange("none")}
+                      className="border-[#c4bdb5] dark:border-slate-500 text-[#1F2A44] focus:ring-[#FFB957]"
+                    />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">Add to calendar only (no trip)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="tripChoice"
+                      checked={tripChoice === "existing"}
+                      onChange={() => handleTripChoiceChange("existing")}
+                      className="border-[#c4bdb5] dark:border-slate-500 text-[#1F2A44] focus:ring-[#FFB957]"
+                    />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">Associate with an existing trip</span>
+                  </label>
+                  {tripChoice === "existing" && (
+                    <select
+                      value={selectedTripId}
+                      onChange={(e) => handleTripDropdownChange(e.target.value)}
+                      className="input-magical ml-6 max-w-full block"
+                    >
+                      <option value="">Select a trip...</option>
+                      <option value={CREATE_TRIP_VALUE}>Click here to create a new trip</option>
+                      {trips.map((trip) => (
+                        <option key={trip.id} value={trip.id}>
+                          {trip.name} ({trip.destination})
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="tripChoice"
+                      checked={tripChoice === "new"}
+                      onChange={() => handleTripChoiceChange("new")}
+                      className="border-[#c4bdb5] dark:border-slate-500 text-[#1F2A44] focus:ring-[#FFB957]"
+                    />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">Create A New Trip</span>
+                  </label>
+                </div>
+              )}
+            </div>
+          )}
+          {isEditMode && editReservation?.tripId && (
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Linked to trip: {editReservation.trip?.name ?? "—"}
+            </p>
+          )}
 
           {/* New Trip Fields */}
-          {isCreatingTrip && (
+          {tripChoice === "new" && (
             <div className="p-4 bg-[#FAF4EF] dark:bg-[#1F2A44]/20 rounded-lg space-y-3">
               <h3 className="font-medium text-[#1F2A44] dark:text-[#E5E5E5]">New Trip Details</h3>
               <input
@@ -608,7 +691,7 @@ export default function AddReservationModal({
           )}
 
           {/* Trip Date Range Hint */}
-          {selectedTrip && !isCreatingTrip && (
+          {selectedTrip && tripChoice === "existing" && (
             <div className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700/50 px-3 py-2 rounded-lg">
               📅 Trip dates: {new Date(selectedTrip.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {new Date(selectedTrip.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </div>

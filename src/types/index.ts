@@ -6,6 +6,14 @@ export type ReservationType = "PARK" | "RIDE" | "HOTEL" | "CAR" | "FLIGHT";
 // Trip Roles
 export type TripRole = "OWNER" | "MEMBER";
 
+// Structured guest for a trip (additional guests flow)
+export interface GuestDetail {
+  firstName: string;
+  lastName: string;
+  type: "adult" | "child";
+  childAge?: number;
+}
+
 // Blog Categories
 export type BlogCategory = "PARK_UPDATE" | "HOLIDAY_EVENT" | "GENERAL" | "TIP";
 
@@ -139,6 +147,7 @@ export interface TripApiResponse {
   endDate: string;
   notes: string | null;
   guests: string[];
+  guestDetails?: GuestDetail[] | null;
   budgetEnabled: boolean;
   budgetAmount: number | null;
   budgetCurrency: string;
@@ -152,7 +161,7 @@ export interface TripApiResponse {
 
 export interface ReservationApiResponse {
   id: string;
-  tripId: string;
+  tripId: string | null;
   type: ReservationType;
   title: string;
   startDateTime: string;
@@ -162,6 +171,7 @@ export interface ReservationApiResponse {
   notes: string | null;
   guests: string[];
   guestCount: number | null;
+  trip?: { name: string } | null;
 }
 
 // Reservation type configuration for UI display

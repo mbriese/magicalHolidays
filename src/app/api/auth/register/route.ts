@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, password } = body;
+    const { name, email, password, firstName, lastName, title, displayPreference } = body;
 
     if (!email || !password) {
       return NextResponse.json(
@@ -33,12 +33,19 @@ export async function POST(request: NextRequest) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+    const fullName = name ?? ([firstName, lastName].filter(Boolean).join(" ").trim() || null);
+    const preference = displayPreference === "formal" ? "formal" : "casual";
 
     await prisma.user.create({
       data: {
-        name: name || null,
+        name: fullName || null,
+        firstName: firstName ? String(firstName).trim() || null : null,
+        lastName: lastName ? String(lastName).trim() || null : null,
+        title: title ? String(title).trim() || null : null,
+        displayPreference: preference,
         email,
         password: hashedPassword,
+        favoriteCharacters: [],
       },
     });
 
@@ -47,9 +54,12 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     console.error("Registration error:", error);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again." },
+      {
+        error: process.env.NODE_ENV === "development" ? message : "Something went wrong. Please try again.",
+      },
       { status: 500 },
     );
   }

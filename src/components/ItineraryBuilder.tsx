@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+const CREATE_TRIP_VALUE = "__create__";
 import {
   type AttractionTheme,
   type Attraction,
@@ -20,6 +23,7 @@ interface ItineraryBuilderProps {
 }
 
 export default function ItineraryBuilder({ onAddToTrip }: ItineraryBuilderProps) {
+  const router = useRouter();
   const [selectedTheme, setSelectedTheme] = useState<AttractionTheme | null>(null);
   const [selectedPark, setSelectedPark] = useState<string>("all");
   const [attractions, setAttractions] = useState<Attraction[]>([]);
@@ -28,6 +32,14 @@ export default function ItineraryBuilder({ onAddToTrip }: ItineraryBuilderProps)
   const [selectedTripId, setSelectedTripId] = useState<string>("");
   const [isAdding, setIsAdding] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const handleTripSelectChange = (value: string) => {
+    if (value === CREATE_TRIP_VALUE) {
+      router.push("/trips/new");
+      return;
+    }
+    setSelectedTripId(value);
+  };
 
   const parks = getParks();
   const themes: AttractionTheme[] = ["chill", "thrill", "throwback"];
@@ -189,18 +201,16 @@ export default function ItineraryBuilder({ onAddToTrip }: ItineraryBuilderProps)
             </label>
             <select
               value={selectedTripId}
-              onChange={(e) => setSelectedTripId(e.target.value)}
+              onChange={(e) => handleTripSelectChange(e.target.value)}
               className="input-magical"
             >
-              {trips.length === 0 ? (
-                <option value="">No trips - create one first</option>
-              ) : (
-                trips.map((trip) => (
-                  <option key={trip.id} value={trip.id}>
-                    {trip.name}
-                  </option>
-                ))
-              )}
+              <option value="">No trips yet</option>
+              <option value={CREATE_TRIP_VALUE}>Click here to create a new trip</option>
+              {trips.map((trip) => (
+                <option key={trip.id} value={trip.id}>
+                  {trip.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>

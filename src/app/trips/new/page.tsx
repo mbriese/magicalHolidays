@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DESTINATIONS } from "@/lib/constants";
+import type { GuestDetail } from "@/types";
 
 interface CreatedTrip {
   id: string;
   name: string;
   destination: string;
+}
+
+function emptyGuest(): GuestDetail {
+  return { firstName: "", lastName: "", type: "adult" };
 }
 
 export default function NewTripPage() {
@@ -16,8 +21,9 @@ export default function NewTripPage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [notes, setNotes] = useState("");
-  const [guests, setGuests] = useState<string[]>([]);
-  const [newGuestName, setNewGuestName] = useState("");
+  const [hasAdditionalGuests, setHasAdditionalGuests] = useState<boolean | null>(null);
+  const [additionalGuestCount, setAdditionalGuestCount] = useState(1);
+  const [guestList, setGuestList] = useState<GuestDetail[]>([]);
   const [budgetEnabled, setBudgetEnabled] = useState(false);
   const [budgetAmount, setBudgetAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -25,24 +31,26 @@ export default function NewTripPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdTrip, setCreatedTrip] = useState<CreatedTrip | null>(null);
 
-  // Guest management functions
-  const handleAddGuest = () => {
-    const trimmedName = newGuestName.trim();
-    if (trimmedName && !guests.includes(trimmedName)) {
-      setGuests([...guests, trimmedName]);
-      setNewGuestName("");
+  // When count changes, resize guestList and preserve existing entries
+  useEffect(() => {
+    if (!hasAdditionalGuests || additionalGuestCount < 1) {
+      setGuestList([]);
+      return;
     }
-  };
+    setGuestList((prev) => {
+      const next = [...prev];
+      while (next.length < additionalGuestCount) next.push(emptyGuest());
+      return next.slice(0, additionalGuestCount);
+    });
+  }, [hasAdditionalGuests, additionalGuestCount]);
 
-  const handleRemoveGuest = (guestToRemove: string) => {
-    setGuests(guests.filter((g) => g !== guestToRemove));
-  };
-
-  const handleGuestKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddGuest();
-    }
+  const updateGuest = (index: number, updates: Partial<GuestDetail>) => {
+    setGuestList((prev) => {
+      const next = [...prev];
+      if (!next[index]) next[index] = emptyGuest();
+      next[index] = { ...next[index], ...updates };
+      return next;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,7 +83,7 @@ export default function NewTripPage() {
           startDate,
           endDate,
           notes: notes || null,
-          guests,
+          guestDetails: hasAdditionalGuests && guestList.length > 0 ? guestList : undefined,
           budgetEnabled,
           budgetAmount: budgetEnabled && budgetAmount ? parseFloat(budgetAmount) : null,
         }),
@@ -221,53 +229,117 @@ export default function NewTripPage() {
               </div>
             </div>
 
-            {/* Guests Section */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                👥 Who&apos;s Going?
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={newGuestName}
-                  onChange={(e) => setNewGuestName(e.target.value)}
-                  onKeyDown={handleGuestKeyDown}
-                  placeholder="Enter guest name..."
-                  className="input-magical flex-1"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddGuest}
-                  disabled={!newGuestName.trim()}
-                  className="px-4 py-2 bg-[#1F2A44]/10 dark:bg-[#1F2A44]/30 text-[#1F2A44] dark:text-[#FFB957] rounded-lg font-medium hover:bg-[#FFB957]/30 dark:hover:bg-[#FFB957]/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Add
-                </button>
-              </div>
-              {guests.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {guests.map((guest) => (
-                    <span
-                      key={guest}
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full text-sm"
-                    >
-                      👤 {guest}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveGuest(guest)}
-                        className="ml-1 text-slate-400 hover:text-red-500 transition-colors"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Add the names of people joining this trip (press Enter or click Add)
+            {/* Additional guests */}
+            <div className="space-y-4">
+              <p className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Will you be traveling with additional guests?
               </p>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="hasAdditionalGuests"
+                    checked={hasAdditionalGuests === true}
+                    onChange={() => setHasAdditionalGuests(true)}
+                    className="w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
+                  />
+                  <span className="text-sm">Yes</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="hasAdditionalGuests"
+                    checked={hasAdditionalGuests === false}
+                    onChange={() => setHasAdditionalGuests(false)}
+                    className="w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
+                  />
+                  <span className="text-sm">No</span>
+                </label>
+              </div>
+
+              {hasAdditionalGuests === true && (
+                <>
+                  <div>
+                    <label htmlFor="additionalGuestCount" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      How many additional guests?
+                    </label>
+                    <input
+                      id="additionalGuestCount"
+                      type="number"
+                      min={1}
+                      max={20}
+                      value={additionalGuestCount}
+                      onChange={(e) => setAdditionalGuestCount(Math.max(1, Math.min(20, parseInt(e.target.value, 10) || 1)))}
+                      className="input-magical w-24"
+                    />
+                  </div>
+                  {guestList.length > 0 && (
+                    <div className="space-y-4 p-4 rounded-xl bg-[#FAF4EF] dark:bg-[#1F2A44]/20 border border-[#E5E5E5] dark:border-midnight-500">
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Guest details
+                      </span>
+                      {guestList.map((guest, index) => (
+                        <div key={index} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <input
+                            type="text"
+                            placeholder="First name"
+                            value={guest.firstName}
+                            onChange={(e) => updateGuest(index, { firstName: e.target.value })}
+                            className="input-magical"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Last name"
+                            value={guest.lastName}
+                            onChange={(e) => updateGuest(index, { lastName: e.target.value })}
+                            className="input-magical"
+                          />
+                          <div className="sm:col-span-2 flex flex-wrap items-center gap-4">
+                            <span className="text-sm text-slate-600 dark:text-slate-400">Type:</span>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`guest-type-${index}`}
+                                checked={guest.type === "adult"}
+                                onChange={() => updateGuest(index, { type: "adult", childAge: undefined })}
+                                className="w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
+                              />
+                              <span className="text-sm">Adult</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`guest-type-${index}`}
+                                checked={guest.type === "child"}
+                                onChange={() => updateGuest(index, { type: "child" })}
+                                className="w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
+                              />
+                              <span className="text-sm">Child</span>
+                            </label>
+                            {guest.type === "child" && (
+                              <>
+                                <label htmlFor={`child-age-${index}`} className="text-sm text-slate-600 dark:text-slate-400">
+                                  Age:
+                                </label>
+                                <input
+                                  id={`child-age-${index}`}
+                                  type="number"
+                                  min={0}
+                                  max={17}
+                                  value={guest.childAge ?? ""}
+                                  onChange={(e) => updateGuest(index, { childAge: e.target.value ? parseInt(e.target.value, 10) : undefined })}
+                                  className="input-magical w-16"
+                                  placeholder="—"
+                                />
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
             </div>
 
             {/* Budget Setup */}

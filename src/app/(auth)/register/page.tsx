@@ -2,11 +2,16 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [name, setName] = useState("");
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [displayPreference, setDisplayPreference] = useState<"casual" | "formal">("formal");
+  const [title, setTitle] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -34,7 +39,14 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          title: displayPreference === "formal" ? title : undefined,
+          displayPreference,
+          email,
+          password,
+        }),
       });
 
       const data = await res.json();
@@ -53,8 +65,9 @@ export default function RegisterPage() {
       if (signInResult?.error) {
         router.push("/login");
       } else {
-        router.push("/dashboard");
-        router.refresh();
+        const url = typeof callbackUrl === "string" && callbackUrl.startsWith("/") ? callbackUrl : "/dashboard";
+        window.location.href = url;
+        return;
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -86,22 +99,92 @@ export default function RegisterPage() {
               </div>
             )}
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label
+                  htmlFor="firstName"
+                  className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                >
+                  First Name
+                </label>
+                <input
+                  id="firstName"
+                  type="text"
+                  required
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="input-magical"
+                  placeholder="First name"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="lastName"
+                  className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                >
+                  Last Name
+                </label>
+                <input
+                  id="lastName"
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="input-magical"
+                  placeholder="Last name"
+                />
+              </div>
+            </div>
+
             <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Full Name
-              </label>
-              <input
-                id="name"
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="input-magical"
-                placeholder="Your name"
-              />
+              <p className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                How would you like us to address you?
+              </p>
+              <div className="space-y-3">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="displayPreference"
+                    checked={displayPreference === "casual"}
+                    onChange={() => setDisplayPreference("casual")}
+                    className="mt-1 w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
+                  />
+                  <span className="text-sm text-slate-700 dark:text-slate-300">
+                    <strong>Casual:</strong> Can I call you {firstName || "First name"}?
+                  </span>
+                </label>
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="displayPreference"
+                    checked={displayPreference === "formal"}
+                    onChange={() => setDisplayPreference("formal")}
+                    className="mt-1 w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
+                  />
+                  <span className="text-sm text-slate-700 dark:text-slate-300">
+                    <strong>Formal:</strong> {title ? `${title} ` : ""}{lastName || "Last name"}
+                  </span>
+                </label>
+                {displayPreference === "formal" && (
+                  <div className="ml-7 mt-2">
+                    <label htmlFor="title" className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                      Title
+                    </label>
+                    <select
+                      id="title"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="input-magical"
+                    >
+                      <option value="">No title</option>
+                      <option value="Mr.">Mr.</option>
+                      <option value="Ms.">Ms.</option>
+                      <option value="Mrs.">Mrs.</option>
+                      <option value="Mx.">Mx.</option>
+                      <option value="Dr.">Dr.</option>
+                    </select>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>

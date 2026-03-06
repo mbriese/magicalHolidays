@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import prisma from "./prisma";
+import { getDisplayName } from "./displayName";
 
 if (process.env.NODE_ENV === "production" && !process.env.NEXTAUTH_SECRET) {
   console.error(
@@ -12,6 +13,7 @@ if (process.env.NODE_ENV === "production" && !process.env.NEXTAUTH_SECRET) {
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
+  trustHost: true,
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -40,7 +42,7 @@ export const authOptions: NextAuthOptions = {
         return {
           id: user.id,
           email: user.email,
-          name: user.name,
+          name: getDisplayName(user),
         };
       },
     }),
@@ -58,8 +60,13 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (session.user && token.id) {
         session.user.id = token.id as string;
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { name: true, firstName: true, lastName: true, title: true, displayPreference: true },
+        });
+        if (dbUser) session.user.name = getDisplayName(dbUser);
       }
       return session;
     },
