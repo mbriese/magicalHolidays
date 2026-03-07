@@ -157,7 +157,7 @@ export default function AddReservationModal({
       } else if (defaultTripId) {
         // Set the default trip when modal opens (not in edit mode)
         setSelectedTripId(defaultTripId);
-        setIsCreatingTrip(false);
+        setTripChoice("existing");
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -175,7 +175,6 @@ export default function AddReservationModal({
     setConfirmationNumber(reservation.confirmationNumber || "");
     setNotes(reservation.notes || "");
     setGuests(reservation.guests || []);
-    setIsCreatingTrip(false);
   };
 
   // Guest management functions

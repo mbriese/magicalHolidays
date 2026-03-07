@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 
@@ -85,7 +86,7 @@ export async function PUT(
         endDate: new Date(endDate),
         notes: notes || null,
         guests: guestNames,
-        ...(details !== undefined && { guestDetails: details }),
+        ...(details !== undefined && { guestDetails: details === null ? Prisma.JsonNull : details }),
         budgetEnabled: budgetEnabled ?? existingTrip.budgetEnabled,
         budgetAmount: budgetEnabled && budgetAmount ? parseFloat(budgetAmount) : null,
       },

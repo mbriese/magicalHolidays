@@ -4,6 +4,7 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { TripItineraryPDFServer } from "@/components/pdf/TripItineraryPDFServer";
 import { prisma } from "@/lib/prisma";
 import React from "react";
+import type { GuestDetail } from "@/types";
 
 // Email from address
 const EMAIL_FROM = process.env.EMAIL_FROM || "Lamplight Holidays <onboarding@resend.dev>";
@@ -76,6 +77,7 @@ export async function POST(request: NextRequest) {
       ...trip,
       startDate: trip.startDate.toISOString(),
       endDate: trip.endDate.toISOString(),
+      guestDetails: trip.guestDetails as GuestDetail[] | null,
       reservations: trip.reservations.map((r) => ({
         ...r,
         startDateTime: r.startDateTime.toISOString(),

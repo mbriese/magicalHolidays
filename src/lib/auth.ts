@@ -13,7 +13,6 @@ if (process.env.NODE_ENV === "production" && !process.env.NEXTAUTH_SECRET) {
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
-  trustHost: true,
   providers: [
     CredentialsProvider({
       name: "credentials",
