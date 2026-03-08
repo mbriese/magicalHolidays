@@ -18,8 +18,8 @@ function RegisterForm() {
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [displayPreference, setDisplayPreference] = useState<"casual" | "formal">("formal");
-  const [title, setTitle] = useState("");
+  const [displayPreference, setDisplayPreference] = useState<"firstName" | "preferredName">("firstName");
+  const [preferredName, setPreferredName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -50,7 +50,7 @@ function RegisterForm() {
         body: JSON.stringify({
           firstName: firstName.trim(),
           lastName: lastName.trim(),
-          title: displayPreference === "formal" ? title : undefined,
+          preferredName: displayPreference === "preferredName" ? preferredName.trim() : undefined,
           displayPreference,
           email,
           password,
@@ -113,14 +113,19 @@ function RegisterForm() {
                   htmlFor="firstName"
                   className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
                 >
-                  First Name
+                  Legal First Name
                 </label>
                 <input
                   id="firstName"
                   type="text"
                   required
                   value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  onChange={(e) => {
+                    setFirstName(e.target.value);
+                    if (displayPreference === "firstName" || !preferredName) {
+                      setPreferredName(e.target.value);
+                    }
+                  }}
                   className="input-magical"
                   placeholder="First name"
                 />
@@ -130,11 +135,12 @@ function RegisterForm() {
                   htmlFor="lastName"
                   className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
                 >
-                  Last Name
+                  Legal Last Name
                 </label>
                 <input
                   id="lastName"
                   type="text"
+                  required
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   className="input-magical"
@@ -142,6 +148,9 @@ function RegisterForm() {
                 />
               </div>
             </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 -mt-3">
+              Must match your driver&apos;s license / passport for travel documents.
+            </p>
 
             <div>
               <p className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
@@ -152,47 +161,51 @@ function RegisterForm() {
                   <input
                     type="radio"
                     name="displayPreference"
-                    checked={displayPreference === "casual"}
-                    onChange={() => setDisplayPreference("casual")}
+                    checked={displayPreference === "firstName"}
+                    onChange={() => setDisplayPreference("firstName")}
                     className="mt-1 w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
                   />
                   <span className="text-sm text-slate-700 dark:text-slate-300">
-                    <strong>Casual:</strong> Can I call you {firstName || "First name"}?
+                    Address me by my first name
                   </span>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
                     type="radio"
                     name="displayPreference"
-                    checked={displayPreference === "formal"}
-                    onChange={() => setDisplayPreference("formal")}
+                    checked={displayPreference === "preferredName"}
+                    onChange={() => {
+                      setDisplayPreference("preferredName");
+                      if (!preferredName) setPreferredName(firstName);
+                    }}
                     className="mt-1 w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
                   />
                   <span className="text-sm text-slate-700 dark:text-slate-300">
-                    <strong>Formal:</strong> {title ? `${title} ` : ""}{lastName || "Last name"}
+                    Address me by my preferred name
                   </span>
                 </label>
-                {displayPreference === "formal" && (
-                  <div className="ml-7 mt-2">
-                    <label htmlFor="title" className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                      Title
+                {displayPreference === "preferredName" && (
+                  <div className="ml-7 mt-1">
+                    <label htmlFor="preferredName" className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                      Preferred name
                     </label>
-                    <select
-                      id="title"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
+                    <input
+                      id="preferredName"
+                      type="text"
+                      value={preferredName}
+                      onChange={(e) => setPreferredName(e.target.value)}
                       className="input-magical"
-                    >
-                      <option value="">No title</option>
-                      <option value="Mr.">Mr.</option>
-                      <option value="Ms.">Ms.</option>
-                      <option value="Mrs.">Mrs.</option>
-                      <option value="Mx.">Mx.</option>
-                      <option value="Dr.">Dr.</option>
-                    </select>
+                      placeholder={firstName || "Preferred name"}
+                    />
                   </div>
                 )}
               </div>
+
+              {(firstName || preferredName) && (
+                <p className="mt-3 text-sm text-[#1F2A44] dark:text-[#FFB957] font-medium">
+                  Great! We&apos;ll call you &ldquo;{displayPreference === "preferredName" && preferredName ? preferredName : firstName}&rdquo;!
+                </p>
+              )}
             </div>
 
             <div>

@@ -19,10 +19,11 @@ model User {
   email              String        @unique
   password           String
   name               String?       // Full name (legacy / fallback)
-  firstName          String?       // For casual: "Can I call you Firstname?"
-  lastName           String?       // For formal: Mr./Ms. Lastname
-  title              String?       // Mr., Ms., Mrs., Mx., Dr. (used when formal)
-  displayPreference  String?       @default("formal") // "formal" = title + lastName; "casual" = firstName
+  firstName          String?       // Legal first name (must match travel documents)
+  lastName           String?       // Legal last name (must match travel documents)
+  title              String?       // Mr., Ms., Mrs., Mx., Dr. (legacy)
+  preferredName      String?       // User's preferred name (if different from firstName)
+  displayPreference  String?       @default("firstName") // "firstName" | "preferredName"
   favoriteCharacters String[]      // For Disney nuggets feature
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt

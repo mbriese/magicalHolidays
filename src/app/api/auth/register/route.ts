@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, password, firstName, lastName, title, displayPreference } = body;
+    const { name, email, password, firstName, lastName, title, preferredName, displayPreference } = body;
 
     if (!email || !password) {
       return NextResponse.json(
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
     const fullName = name ?? ([firstName, lastName].filter(Boolean).join(" ").trim() || null);
-    const preference = displayPreference === "formal" ? "formal" : "casual";
+    const preference = displayPreference === "preferredName" ? "preferredName" : "firstName";
 
     await prisma.user.create({
       data: {
@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
         firstName: firstName ? String(firstName).trim() || null : null,
         lastName: lastName ? String(lastName).trim() || null : null,
         title: title ? String(title).trim() || null : null,
+        preferredName: preferredName ? String(preferredName).trim() || null : null,
         displayPreference: preference,
         email,
         password: hashedPassword,

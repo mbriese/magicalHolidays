@@ -10,9 +10,9 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { firstName, lastName, title, displayPreference } = body;
+    const { firstName, lastName, title, preferredName, displayPreference } = body;
 
-    const preference = displayPreference === "formal" ? "formal" : "casual";
+    const preference = displayPreference === "preferredName" ? "preferredName" : "firstName";
     const fullName = [firstName, lastName].filter(Boolean).join(" ").trim() || null;
 
     await prisma.user.update({
@@ -22,6 +22,7 @@ export async function PUT(request: NextRequest) {
         firstName: firstName != null ? String(firstName).trim() || null : undefined,
         lastName: lastName != null ? String(lastName).trim() || null : undefined,
         title: title != null ? String(title).trim() || null : undefined,
+        preferredName: preferredName != null ? String(preferredName).trim() || null : undefined,
         displayPreference: preference,
       },
     });
@@ -45,7 +46,7 @@ export async function GET() {
 
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
-      select: { firstName: true, lastName: true, title: true, displayPreference: true },
+      select: { firstName: true, lastName: true, title: true, preferredName: true, displayPreference: true },
     });
 
     if (!dbUser) {

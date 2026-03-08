@@ -39,8 +39,8 @@ function PreferredNameSection() {
   const { update } = useSession();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [title, setTitle] = useState("");
-  const [displayPreference, setDisplayPreference] = useState<"casual" | "formal">("formal");
+  const [preferredName, setPreferredName] = useState("");
+  const [displayPreference, setDisplayPreference] = useState<"firstName" | "preferredName">("firstName");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -54,8 +54,9 @@ function PreferredNameSection() {
         if (!cancelled && data) {
           setFirstName(data.firstName ?? "");
           setLastName(data.lastName ?? "");
-          setTitle(data.title ?? "");
-          setDisplayPreference(data.displayPreference === "formal" ? "formal" : "casual");
+          setPreferredName(data.preferredName ?? data.firstName ?? "");
+          const pref = data.displayPreference;
+          setDisplayPreference(pref === "preferredName" ? "preferredName" : "firstName");
         }
         setFetched(true);
       })
@@ -74,7 +75,7 @@ function PreferredNameSection() {
         body: JSON.stringify({
           firstName: firstName.trim(),
           lastName: lastName.trim(),
-          title: displayPreference === "formal" ? title : "",
+          preferredName: displayPreference === "preferredName" ? preferredName.trim() : "",
           displayPreference,
         }),
       });
@@ -83,7 +84,10 @@ function PreferredNameSection() {
         setMessage(data.error ?? "Update failed.");
         setIsError(true);
       } else {
-        setMessage("Saved. We’ll use this when we address you.");
+        const name = displayPreference === "preferredName" && preferredName.trim()
+          ? preferredName.trim()
+          : firstName.trim();
+        setMessage(`Saved! We'll call you "${name}".`);
         setIsError(false);
         await update();
       }
@@ -98,35 +102,44 @@ function PreferredNameSection() {
   if (!fetched) {
     return (
       <SectionCard title="How we address you">
-        <p className="text-sm text-slate-500 dark:text-slate-400">Loading…</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Loading...</p>
       </SectionCard>
     );
   }
 
+  const displayedName = displayPreference === "preferredName" && preferredName
+    ? preferredName
+    : firstName;
+
   return (
     <SectionCard title="How we address you">
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-        Choose how you’d like to be addressed: casual (first name) or formal (title + last name).
+        Your legal name is used for travel documents and must match your driver&apos;s license / passport.
       </p>
       <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
         <StatusMessage message={message} isError={isError} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label htmlFor="profileFirstName" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              First name
+              Legal First Name
             </label>
             <input
               id="profileFirstName"
               type="text"
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              onChange={(e) => {
+                setFirstName(e.target.value);
+                if (displayPreference === "firstName" || !preferredName) {
+                  setPreferredName(e.target.value);
+                }
+              }}
               className="input-magical"
               placeholder="First name"
             />
           </div>
           <div>
             <label htmlFor="profileLastName" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Last name
+              Legal Last Name
             </label>
             <input
               id="profileLastName"
@@ -140,57 +153,60 @@ function PreferredNameSection() {
         </div>
         <div>
           <p className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            Address style
+            How would you like us to address you?
           </p>
           <div className="space-y-2">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
                 name="accountDisplayPreference"
-                checked={displayPreference === "casual"}
-                onChange={() => setDisplayPreference("casual")}
+                checked={displayPreference === "firstName"}
+                onChange={() => setDisplayPreference("firstName")}
                 className="w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
               />
-              <span className="text-sm">Casual: Can I call you {firstName || "First name"}?</span>
+              <span className="text-sm text-slate-700 dark:text-slate-300">Address me by my first name</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
                 name="accountDisplayPreference"
-                checked={displayPreference === "formal"}
-                onChange={() => setDisplayPreference("formal")}
+                checked={displayPreference === "preferredName"}
+                onChange={() => {
+                  setDisplayPreference("preferredName");
+                  if (!preferredName) setPreferredName(firstName);
+                }}
                 className="w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
               />
-              <span className="text-sm">Formal: {title ? `${title} ` : ""}{lastName || "Last name"}</span>
+              <span className="text-sm text-slate-700 dark:text-slate-300">Address me by my preferred name</span>
             </label>
-            {displayPreference === "formal" && (
-              <div className="ml-6 mt-2">
-                <label htmlFor="profileTitle" className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                  Title
+            {displayPreference === "preferredName" && (
+              <div className="ml-6 mt-1">
+                <label htmlFor="profilePreferredName" className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                  Preferred name
                 </label>
-                <select
-                  id="profileTitle"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                <input
+                  id="profilePreferredName"
+                  type="text"
+                  value={preferredName}
+                  onChange={(e) => setPreferredName(e.target.value)}
                   className="input-magical"
-                >
-                  <option value="">No title</option>
-                  <option value="Mr.">Mr.</option>
-                  <option value="Ms.">Ms.</option>
-                  <option value="Mrs.">Mrs.</option>
-                  <option value="Mx.">Mx.</option>
-                  <option value="Dr.">Dr.</option>
-                </select>
+                  placeholder={firstName || "Preferred name"}
+                />
               </div>
             )}
           </div>
+          {displayedName && (
+            <p className="mt-3 text-sm text-[#1F2A44] dark:text-[#FFB957] font-medium">
+              Great! We&apos;ll call you &ldquo;{displayedName}&rdquo;!
+            </p>
+          )}
         </div>
         <button
           type="submit"
           disabled={isLoading}
           className="btn-magical py-2.5 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? "Saving…" : "Save"}
+          {isLoading ? "Saving..." : "Save"}
         </button>
       </form>
     </SectionCard>
@@ -420,7 +436,7 @@ export default function AccountPage() {
           href="/dashboard"
           className="text-sm text-[#1F2A44] dark:text-[#FAF4EF] hover:text-[#FFB957] transition-colors"
         >
-          ← Back to dashboard
+          &larr; Back to dashboard
         </a>
 
         <div className="mt-3 flex items-center justify-between">
