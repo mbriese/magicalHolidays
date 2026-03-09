@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { DESTINATIONS } from "@/lib/constants";
 import type { GuestDetail } from "@/types";
 
@@ -15,6 +16,7 @@ function emptyGuest(): GuestDetail {
 }
 
 export default function NewTripPage() {
+  const { data: session } = useSession();
   const [name, setName] = useState("");
   const [destination, setDestination] = useState("");
   const [customDestination, setCustomDestination] = useState("");
@@ -114,7 +116,9 @@ export default function NewTripPage() {
             Create New Trip ✨
           </h1>
           <p className="text-[#E5E5E5]">
-            Start planning your next magical adventure
+            {session?.user?.name
+              ? `Crafting your next magical adventure, ${session.user.name}!`
+              : "Start planning your next magical adventure"}
           </p>
         </div>
       </div>
