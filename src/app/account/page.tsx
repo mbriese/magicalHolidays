@@ -40,7 +40,7 @@ function PreferredNameSection() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [preferredName, setPreferredName] = useState("");
-  const [displayPreference, setDisplayPreference] = useState<"firstName" | "preferredName">("firstName");
+  const [usePreferredName, setUsePreferredName] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -54,9 +54,8 @@ function PreferredNameSection() {
         if (!cancelled && data) {
           setFirstName(data.firstName ?? "");
           setLastName(data.lastName ?? "");
-          setPreferredName(data.preferredName ?? data.firstName ?? "");
-          const pref = data.displayPreference;
-          setDisplayPreference(pref === "preferredName" ? "preferredName" : "firstName");
+          setPreferredName(data.preferredName ?? "");
+          setUsePreferredName(data.displayPreference === "preferredName");
         }
         setFetched(true);
       })
@@ -75,8 +74,8 @@ function PreferredNameSection() {
         body: JSON.stringify({
           firstName: firstName.trim(),
           lastName: lastName.trim(),
-          preferredName: displayPreference === "preferredName" ? preferredName.trim() : "",
-          displayPreference,
+          preferredName: usePreferredName ? preferredName.trim() : "",
+          displayPreference: usePreferredName ? "preferredName" : "firstName",
         }),
       });
       const data = await res.json();
@@ -84,7 +83,7 @@ function PreferredNameSection() {
         setMessage(data.error ?? "Update failed.");
         setIsError(true);
       } else {
-        const name = displayPreference === "preferredName" && preferredName.trim()
+        const name = usePreferredName && preferredName.trim()
           ? preferredName.trim()
           : firstName.trim();
         setMessage(`Saved! We'll call you "${name}".`);
@@ -107,10 +106,6 @@ function PreferredNameSection() {
     );
   }
 
-  const displayedName = displayPreference === "preferredName" && preferredName
-    ? preferredName
-    : firstName;
-
   return (
     <SectionCard title="How we address you">
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
@@ -127,12 +122,7 @@ function PreferredNameSection() {
               id="profileFirstName"
               type="text"
               value={firstName}
-              onChange={(e) => {
-                setFirstName(e.target.value);
-                if (displayPreference === "firstName" || !preferredName) {
-                  setPreferredName(e.target.value);
-                }
-              }}
+              onChange={(e) => setFirstName(e.target.value)}
               className="input-magical"
               placeholder="First name"
             />
@@ -155,50 +145,53 @@ function PreferredNameSection() {
           <p className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
             How would you like us to address you?
           </p>
-          <div className="space-y-2">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="accountDisplayPreference"
-                checked={displayPreference === "firstName"}
-                onChange={() => setDisplayPreference("firstName")}
-                className="w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
-              />
-              <span className="text-sm text-slate-700 dark:text-slate-300">Address me by my first name</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="accountDisplayPreference"
-                checked={displayPreference === "preferredName"}
-                onChange={() => {
-                  setDisplayPreference("preferredName");
-                  if (!preferredName) setPreferredName(firstName);
-                }}
-                className="w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
-              />
-              <span className="text-sm text-slate-700 dark:text-slate-300">Address me by my preferred name</span>
-            </label>
-            {displayPreference === "preferredName" && (
-              <div className="ml-6 mt-1">
-                <label htmlFor="profilePreferredName" className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                  Preferred name
-                </label>
-                <input
-                  id="profilePreferredName"
-                  type="text"
-                  value={preferredName}
-                  onChange={(e) => setPreferredName(e.target.value)}
-                  className="input-magical"
-                  placeholder={firstName || "Preferred name"}
-                />
-              </div>
-            )}
-          </div>
-          {displayedName && (
-            <p className="mt-3 text-sm text-[#1F2A44] dark:text-[#FFB957] font-medium">
-              Great! We&apos;ll call you &ldquo;{displayedName}&rdquo;!
+
+          {firstName && (
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+              We&apos;ll call you <span className="font-medium text-[#1F2A44] dark:text-[#FAF4EF]">{usePreferredName && preferredName ? preferredName : firstName}</span>
             </p>
+          )}
+
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={usePreferredName}
+              onChange={(e) => {
+                setUsePreferredName(e.target.checked);
+                if (e.target.checked && !preferredName) {
+                  setPreferredName(firstName);
+                }
+              }}
+              className="w-4 h-4 rounded border-[#E5E5E5] text-[#1F2A44] focus:ring-[#FFB957]"
+            />
+            <span className="text-sm text-slate-700 dark:text-slate-300">
+              Use a preferred name for communications
+            </span>
+          </label>
+
+          {usePreferredName && (
+            <div className="mt-3 ml-6">
+              <label htmlFor="profilePreferredName" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                Preferred name
+              </label>
+              <input
+                id="profilePreferredName"
+                type="text"
+                value={preferredName}
+                onChange={(e) => setPreferredName(e.target.value)}
+                className="input-magical"
+                placeholder={firstName || "Preferred name"}
+              />
+              <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+                Travel documents will still use your legal name.
+              </p>
+
+              {preferredName && (
+                <p className="mt-2 text-sm text-[#1F2A44] dark:text-[#FFB957] font-medium">
+                  Great! We&apos;ll call you &ldquo;{preferredName}&rdquo;!
+                </p>
+              )}
+            </div>
           )}
         </div>
         <button

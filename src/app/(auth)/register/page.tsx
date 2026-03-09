@@ -18,7 +18,7 @@ function RegisterForm() {
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [displayPreference, setDisplayPreference] = useState<"firstName" | "preferredName">("firstName");
+  const [usePreferredName, setUsePreferredName] = useState(false);
   const [preferredName, setPreferredName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,8 +50,8 @@ function RegisterForm() {
         body: JSON.stringify({
           firstName: firstName.trim(),
           lastName: lastName.trim(),
-          preferredName: displayPreference === "preferredName" ? preferredName.trim() : undefined,
-          displayPreference,
+          preferredName: usePreferredName ? preferredName.trim() : undefined,
+          displayPreference: usePreferredName ? "preferredName" : "firstName",
           email,
           password,
         }),
@@ -70,13 +70,15 @@ function RegisterForm() {
         redirect: false,
       });
 
-      if (signInResult?.error) {
-        router.push("/login");
-      } else {
-        const url = typeof callbackUrl === "string" && callbackUrl.startsWith("/") ? callbackUrl : "/dashboard";
-        window.location.href = url;
+      if (!signInResult?.ok) {
+        setError("Account created! Please sign in.");
+        router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
         return;
       }
+
+      const url = typeof callbackUrl === "string" && callbackUrl.startsWith("/") ? callbackUrl : "/dashboard";
+      window.location.href = url;
+      return;
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -120,12 +122,7 @@ function RegisterForm() {
                   type="text"
                   required
                   value={firstName}
-                  onChange={(e) => {
-                    setFirstName(e.target.value);
-                    if (displayPreference === "firstName" || !preferredName) {
-                      setPreferredName(e.target.value);
-                    }
-                  }}
+                  onChange={(e) => setFirstName(e.target.value)}
                   className="input-magical"
                   placeholder="First name"
                 />
@@ -156,55 +153,53 @@ function RegisterForm() {
               <p className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 How would you like us to address you?
               </p>
-              <div className="space-y-3">
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="displayPreference"
-                    checked={displayPreference === "firstName"}
-                    onChange={() => setDisplayPreference("firstName")}
-                    className="mt-1 w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
-                  />
-                  <span className="text-sm text-slate-700 dark:text-slate-300">
-                    Address me by my first name
-                  </span>
-                </label>
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="displayPreference"
-                    checked={displayPreference === "preferredName"}
-                    onChange={() => {
-                      setDisplayPreference("preferredName");
-                      if (!preferredName) setPreferredName(firstName);
-                    }}
-                    className="mt-1 w-4 h-4 text-[#1F2A44] border-[#E5E5E5] focus:ring-[#FFB957]"
-                  />
-                  <span className="text-sm text-slate-700 dark:text-slate-300">
-                    Address me by my preferred name
-                  </span>
-                </label>
-                {displayPreference === "preferredName" && (
-                  <div className="ml-7 mt-1">
-                    <label htmlFor="preferredName" className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                      Preferred name
-                    </label>
-                    <input
-                      id="preferredName"
-                      type="text"
-                      value={preferredName}
-                      onChange={(e) => setPreferredName(e.target.value)}
-                      className="input-magical"
-                      placeholder={firstName || "Preferred name"}
-                    />
-                  </div>
-                )}
-              </div>
 
-              {(firstName || preferredName) && (
-                <p className="mt-3 text-sm text-[#1F2A44] dark:text-[#FFB957] font-medium">
-                  Great! We&apos;ll call you &ldquo;{displayPreference === "preferredName" && preferredName ? preferredName : firstName}&rdquo;!
+              {firstName && (
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                  We&apos;ll call you <span className="font-medium text-[#1F2A44] dark:text-[#FAF4EF]">{usePreferredName && preferredName ? preferredName : firstName}</span>
                 </p>
+              )}
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={usePreferredName}
+                  onChange={(e) => {
+                    setUsePreferredName(e.target.checked);
+                    if (e.target.checked && !preferredName) {
+                      setPreferredName(firstName);
+                    }
+                  }}
+                  className="w-4 h-4 rounded border-[#E5E5E5] text-[#1F2A44] focus:ring-[#FFB957]"
+                />
+                <span className="text-sm text-slate-700 dark:text-slate-300">
+                  Use a preferred name for communications
+                </span>
+              </label>
+
+              {usePreferredName && (
+                <div className="mt-3 ml-6">
+                  <label htmlFor="preferredName" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Preferred name
+                  </label>
+                  <input
+                    id="preferredName"
+                    type="text"
+                    value={preferredName}
+                    onChange={(e) => setPreferredName(e.target.value)}
+                    className="input-magical"
+                    placeholder={firstName || "Preferred name"}
+                  />
+                  <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+                    Travel documents will still use your legal name.
+                  </p>
+
+                  {preferredName && (
+                    <p className="mt-2 text-sm text-[#1F2A44] dark:text-[#FFB957] font-medium">
+                      Great! We&apos;ll call you &ldquo;{preferredName}&rdquo;!
+                    </p>
+                  )}
+                </div>
               )}
             </div>
 
