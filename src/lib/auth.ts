@@ -13,6 +13,9 @@ if (process.env.NODE_ENV === "production" && !process.env.NEXTAUTH_SECRET) {
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
+  // Required for Railway's reverse proxy to trust forwarded headers
+  // @ts-expect-error trustHost is accepted at runtime by next-auth v4 but not in its types
+  trustHost: true,
   providers: [
     CredentialsProvider({
       name: "credentials",
