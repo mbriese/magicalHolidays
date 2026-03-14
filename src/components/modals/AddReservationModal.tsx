@@ -1,11 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { reservationLabels, type ReservationType } from "@/types";
+import { reservationLabels, type ReservationType, type ReservationApiResponse, type TripApiResponse } from "@/types";
+import { DESTINATIONS, DESTINATION_PARKS } from "@/lib/constants";
+import { allAttractions } from "@/data/attractions";
 
-interface Trip {
+interface AddReservationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+  editReservation?: ReservationApiResponse | null;
+  defaultTripId?: string | null;
+  defaultType?: ReservationType;
+}
+
+// Simplified trip type for the dropdown
+interface TripOption {
   id: string;
   name: string;
   destination: string;
@@ -13,31 +25,20 @@ interface Trip {
   endDate: string;
 }
 
-interface AddReservationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
-}
-
 const reservationTypes: ReservationType[] = ["PARK", "RIDE", "HOTEL", "CAR", "FLIGHT"];
-
-const destinations = [
-  "Walt Disney World",
-  "Disneyland Resort",
-  "Tokyo Disney Resort",
-  "Disneyland Paris",
-  "Hong Kong Disneyland",
-  "Shanghai Disney Resort",
-  "Other",
-];
 
 export default function AddReservationModal({
   isOpen,
   onClose,
   onSuccess,
+  editReservation,
+  defaultTripId,
+  defaultType,
 }: AddReservationModalProps) {
+  const isEditMode = !!editReservation;
+
   // Trip selection
-  const [trips, setTrips] = useState<Trip[]>([]);
+  const [trips, setTrips] = useState<TripOption[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<string>("");
   const [isCreatingTrip, setIsCreatingTrip] = useState(false);
   const [loadingTrips, setLoadingTrips] = useState(true);
@@ -47,6 +48,28 @@ export default function AddReservationModal({
   const [newTripDestination, setNewTripDestination] = useState("");
   const [newTripStartDate, setNewTripStartDate] = useState<Date | null>(null);
   const [newTripEndDate, setNewTripEndDate] = useState<Date | null>(null);
+  const [newTripGuests, setNewTripGuests] = useState<string[]>([]);
+  const [newTripGuestName, setNewTripGuestName] = useState("");
+
+  // New trip guest management
+  const handleAddTripGuest = () => {
+    const trimmedName = newTripGuestName.trim();
+    if (trimmedName && !newTripGuests.includes(trimmedName)) {
+      setNewTripGuests([...newTripGuests, trimmedName]);
+      setNewTripGuestName("");
+    }
+  };
+
+  const handleRemoveTripGuest = (guestToRemove: string) => {
+    setNewTripGuests(newTripGuests.filter((g) => g !== guestToRemove));
+  };
+
+  const handleTripGuestKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddTripGuest();
+    }
+  };
 
   // Reservation fields
   const [type, setType] = useState<ReservationType>("PARK");
@@ -57,17 +80,117 @@ export default function AddReservationModal({
   const [location, setLocation] = useState("");
   const [confirmationNumber, setConfirmationNumber] = useState("");
   const [notes, setNotes] = useState("");
+  const [guests, setGuests] = useState<string[]>([]);
+  const [newGuestName, setNewGuestName] = useState("");
+
+  // Attraction selection for RIDE type
+  const [selectedAttractionId, setSelectedAttractionId] = useState<string>("");
+  const [selectedPark, setSelectedPark] = useState<string>("");
+  const [useCustomTitle, setUseCustomTitle] = useState(false);
+
+  // Get the selected trip's destination
+  const selectedTrip = useMemo(() => {
+    return trips.find((t) => t.id === selectedTripId);
+  }, [trips, selectedTripId]);
+
+  // Set default dates to trip start date when trip is selected (not in edit mode)
+  useEffect(() => {
+    if (selectedTrip && !editReservation && !startDateTime) {
+      const tripStartDate = new Date(selectedTrip.startDate);
+      // Set to 9:00 AM on the trip start date as a reasonable default
+      tripStartDate.setHours(9, 0, 0, 0);
+      setStartDateTime(tripStartDate);
+      
+      // Set end time to 10:00 AM (1 hour later) as default
+      const defaultEndDate = new Date(tripStartDate);
+      defaultEndDate.setHours(10, 0, 0, 0);
+      setEndDateTime(defaultEndDate);
+    }
+  }, [selectedTrip, editReservation, startDateTime]);
+
+  // Get available parks for the destination
+  const availableParks = useMemo(() => {
+    if (!selectedTrip) return [];
+    return DESTINATION_PARKS[selectedTrip.destination] || [];
+  }, [selectedTrip]);
+
+  // Get attractions for the selected park
+  const availableAttractions = useMemo(() => {
+    if (!selectedPark) return [];
+    return allAttractions.filter((a) => a.park === selectedPark);
+  }, [selectedPark]);
+
+  // Handle attraction selection
+  const handleAttractionSelect = (attractionId: string) => {
+    setSelectedAttractionId(attractionId);
+    const attraction = allAttractions.find((a) => a.id === attractionId);
+    if (attraction) {
+      setTitle(attraction.name);
+      setLocation(attraction.location);
+    }
+  };
+
+  // Handle park change
+  const handleParkChange = (park: string) => {
+    setSelectedPark(park);
+    setSelectedAttractionId("");
+    if (!useCustomTitle) {
+      setTitle("");
+      setLocation("");
+    }
+  };
 
   // Form state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch trips on mount
+  // Fetch trips on mount and populate form in edit mode
   useEffect(() => {
     if (isOpen) {
       fetchTrips();
+      if (editReservation) {
+        populateEditForm(editReservation);
+      } else if (defaultTripId) {
+        // Set the default trip when modal opens (not in edit mode)
+        setSelectedTripId(defaultTripId);
+        setIsCreatingTrip(false);
+      }
     }
-  }, [isOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, editReservation, defaultTripId]);
+
+  const populateEditForm = (reservation: ReservationApiResponse) => {
+    setSelectedTripId(reservation.tripId);
+    setType(reservation.type);
+    setTitle(reservation.title);
+    setStartDateTime(new Date(reservation.startDateTime));
+    setEndDateTime(new Date(reservation.endDateTime));
+    setLocation(reservation.location || "");
+    setConfirmationNumber(reservation.confirmationNumber || "");
+    setNotes(reservation.notes || "");
+    setGuests(reservation.guests || []);
+    setIsCreatingTrip(false);
+  };
+
+  // Guest management functions
+  const handleAddGuest = () => {
+    const trimmedName = newGuestName.trim();
+    if (trimmedName && !guests.includes(trimmedName)) {
+      setGuests([...guests, trimmedName]);
+      setNewGuestName("");
+    }
+  };
+
+  const handleRemoveGuest = (guestToRemove: string) => {
+    setGuests(guests.filter((g) => g !== guestToRemove));
+  };
+
+  const handleGuestKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddGuest();
+    }
+  };
 
   const fetchTrips = async () => {
     setLoadingTrips(true);
@@ -78,6 +201,10 @@ export default function AddReservationModal({
         setTrips(data);
         if (data.length === 0) {
           setIsCreatingTrip(true);
+        } else if (defaultTripId) {
+          // Use the provided default trip ID if available
+          setSelectedTripId(defaultTripId);
+          setIsCreatingTrip(false);
         } else {
           setSelectedTripId(data[0].id);
         }
@@ -109,6 +236,7 @@ export default function AddReservationModal({
           destination: newTripDestination,
           startDate: newTripStartDate?.toISOString(),
           endDate: newTripEndDate?.toISOString(),
+          guests: newTripGuests,
         }),
       });
 
@@ -155,20 +283,29 @@ export default function AddReservationModal({
         return;
       }
 
-      // Create reservation
-      const response = await fetch("/api/reservations", {
-        method: "POST",
+      const reservationData = {
+        tripId,
+        type,
+        title,
+        startDateTime: startDateTime.toISOString(),
+        endDateTime: endDateTime.toISOString(),
+        location: location || null,
+        confirmationNumber: confirmationNumber || null,
+        notes: notes || null,
+        guests: guests,
+        guestCount: guests.length > 0 ? guests.length : null,
+      };
+
+      // Create or update reservation
+      const url = isEditMode
+        ? `/api/reservations/${editReservation.id}`
+        : "/api/reservations";
+      const method = isEditMode ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tripId,
-          type,
-          title,
-          startDateTime: startDateTime.toISOString(),
-          endDateTime: endDateTime.toISOString(),
-          location: location || null,
-          confirmationNumber: confirmationNumber || null,
-          notes: notes || null,
-        }),
+        body: JSON.stringify(reservationData),
       });
 
       if (response.ok) {
@@ -178,7 +315,7 @@ export default function AddReservationModal({
         onClose();
       } else {
         const data = await response.json();
-        setError(data.error || "Failed to create reservation");
+        setError(data.error || `Failed to ${isEditMode ? "update" : "create"} reservation`);
       }
     } catch (err) {
       setError("Something went wrong. Please try again.");
@@ -189,13 +326,20 @@ export default function AddReservationModal({
   };
 
   const resetForm = () => {
-    setSelectedTripId(trips.length > 0 ? trips[0].id : "");
-    setIsCreatingTrip(trips.length === 0);
+    if (defaultTripId) {
+      setSelectedTripId(defaultTripId);
+      setIsCreatingTrip(false);
+    } else {
+      setSelectedTripId(trips.length > 0 ? trips[0].id : "");
+      setIsCreatingTrip(trips.length === 0);
+    }
     setNewTripName("");
     setNewTripDestination("");
     setNewTripStartDate(null);
     setNewTripEndDate(null);
-    setType("PARK");
+    setNewTripGuests([]);
+    setNewTripGuestName("");
+    setType(defaultType || "PARK");
     setTitle("");
     setStartDateTime(null);
     setEndDateTime(null);
@@ -203,8 +347,21 @@ export default function AddReservationModal({
     setLocation("");
     setConfirmationNumber("");
     setNotes("");
+    setGuests([]);
+    setNewGuestName("");
     setError("");
+    // Reset attraction selection
+    setSelectedAttractionId("");
+    setSelectedPark("");
+    setUseCustomTitle(false);
   };
+
+  // Set default type when modal opens with a default type
+  useEffect(() => {
+    if (isOpen && defaultType && !editReservation) {
+      setType(defaultType);
+    }
+  }, [isOpen, defaultType, editReservation]);
 
   if (!isOpen) return null;
 
@@ -213,7 +370,7 @@ export default function AddReservationModal({
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-lg w-full p-6 my-8 animate-fade-in">
         <div className="flex justify-between items-start mb-6">
           <h2 className="font-serif text-2xl font-bold text-purple-900 dark:text-white">
-            Add Reservation ✨
+            {isEditMode ? "Edit Reservation ✏️" : "Add Reservation ✨"}
           </h2>
           <button
             onClick={onClose}
@@ -244,13 +401,14 @@ export default function AddReservationModal({
                 value={isCreatingTrip ? "new" : selectedTripId}
                 onChange={(e) => handleTripChange(e.target.value)}
                 className="input-magical"
+                disabled={isEditMode}
               >
                 {trips.map((trip) => (
                   <option key={trip.id} value={trip.id}>
                     {trip.name} ({trip.destination})
                   </option>
                 ))}
-                <option value="new">+ Create New Trip</option>
+                {!isEditMode && <option value="new">+ Create New Trip</option>}
               </select>
             )}
           </div>
@@ -272,7 +430,7 @@ export default function AddReservationModal({
                 className="input-magical"
               >
                 <option value="">Select destination</option>
-                {destinations.map((dest) => (
+                {DESTINATIONS.map((dest) => (
                   <option key={dest} value={dest}>{dest}</option>
                 ))}
               </select>
@@ -299,6 +457,47 @@ export default function AddReservationModal({
                   />
                 </div>
               </div>
+              {/* Trip Guests */}
+              <div>
+                <label className="block text-xs text-slate-600 dark:text-slate-400 mb-1">👥 Who&apos;s Going?</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newTripGuestName}
+                    onChange={(e) => setNewTripGuestName(e.target.value)}
+                    onKeyDown={handleTripGuestKeyDown}
+                    placeholder="Add guest name..."
+                    className="input-magical flex-1 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddTripGuest}
+                    disabled={!newTripGuestName.trim()}
+                    className="px-3 py-1 bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300 rounded-lg text-sm font-medium hover:bg-purple-300 dark:hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
+                {newTripGuests.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {newTripGuests.map((guest) => (
+                      <span
+                        key={guest}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full text-xs"
+                      >
+                        {guest}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTripGuest(guest)}
+                          className="text-slate-400 hover:text-red-500"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -320,19 +519,100 @@ export default function AddReservationModal({
             </select>
           </div>
 
-          {/* Title */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Title *
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={type === "PARK" ? "e.g., Magic Kingdom" : type === "RIDE" ? "e.g., Space Mountain" : type === "HOTEL" ? "e.g., Grand Floridian" : type === "CAR" ? "e.g., Hertz Rental" : "e.g., Delta Flight 1234"}
-              className="input-magical"
-            />
-          </div>
+          {/* Ride/Attraction Selector - only for RIDE type with supported destinations */}
+          {type === "RIDE" && availableParks.length > 0 && !useCustomTitle && (
+            <>
+              {/* Park Selector */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Select Park *
+                </label>
+                <select
+                  value={selectedPark}
+                  onChange={(e) => handleParkChange(e.target.value)}
+                  className="input-magical"
+                >
+                  <option value="">Choose a park...</option>
+                  {availableParks.map((park) => (
+                    <option key={park} value={park}>
+                      {park}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Attraction Selector */}
+              {selectedPark && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Select Ride/Attraction *
+                  </label>
+                  <select
+                    value={selectedAttractionId}
+                    onChange={(e) => handleAttractionSelect(e.target.value)}
+                    className="input-magical"
+                  >
+                    <option value="">Choose an attraction...</option>
+                    {availableAttractions.map((attraction) => (
+                      <option key={attraction.id} value={attraction.id}>
+                        {attraction.icon} {attraction.name}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedAttractionId && (
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                      {allAttractions.find((a) => a.id === selectedAttractionId)?.tips}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Option to enter custom */}
+              <button
+                type="button"
+                onClick={() => setUseCustomTitle(true)}
+                className="text-sm text-purple-600 dark:text-purple-400 hover:underline"
+              >
+                Or enter a custom ride name...
+              </button>
+            </>
+          )}
+
+          {/* Title - shown for non-RIDE types, or when using custom title, or unsupported destinations */}
+          {(type !== "RIDE" || useCustomTitle || availableParks.length === 0) && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Title *
+                {type === "RIDE" && useCustomTitle && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUseCustomTitle(false);
+                      setTitle("");
+                      setLocation("");
+                    }}
+                    className="ml-2 text-xs text-purple-600 dark:text-purple-400 hover:underline"
+                  >
+                    (Select from list instead)
+                  </button>
+                )}
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder={type === "PARK" ? "e.g., Magic Kingdom" : type === "RIDE" ? "e.g., Space Mountain Lightning Lane" : type === "HOTEL" ? "e.g., Grand Floridian" : type === "CAR" ? "e.g., Hertz Rental" : "e.g., Delta Flight 1234"}
+                className="input-magical"
+              />
+            </div>
+          )}
+
+          {/* Trip Date Range Hint */}
+          {selectedTrip && !isCreatingTrip && (
+            <div className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700/50 px-3 py-2 rounded-lg">
+              📅 Trip dates: {new Date(selectedTrip.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {new Date(selectedTrip.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            </div>
+          )}
 
           {/* All Day Checkbox */}
           <label className="flex items-center space-x-2 cursor-pointer">
@@ -360,6 +640,7 @@ export default function AddReservationModal({
                 dateFormat={isAllDay ? "MMM d, yyyy" : "MMM d, yyyy h:mm aa"}
                 className="input-magical w-full"
                 placeholderText={isAllDay ? "Select date" : "Select date & time"}
+                openToDate={selectedTrip ? new Date(selectedTrip.startDate) : undefined}
               />
             </div>
             <div>
@@ -376,6 +657,7 @@ export default function AddReservationModal({
                 className="input-magical w-full"
                 placeholderText={isAllDay ? "Select date" : "Select date & time"}
                 minDate={startDateTime || undefined}
+                openToDate={startDateTime || (selectedTrip ? new Date(selectedTrip.startDate) : undefined)}
               />
             </div>
           </div>
@@ -420,6 +702,55 @@ export default function AddReservationModal({
             />
           </div>
 
+          {/* Guests */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              Guests
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newGuestName}
+                onChange={(e) => setNewGuestName(e.target.value)}
+                onKeyDown={handleGuestKeyDown}
+                placeholder="Enter guest name..."
+                className="input-magical flex-1"
+              />
+              <button
+                type="button"
+                onClick={handleAddGuest}
+                disabled={!newGuestName.trim()}
+                className="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg font-medium hover:bg-purple-200 dark:hover:bg-purple-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Add
+              </button>
+            </div>
+            {guests.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {guests.map((guest) => (
+                  <span
+                    key={guest}
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full text-sm"
+                  >
+                    👤 {guest}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveGuest(guest)}
+                      className="ml-1 text-slate-400 hover:text-red-500 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Press Enter or click Add to add guests
+            </p>
+          </div>
+
           {/* Buttons */}
           <div className="flex gap-3 pt-4">
             <button
@@ -434,7 +765,7 @@ export default function AddReservationModal({
               disabled={isLoading}
               className="btn-magical flex-1 disabled:opacity-50"
             >
-              {isLoading ? "Saving..." : "Add Reservation"}
+              {isLoading ? "Saving..." : isEditMode ? "Save Changes" : "Add Reservation"}
             </button>
           </div>
         </form>

@@ -1,341 +1,280 @@
 "use client";
 
-import { useState } from "react";
-import TripCalendar from "@/components/calendar/TripCalendar";
-import type { CalendarEvent, Trip } from "@/types";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import AddReservationModal from "@/components/modals/AddReservationModal";
+import ConfirmModal from "@/components/modals/ConfirmModal";
+import { formatDateRange } from "@/lib/formatters";
+import {
+  reservationTypeConfig,
+  type ReservationType,
+  type ReservationApiResponse,
+  type TripApiResponse,
+} from "@/types";
 
-// Demo data - using static dates to avoid hydration mismatch
-const demoTrip: Trip = {
-  id: "1",
-  name: "Summer Magic 2026",
-  destination: "Walt Disney World",
-  startDate: new Date("2026-07-15T00:00:00"),
-  endDate: new Date("2026-07-22T00:00:00"),
-  notes: "Family vacation - need to book dining reservations!",
-  ownerId: "user1",
-  createdAt: new Date("2026-01-01T00:00:00"),
-};
-
-interface DemoMember {
-  id: string;
-  tripId: string;
-  userId: string;
-  role: "OWNER" | "MEMBER";
-  joinedAt: Date;
-  user: { name: string; email: string };
+// Extended trip interface with reservations array
+interface TripWithReservations extends TripApiResponse {
+  reservations: ReservationApiResponse[];
 }
 
-const demoMembers: DemoMember[] = [
-  {
-    id: "m1",
-    tripId: "1",
-    userId: "user1",
-    role: "OWNER",
-    joinedAt: new Date("2026-01-01T00:00:00"),
-    user: { name: "You", email: "you@example.com" },
-  },
-  {
-    id: "m2",
-    tripId: "1",
-    userId: "user2",
-    role: "MEMBER",
-    joinedAt: new Date("2026-01-05T00:00:00"),
-    user: { name: "Sarah Smith", email: "sarah@example.com" },
-  },
-  {
-    id: "m3",
-    tripId: "1",
-    userId: "user3",
-    role: "MEMBER",
-    joinedAt: new Date("2026-01-05T00:00:00"),
-    user: { name: "Tom Johnson", email: "tom@example.com" },
-  },
-];
-
-const demoEvents: CalendarEvent[] = [
-  {
-    id: "1",
-    title: "Magic Kingdom",
-    start: "2026-07-16T08:00:00",
-    end: "2026-07-16T22:00:00",
-    extendedProps: {
-      type: "PARK",
-      location: "Magic Kingdom Park",
-      confirmationNumber: "MK-12345",
-    },
-  },
-  {
-    id: "2",
-    title: "Space Mountain - LL",
-    start: "2026-07-16T11:00:00",
-    end: "2026-07-16T12:00:00",
-    extendedProps: {
-      type: "RIDE",
-      location: "Tomorrowland",
-    },
-  },
-  {
-    id: "3",
-    title: "Grand Floridian Resort",
-    start: "2026-07-15",
-    end: "2026-07-22",
-    allDay: true,
-    extendedProps: {
-      type: "HOTEL",
-      location: "4401 Floridian Way",
-      confirmationNumber: "GF-98765",
-    },
-  },
-  {
-    id: "4",
-    title: "EPCOT",
-    start: "2026-07-17T09:00:00",
-    end: "2026-07-17T21:00:00",
-    extendedProps: {
-      type: "PARK",
-      location: "EPCOT",
-      confirmationNumber: "EP-67890",
-    },
-  },
-  {
-    id: "5",
-    title: "Flight to Orlando",
-    start: "2026-07-15T06:00:00",
-    end: "2026-07-15T10:00:00",
-    extendedProps: {
-      type: "FLIGHT",
-      location: "MCO - Orlando International",
-      confirmationNumber: "DL-456789",
-    },
-  },
-];
-
 export default function TripDetailPage() {
-  const [trip] = useState(demoTrip);
-  const [members] = useState(demoMembers);
-  const [events] = useState<CalendarEvent[]>(demoEvents);
-  const [showInviteModal, setShowInviteModal] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [activeTab, setActiveTab] = useState<"calendar" | "reservations" | "members">("calendar");
+  const params = useParams();
+  const tripId = params.id as string;
 
-  const formatDateRange = (start: Date, end: Date) => {
-    const startStr = start.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-    });
-    const endStr = end.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-    return `${startStr} - ${endStr}`;
+  const [trip, setTrip] = useState<TripWithReservations | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Reservation modal state
+  const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
+  const [defaultReservationType, setDefaultReservationType] = useState<ReservationType | undefined>();
+  const [editingReservation, setEditingReservation] = useState<ReservationApiResponse | null>(null);
+
+  // Delete reservation state
+  const [deleteReservation, setDeleteReservation] = useState<ReservationApiResponse | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    fetchTrip();
+  }, [tripId]);
+
+  const fetchTrip = async () => {
+    try {
+      const response = await fetch(`/api/trips/${tripId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setTrip(data);
+      } else {
+        setError("Trip not found");
+      }
+    } catch (err) {
+      console.error("Error fetching trip:", err);
+      setError("Failed to load trip");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleInvite = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement invite functionality
-    console.log("Invite:", inviteEmail);
-    setInviteEmail("");
-    setShowInviteModal(false);
+  const formatReservationDate = (dateStr: string, showTime: boolean = true) => {
+    const date = new Date(dateStr);
+    const dateFormatted = date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+    if (!showTime) return dateFormatted;
+    const timeFormatted = date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+    return `${dateFormatted} at ${timeFormatted}`;
   };
+
+  const handleAddReservation = (type?: ReservationType) => {
+    setDefaultReservationType(type);
+    setEditingReservation(null);
+    setIsReservationModalOpen(true);
+  };
+
+  const handleEditReservation = (reservation: ReservationApiResponse) => {
+    setEditingReservation(reservation);
+    setDefaultReservationType(undefined);
+    setIsReservationModalOpen(true);
+  };
+
+  const handleDeleteClick = (reservation: ReservationApiResponse) => {
+    setDeleteReservation(reservation);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteReservation) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/reservations/${deleteReservation.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setDeleteReservation(null);
+        fetchTrip();
+      }
+    } catch (error) {
+      console.error("Error deleting reservation:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleReservationSuccess = () => {
+    fetchTrip();
+  };
+
+  const handleModalClose = () => {
+    setIsReservationModalOpen(false);
+    setEditingReservation(null);
+    setDefaultReservationType(undefined);
+  };
+
+  // Group reservations by type
+  const getReservationsByType = (type: ReservationType) => {
+    return trip?.reservations.filter((r) => r.type === type) || [];
+  };
+
+  if (loading) {
+    return (
+      <div className="animate-fade-in">
+        <div className="bg-linear-to-r from-purple-600 to-purple-800 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="animate-pulse">
+              <div className="h-4 w-24 bg-purple-400/50 rounded mb-4" />
+              <div className="h-8 w-64 bg-purple-400/50 rounded mb-2" />
+              <div className="h-4 w-48 bg-purple-400/50 rounded" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !trip) {
+    return (
+      <div className="animate-fade-in">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+          <span className="text-6xl mb-6 block">😕</span>
+          <h1 className="font-serif text-2xl font-bold text-purple-900 dark:text-white mb-3">
+            {error || "Trip not found"}
+          </h1>
+          <a href="/trips" className="btn-magical">
+            Back to Trips
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  const hotelReservations = getReservationsByType("HOTEL");
+  const parkReservations = getReservationsByType("PARK");
+  const rideReservations = getReservationsByType("RIDE");
+  const flightReservations = getReservationsByType("FLIGHT");
+  const carReservations = getReservationsByType("CAR");
 
   return (
     <div className="animate-fade-in">
       {/* Page Header */}
       <div className="bg-linear-to-r from-purple-600 to-purple-800 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between">
-            <div>
-              <a
-                href="/trips"
-                className="text-purple-200 hover:text-white text-sm mb-2 inline-block"
-              >
-                ← Back to Trips
-              </a>
-              <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
-                {trip.name}
-              </h1>
-              <p className="text-purple-100 mb-1">{trip.destination}</p>
-              <p className="text-purple-200 text-sm">
-                {formatDateRange(trip.startDate, trip.endDate)}
-              </p>
+          <a
+            href="/trips"
+            className="text-purple-200 hover:text-white text-sm mb-2 inline-block"
+          >
+            ← Back to Trips
+          </a>
+          <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
+            {trip.name}
+          </h1>
+          <p className="text-purple-100 mb-1">{trip.destination}</p>
+          <p className="text-purple-200 text-sm">
+            {formatDateRange(trip.startDate, trip.endDate, { includeWeekday: true })}
+          </p>
+          {trip.budgetEnabled && trip.budgetAmount && (
+            <p className="text-purple-200 text-sm mt-2">
+              💰 Budget: ${trip.budgetAmount.toLocaleString()}
+            </p>
+          )}
+          {trip.guests && trip.guests.length > 0 && (
+            <div className="mt-3">
+              <p className="text-purple-200 text-sm mb-1">👥 Travelers:</p>
+              <div className="flex flex-wrap gap-2">
+                {trip.guests.map((guest) => (
+                  <span
+                    key={guest}
+                    className="inline-block px-2 py-1 bg-white/20 text-white rounded-full text-xs"
+                  >
+                    {guest}
+                  </span>
+                ))}
+              </div>
             </div>
-            <div className="mt-4 md:mt-0 flex gap-3">
-              <button className="btn-gold text-sm py-2 px-4">
-                + Add Reservation
-              </button>
-              <button
-                onClick={() => setShowInviteModal(true)}
-                className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-              >
-                Invite Members
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tabs */}
-        <div className="flex space-x-1 bg-purple-100 dark:bg-slate-800 rounded-lg p-1 mb-8 max-w-md">
-          {(["calendar", "reservations", "members"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                activeTab === tab
-                  ? "bg-white dark:bg-slate-700 text-purple-700 dark:text-purple-300 shadow-sm"
-                  : "text-slate-600 dark:text-slate-400 hover:text-purple-600"
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="card-magical p-4 text-center">
+            <div className="text-2xl font-bold text-amber-600">{hotelReservations.length}</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400">Hotel</div>
+          </div>
+          <div className="card-magical p-4 text-center">
+            <div className="text-2xl font-bold text-purple-600">{parkReservations.length}</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400">Park Days</div>
+          </div>
+          <div className="card-magical p-4 text-center">
+            <div className="text-2xl font-bold text-blue-600">{rideReservations.length}</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400">Rides</div>
+          </div>
+          <div className="card-magical p-4 text-center">
+            <div className="text-2xl font-bold text-sky-600">{flightReservations.length + carReservations.length}</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400">Transportation</div>
+          </div>
         </div>
 
-        {/* Calendar Tab */}
-        {activeTab === "calendar" && (
-          <TripCalendar
-            events={events}
-            onEventClick={(id) => console.log("Event clicked:", id)}
-            onDateSelect={(start, end) =>
-              console.log("Date selected:", start, end)
-            }
-          />
-        )}
+        {/* Hotel Section */}
+        <ReservationSection
+          type="HOTEL"
+          reservations={hotelReservations}
+          onAdd={() => handleAddReservation("HOTEL")}
+          onEdit={handleEditReservation}
+          onDelete={handleDeleteClick}
+          formatDate={formatReservationDate}
+          emptyMessage="No hotel booked yet. Where will you stay?"
+        />
 
-        {/* Reservations Tab */}
-        {activeTab === "reservations" && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="font-serif text-2xl font-bold text-purple-900 dark:text-white">
-                All Reservations
-              </h2>
-              <button className="btn-magical text-sm py-2 px-4">
-                + Add Reservation
-              </button>
-            </div>
-            {events.map((event) => (
-              <div
-                key={event.id}
-                className="card-magical p-4 flex items-center space-x-4"
-              >
-                <div
-                  className="w-3 h-16 rounded-full"
-                  style={{
-                    backgroundColor:
-                      event.extendedProps?.type === "PARK"
-                        ? "#8b5cf6"
-                        : event.extendedProps?.type === "RIDE"
-                        ? "#3b82f6"
-                        : event.extendedProps?.type === "HOTEL"
-                        ? "#f59e0b"
-                        : event.extendedProps?.type === "CAR"
-                        ? "#22c55e"
-                        : "#0ea5e9",
-                  }}
-                />
-                <div className="grow">
-                  <h3 className="font-semibold text-purple-900 dark:text-white">
-                    {event.title}
-                  </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {new Date(event.start).toLocaleDateString("en-US", {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                    {!event.allDay &&
-                      ` at ${new Date(event.start).toLocaleTimeString("en-US", {
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}`}
-                  </p>
-                  {event.extendedProps?.location && (
-                    <p className="text-sm text-slate-500 dark:text-slate-500">
-                      📍 {event.extendedProps.location}
-                    </p>
-                  )}
-                </div>
-                {event.extendedProps?.confirmationNumber && (
-                  <div className="text-right">
-                    <span className="text-xs text-slate-500">Conf #</span>
-                    <p className="text-sm font-mono text-slate-700 dark:text-slate-300">
-                      {event.extendedProps.confirmationNumber}
-                    </p>
-                  </div>
-                )}
-                <button className="text-slate-400 hover:text-purple-600">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                    />
-                  </svg>
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+        {/* Parks Section */}
+        <ReservationSection
+          type="PARK"
+          reservations={parkReservations}
+          onAdd={() => handleAddReservation("PARK")}
+          onEdit={handleEditReservation}
+          onDelete={handleDeleteClick}
+          formatDate={formatReservationDate}
+          emptyMessage="No park days planned yet. Which parks will you visit?"
+        />
 
-        {/* Members Tab */}
-        {activeTab === "members" && (
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="font-serif text-2xl font-bold text-purple-900 dark:text-white">
-                Trip Members
-              </h2>
-              <button
-                onClick={() => setShowInviteModal(true)}
-                className="btn-magical text-sm py-2 px-4"
-              >
-                + Invite Member
-              </button>
-            </div>
-            <div className="space-y-3">
-              {members.map((member) => (
-                <div
-                  key={member.id}
-                  className="card-magical p-4 flex items-center justify-between"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                      <span className="text-xl font-semibold text-purple-600 dark:text-purple-400">
-                        {member.user.name.charAt(0)}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-purple-900 dark:text-white">
-                        {member.user.name}
-                      </h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
-                        {member.user.email}
-                      </p>
-                    </div>
-                  </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      member.role === "OWNER"
-                        ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                        : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400"
-                    }`}
-                  >
-                    {member.role}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Rides Section */}
+        <ReservationSection
+          type="RIDE"
+          reservations={rideReservations}
+          onAdd={() => handleAddReservation("RIDE")}
+          onEdit={handleEditReservation}
+          onDelete={handleDeleteClick}
+          formatDate={formatReservationDate}
+          emptyMessage="No ride reservations yet. What attractions do you want to experience?"
+        />
+
+        {/* Flights Section */}
+        <ReservationSection
+          type="FLIGHT"
+          reservations={flightReservations}
+          onAdd={() => handleAddReservation("FLIGHT")}
+          onEdit={handleEditReservation}
+          onDelete={handleDeleteClick}
+          formatDate={formatReservationDate}
+          emptyMessage="No flights booked yet. How will you get there?"
+        />
+
+        {/* Car Rental Section */}
+        <ReservationSection
+          type="CAR"
+          reservations={carReservations}
+          onAdd={() => handleAddReservation("CAR")}
+          onEdit={handleEditReservation}
+          onDelete={handleDeleteClick}
+          formatDate={formatReservationDate}
+          emptyMessage="No car rental booked yet. Will you need a vehicle?"
+        />
 
         {/* Trip Notes */}
         {trip.notes && (
@@ -348,45 +287,148 @@ export default function TripDetailPage() {
         )}
       </div>
 
-      {/* Invite Modal */}
-      {showInviteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-md w-full p-6 animate-fade-in">
-            <h3 className="font-serif text-xl font-bold text-purple-900 dark:text-white mb-4">
-              Invite a Travel Companion
-            </h3>
-            <form onSubmit={handleInvite}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  className="input-magical"
-                  placeholder="friend@example.com"
-                />
-              </div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                They&apos;ll receive an email invitation to join this trip and view
-                all reservations.
-              </p>
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setShowInviteModal(false)}
-                  className="btn-outline text-sm py-2 px-4"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="btn-magical text-sm py-2 px-4">
-                  Send Invite
-                </button>
-              </div>
-            </form>
+      {/* Add/Edit Reservation Modal */}
+      <AddReservationModal
+        isOpen={isReservationModalOpen}
+        onClose={handleModalClose}
+        onSuccess={handleReservationSuccess}
+        editReservation={editingReservation}
+        defaultTripId={tripId}
+        defaultType={defaultReservationType}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!deleteReservation}
+        onClose={() => setDeleteReservation(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Reservation"
+        message={`Are you sure you want to delete "${deleteReservation?.title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={isDeleting}
+      />
+    </div>
+  );
+}
+
+// Reservation Section Component
+interface ReservationSectionProps {
+  type: ReservationType;
+  reservations: ReservationApiResponse[];
+  onAdd: () => void;
+  onEdit: (reservation: ReservationApiResponse) => void;
+  onDelete: (reservation: ReservationApiResponse) => void;
+  formatDate: (date: string, showTime?: boolean) => string;
+  emptyMessage: string;
+}
+
+function ReservationSection({
+  type,
+  reservations,
+  onAdd,
+  onEdit,
+  onDelete,
+  formatDate,
+  emptyMessage,
+}: ReservationSectionProps) {
+  const config = reservationTypeConfig[type];
+
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-serif text-xl font-bold text-purple-900 dark:text-white flex items-center gap-2">
+          <span>{config.icon}</span>
+          {config.label}
+        </h2>
+        <button
+          onClick={onAdd}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${config.bgColor} ${config.color} hover:opacity-80`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Add {config.label}
+        </button>
+      </div>
+
+      {reservations.length === 0 ? (
+        <div className={`p-6 rounded-xl border-2 border-dashed ${config.bgColor} border-opacity-50`}>
+          <p className="text-center text-slate-500 dark:text-slate-400">
+            {emptyMessage}
+          </p>
+          <div className="text-center mt-3">
+            <button
+              onClick={onAdd}
+              className={`text-sm font-medium ${config.color} hover:underline`}
+            >
+              + Add your first {config.label.toLowerCase()}
+            </button>
           </div>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {reservations
+            .sort((a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime())
+            .map((reservation) => (
+              <div
+                key={reservation.id}
+                className="card-magical p-4 flex items-center gap-4 group"
+              >
+                <div
+                  className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl ${config.bgColor}`}
+                >
+                  {config.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-purple-900 dark:text-white truncate">
+                    {reservation.title}
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    {formatDate(reservation.startDateTime, type !== "HOTEL")}
+                  </p>
+                  {reservation.location && (
+                    <p className="text-sm text-slate-500 dark:text-slate-500 truncate">
+                      📍 {reservation.location}
+                    </p>
+                  )}
+                  {reservation.guests && reservation.guests.length > 0 && (
+                    <p className="text-sm text-slate-500 dark:text-slate-500 truncate">
+                      👥 {reservation.guests.join(", ")}
+                    </p>
+                  )}
+                </div>
+                {reservation.confirmationNumber && (
+                  <div className="text-right hidden sm:block">
+                    <span className="text-xs text-slate-500">Conf #</span>
+                    <p className="text-sm font-mono text-slate-700 dark:text-slate-300">
+                      {reservation.confirmationNumber}
+                    </p>
+                  </div>
+                )}
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => onEdit(reservation)}
+                    className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                    title="Edit"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => onDelete(reservation)}
+                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    title="Delete"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            ))}
         </div>
       )}
     </div>
