@@ -104,19 +104,19 @@ export default function HeroCarousel({
             <div className="absolute inset-0 bg-linear-to-r from-black/45 via-black/20 to-transparent" />
 
             {/* ================= BRAND LOCKUP ================= */}
-            <div className="absolute left-4 sm:left-[8%] top-[5%] sm:top-[6%] flex items-center gap-2 sm:gap-4 z-20 pointer-events-none select-none max-w-[85%]">
+            <div className="absolute left-4 sm:left-[8%] top-[4%] sm:top-[5%] flex items-center gap-2 sm:gap-4 z-20 pointer-events-none select-none max-w-[85%]">
               <Image
                 src="/images/heroes/lanternLogo.png"
                 alt="Lamplight Holidays"
                 width={160}
                 height={160}
                 priority
-                className="w-10 sm:w-14 md:w-20 lg:w-24 h-auto shrink-0 drop-shadow-[0_25px_60px_rgba(255,190,110,0.65)]"
+                className="w-10 sm:w-14 md:w-16 lg:w-20 h-auto shrink-0 drop-shadow-[0_25px_60px_rgba(255,190,110,0.65)]"
               />
               <span
                 className="
                   [font-family:var(--font-brand)]
-                  text-2xl sm:text-4xl md:text-5xl lg:text-7xl
+                  text-2xl sm:text-4xl md:text-5xl lg:text-6xl
                   leading-none
                   text-white
                   drop-shadow-[0_10px_35px_rgba(0,0,0,0.65)]
@@ -127,7 +127,7 @@ export default function HeroCarousel({
             </div>
 
             {/* ================= TEXT BLOCK ================= */}
-            <div className="absolute top-[18%] sm:top-[20%] left-4 sm:left-[8%] right-4 sm:right-auto max-w-xl text-white z-20">
+            <div className="absolute top-[20%] sm:top-[24%] left-4 sm:left-[8%] right-4 sm:right-auto max-w-xl text-white z-20">
               <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold leading-tight drop-shadow-lg">
                 {slide.title}
               </h1>

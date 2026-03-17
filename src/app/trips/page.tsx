@@ -177,8 +177,30 @@ export default function TripsPage() {
         </div>
         
         {/* Banner Section */}
-        <div className="bg-linear-to-r from-[#1F2A44] to-midnight-600 py-6">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          className="relative overflow-hidden py-6"
+          style={{
+            background: `
+              radial-gradient(ellipse 70% 90% at 85% 50%, rgba(255,185,87,0.22) 0%, transparent 70%),
+              radial-gradient(ellipse 50% 70% at 15% 60%, rgba(168,130,255,0.15) 0%, transparent 70%),
+              radial-gradient(2.5px 2.5px at 8% 18%, rgba(255,255,255,0.6) 50%, transparent 50%),
+              radial-gradient(2px 2px at 25% 72%, rgba(255,255,255,0.5) 50%, transparent 50%),
+              radial-gradient(3px 3px at 52% 12%, rgba(255,220,130,0.7) 50%, transparent 50%),
+              radial-gradient(2px 2px at 72% 58%, rgba(255,255,255,0.5) 50%, transparent 50%),
+              radial-gradient(2.5px 2.5px at 92% 28%, rgba(255,220,130,0.55) 50%, transparent 50%),
+              radial-gradient(3px 3px at 42% 88%, rgba(255,255,255,0.6) 50%, transparent 50%),
+              radial-gradient(2px 2px at 63% 38%, rgba(255,220,130,0.5) 50%, transparent 50%),
+              radial-gradient(2.5px 2.5px at 88% 78%, rgba(255,255,255,0.45) 50%, transparent 50%),
+              radial-gradient(2px 2px at 18% 48%, rgba(255,220,130,0.55) 50%, transparent 50%),
+              radial-gradient(3px 3px at 38% 30%, rgba(255,255,255,0.5) 50%, transparent 50%),
+              radial-gradient(2px 2px at 78% 15%, rgba(255,255,255,0.45) 50%, transparent 50%),
+              radial-gradient(2.5px 2.5px at 5% 65%, rgba(255,220,130,0.5) 50%, transparent 50%),
+              radial-gradient(2px 2px at 58% 68%, rgba(255,255,255,0.4) 50%, transparent 50%),
+              linear-gradient(to right, #1F2A44, #2a3a5c)
+            `,
+          }}
+        >
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
               {pageTitle} ✨
             </h1>
@@ -225,8 +247,30 @@ export default function TripsPage() {
       </div>
       
       {/* Banner Section */}
-      <div className="bg-linear-to-r from-[#1F2A44] to-midnight-600 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div
+        className="relative overflow-hidden py-6"
+        style={{
+          background: `
+            radial-gradient(ellipse 70% 90% at 85% 50%, rgba(255,185,87,0.22) 0%, transparent 70%),
+            radial-gradient(ellipse 50% 70% at 15% 60%, rgba(168,130,255,0.15) 0%, transparent 70%),
+            radial-gradient(2.5px 2.5px at 8% 18%, rgba(255,255,255,0.6) 50%, transparent 50%),
+            radial-gradient(2px 2px at 25% 72%, rgba(255,255,255,0.5) 50%, transparent 50%),
+            radial-gradient(3px 3px at 52% 12%, rgba(255,220,130,0.7) 50%, transparent 50%),
+            radial-gradient(2px 2px at 72% 58%, rgba(255,255,255,0.5) 50%, transparent 50%),
+            radial-gradient(2.5px 2.5px at 92% 28%, rgba(255,220,130,0.55) 50%, transparent 50%),
+            radial-gradient(3px 3px at 42% 88%, rgba(255,255,255,0.6) 50%, transparent 50%),
+            radial-gradient(2px 2px at 63% 38%, rgba(255,220,130,0.5) 50%, transparent 50%),
+            radial-gradient(2.5px 2.5px at 88% 78%, rgba(255,255,255,0.45) 50%, transparent 50%),
+            radial-gradient(2px 2px at 18% 48%, rgba(255,220,130,0.55) 50%, transparent 50%),
+            radial-gradient(3px 3px at 38% 30%, rgba(255,255,255,0.5) 50%, transparent 50%),
+            radial-gradient(2px 2px at 78% 15%, rgba(255,255,255,0.45) 50%, transparent 50%),
+            radial-gradient(2.5px 2.5px at 5% 65%, rgba(255,220,130,0.5) 50%, transparent 50%),
+            radial-gradient(2px 2px at 58% 68%, rgba(255,255,255,0.4) 50%, transparent 50%),
+            linear-gradient(to right, #1F2A44, #2a3a5c)
+          `,
+        }}
+      >
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">

@@ -71,13 +71,13 @@ export default function RootLayout({
                 {/* Logo */}
                 <a href="/" className="flex items-center gap-2 sm:gap-3 min-w-0 shrink">
                   <img src="/images/brand/lantern.svg" alt="Lamplight Holidays lantern logo" className="w-7 h-7 sm:w-8 sm:h-8 object-contain shrink-0"/>
-                  <span className="[font-family:var(--font-brand)] text-xl sm:text-2xl md:text-4xl leading-snug text-[#1F2A44] dark:text-[#FAF4EF] truncate">
+                  <span className="[font-family:var(--font-brand)] text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-snug text-[#1F2A44] dark:text-[#FAF4EF] truncate">
                     Lamplight Holidays
                   </span>
                 </a>
 
                 {/* Navigation */}
-                <nav className="hidden md:flex items-center space-x-6">
+                <nav className="hidden md:flex items-center space-x-3 lg:space-x-6 text-sm lg:text-base">
                   <a
                     href="/dashboard"
                     className="text-[#2B2B2B] dark:text-[#FAF4EF] hover:text-[#FFB957] transition-colors font-medium"
@@ -99,7 +99,7 @@ export default function RootLayout({
                 </nav>
 
                 {/* Auth Buttons + PixieDust */}
-                <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 shrink-0">
                   <PixieDust />
                   <HeaderAuth />
                 </div>
