@@ -11,36 +11,36 @@ if (process.env.NODE_ENV === "production" && !process.env.NEXTAUTH_SECRET) {
   );
 }
 
-const useSecureCookies = !!process.env.NEXTAUTH_URL?.startsWith("https://");
-const cookiePrefix = useSecureCookies ? "__Secure-" : "";
+const isSecure = !!process.env.NEXTAUTH_URL?.startsWith("https://");
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   cookies: {
     sessionToken: {
-      name: `${cookiePrefix}next-auth.session-token`,
+      name: "next-auth.session-token",
       options: {
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "lax" as const,
         path: "/",
-        secure: useSecureCookies,
+        secure: isSecure,
       },
     },
     callbackUrl: {
-      name: `${cookiePrefix}next-auth.callback-url`,
+      name: "next-auth.callback-url",
       options: {
-        sameSite: "lax",
+        httpOnly: true,
+        sameSite: "lax" as const,
         path: "/",
-        secure: useSecureCookies,
+        secure: isSecure,
       },
     },
     csrfToken: {
-      name: `${useSecureCookies ? "__Host-" : ""}next-auth.csrf-token`,
+      name: "next-auth.csrf-token",
       options: {
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "lax" as const,
         path: "/",
-        secure: useSecureCookies,
+        secure: isSecure,
       },
     },
   },
