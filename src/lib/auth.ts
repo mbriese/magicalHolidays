@@ -11,39 +11,8 @@ if (process.env.NODE_ENV === "production" && !process.env.NEXTAUTH_SECRET) {
   );
 }
 
-const isSecure = !!process.env.NEXTAUTH_URL?.startsWith("https://");
-
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
-  cookies: {
-    sessionToken: {
-      name: "next-auth.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax" as const,
-        path: "/",
-        secure: isSecure,
-      },
-    },
-    callbackUrl: {
-      name: "next-auth.callback-url",
-      options: {
-        httpOnly: true,
-        sameSite: "lax" as const,
-        path: "/",
-        secure: isSecure,
-      },
-    },
-    csrfToken: {
-      name: "next-auth.csrf-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax" as const,
-        path: "/",
-        secure: isSecure,
-      },
-    },
-  },
   providers: [
     CredentialsProvider({
       name: "credentials",
