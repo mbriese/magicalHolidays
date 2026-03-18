@@ -1,9 +1,11 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 export default function HeaderAuth() {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
 
   if (status === "loading") {
     return <div className="w-20 h-8" />;
@@ -33,6 +35,10 @@ export default function HeaderAuth() {
         </button>
       </div>
     );
+  }
+
+  if (pathname === "/register") {
+    return null;
   }
 
   return (

@@ -206,10 +206,30 @@ function PreferredNameSection() {
   );
 }
 
+function PasswordToggle({ show, onToggle }: { show: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+      aria-label={show ? "Hide password" : "Show password"}
+    >
+      {show ? (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/></svg>
+      ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      )}
+    </button>
+  );
+}
+
 function ChangePasswordSection() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -265,41 +285,50 @@ function ChangePasswordSection() {
           <label htmlFor="currentPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
             Current Password
           </label>
-          <input
-            id="currentPassword"
-            type="password"
-            required
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            className="input-magical"
-          />
+          <div className="relative">
+            <input
+              id="currentPassword"
+              type={showCurrentPassword ? "text" : "password"}
+              required
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className="input-magical pr-10"
+            />
+            <PasswordToggle show={showCurrentPassword} onToggle={() => setShowCurrentPassword(!showCurrentPassword)} />
+          </div>
         </div>
         <div>
           <label htmlFor="newPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
             New Password
           </label>
-          <input
-            id="newPassword"
-            type="password"
-            required
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="input-magical"
-            placeholder="At least 8 characters"
-          />
+          <div className="relative">
+            <input
+              id="newPassword"
+              type={showNewPassword ? "text" : "password"}
+              required
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="input-magical pr-10"
+              placeholder="At least 8 characters"
+            />
+            <PasswordToggle show={showNewPassword} onToggle={() => setShowNewPassword(!showNewPassword)} />
+          </div>
         </div>
         <div>
           <label htmlFor="confirmNewPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
             Confirm New Password
           </label>
-          <input
-            id="confirmNewPassword"
-            type="password"
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="input-magical"
-          />
+          <div className="relative">
+            <input
+              id="confirmNewPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="input-magical pr-10"
+            />
+            <PasswordToggle show={showConfirmPassword} onToggle={() => setShowConfirmPassword(!showConfirmPassword)} />
+          </div>
         </div>
         <button
           type="submit"
@@ -317,6 +346,7 @@ function ChangeEmailSection() {
   const { data: session, update } = useSession();
   const [newEmail, setNewEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -377,15 +407,18 @@ function ChangeEmailSection() {
           <label htmlFor="emailPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
             Confirm Password
           </label>
-          <input
-            id="emailPassword"
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="input-magical"
-            placeholder="Enter your password to confirm"
-          />
+          <div className="relative">
+            <input
+              id="emailPassword"
+              type={showPassword ? "text" : "password"}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input-magical pr-10"
+              placeholder="Enter your password to confirm"
+            />
+            <PasswordToggle show={showPassword} onToggle={() => setShowPassword(!showPassword)} />
+          </div>
         </div>
         <button
           type="submit"
