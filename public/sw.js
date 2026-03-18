@@ -1,5 +1,5 @@
 // Magical Holidays Service Worker
-const CACHE_NAME = 'magical-holidays-v1';
+const CACHE_NAME = 'magical-holidays-v2';
 const OFFLINE_URL = '/offline';
 
 // Assets to cache immediately on install
@@ -50,6 +50,11 @@ self.addEventListener('fetch', (event) => {
 
   // Skip non-GET requests
   if (request.method !== 'GET') {
+    return;
+  }
+
+  // Never cache auth routes — session state must always be fresh
+  if (url.pathname.startsWith('/api/auth')) {
     return;
   }
 
