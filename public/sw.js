@@ -1,12 +1,10 @@
 // Magical Holidays Service Worker
-const CACHE_NAME = 'magical-holidays-v2';
+const CACHE_NAME = 'magical-holidays-v3';
 const OFFLINE_URL = '/offline';
 
-// Assets to cache immediately on install
+// Only precache the offline fallback and manifest — page routes must
+// always hit the network so auth state is respected.
 const PRECACHE_ASSETS = [
-  '/',
-  '/dashboard',
-  '/trips',
   '/offline',
   '/manifest.json',
 ];
