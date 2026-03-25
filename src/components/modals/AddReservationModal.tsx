@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { reservationLabels, type ReservationType, type ReservationApiResponse, type TripApiResponse } from "@/types";
-import { DESTINATIONS, DESTINATION_PARKS } from "@/lib/constants";
+import { DESTINATIONS, DESTINATION_PARKS, RESERVATION_TYPES } from "@/lib/constants";
 import { allAttractions } from "@/data/attractions";
+import { StatusMessage } from "@/components/StatusMessage";
+import { GuestListInput } from "@/components/GuestListInput";
 
 interface AddReservationModalProps {
   isOpen: boolean;
@@ -26,7 +28,6 @@ interface TripOption {
   endDate: string;
 }
 
-const reservationTypes: ReservationType[] = ["PARK", "RIDE", "HOTEL", "CAR", "FLIGHT"];
 const CREATE_TRIP_VALUE = "__create__";
 
 export default function AddReservationModal({
@@ -53,27 +54,6 @@ export default function AddReservationModal({
   const [newTripStartDate, setNewTripStartDate] = useState<Date | null>(null);
   const [newTripEndDate, setNewTripEndDate] = useState<Date | null>(null);
   const [newTripGuests, setNewTripGuests] = useState<string[]>([]);
-  const [newTripGuestName, setNewTripGuestName] = useState("");
-
-  // New trip guest management
-  const handleAddTripGuest = () => {
-    const trimmedName = newTripGuestName.trim();
-    if (trimmedName && !newTripGuests.includes(trimmedName)) {
-      setNewTripGuests([...newTripGuests, trimmedName]);
-      setNewTripGuestName("");
-    }
-  };
-
-  const handleRemoveTripGuest = (guestToRemove: string) => {
-    setNewTripGuests(newTripGuests.filter((g) => g !== guestToRemove));
-  };
-
-  const handleTripGuestKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddTripGuest();
-    }
-  };
 
   // Reservation fields
   const [type, setType] = useState<ReservationType>("PARK");
@@ -85,7 +65,6 @@ export default function AddReservationModal({
   const [confirmationNumber, setConfirmationNumber] = useState("");
   const [notes, setNotes] = useState("");
   const [guests, setGuests] = useState<string[]>([]);
-  const [newGuestName, setNewGuestName] = useState("");
 
   // Attraction selection for RIDE type
   const [selectedAttractionId, setSelectedAttractionId] = useState<string>("");
@@ -175,26 +154,6 @@ export default function AddReservationModal({
     setConfirmationNumber(reservation.confirmationNumber || "");
     setNotes(reservation.notes || "");
     setGuests(reservation.guests || []);
-  };
-
-  // Guest management functions
-  const handleAddGuest = () => {
-    const trimmedName = newGuestName.trim();
-    if (trimmedName && !guests.includes(trimmedName)) {
-      setGuests([...guests, trimmedName]);
-      setNewGuestName("");
-    }
-  };
-
-  const handleRemoveGuest = (guestToRemove: string) => {
-    setGuests(guests.filter((g) => g !== guestToRemove));
-  };
-
-  const handleGuestKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddGuest();
-    }
   };
 
   const fetchTrips = async () => {
@@ -358,7 +317,6 @@ export default function AddReservationModal({
     setNewTripStartDate(null);
     setNewTripEndDate(null);
     setNewTripGuests([]);
-    setNewTripGuestName("");
     setType(defaultType || "PARK");
     setTitle("");
     setStartDateTime(null);
@@ -368,7 +326,6 @@ export default function AddReservationModal({
     setConfirmationNumber("");
     setNotes("");
     setGuests([]);
-    setNewGuestName("");
     setError("");
     // Reset attraction selection
     setSelectedAttractionId("");
@@ -402,11 +359,7 @@ export default function AddReservationModal({
           </button>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
-            {error}
-          </div>
-        )}
+        {error && <div className="mb-4"><StatusMessage message={error} isError /></div>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Trip association: radio buttons */}
@@ -539,47 +492,14 @@ export default function AddReservationModal({
                   />
                 </div>
               </div>
-              {/* Trip Guests */}
-              <div>
-                <label className="block text-xs text-slate-600 dark:text-slate-400 mb-1">👥 Who&apos;s Going?</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newTripGuestName}
-                    onChange={(e) => setNewTripGuestName(e.target.value)}
-                    onKeyDown={handleTripGuestKeyDown}
-                    placeholder="Add guest name..."
-                    className="input-magical flex-1 text-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddTripGuest}
-                    disabled={!newTripGuestName.trim()}
-                    className="px-3 py-1 bg-[#FFB957]/30 dark:bg-[#FFB957]/20 text-[#1F2A44] dark:text-[#FFB957] rounded-lg text-sm font-medium hover:bg-[#FFB957]/50 dark:hover:bg-[#FFB957]/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Add
-                  </button>
-                </div>
-                {newTripGuests.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {newTripGuests.map((guest) => (
-                      <span
-                        key={guest}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full text-xs"
-                      >
-                        {guest}
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveTripGuest(guest)}
-                          className="text-slate-400 hover:text-red-500"
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <GuestListInput
+                guests={newTripGuests}
+                onAdd={(name) => { setNewTripGuests([...newTripGuests, name]); }}
+                onRemove={(name) => { setNewTripGuests(newTripGuests.filter((g) => g !== name)); }}
+                placeholder="Add guest name..."
+                label="👥 Who's Going?"
+                compact
+              />
             </div>
           )}
 
@@ -593,7 +513,7 @@ export default function AddReservationModal({
               onChange={(e) => setType(e.target.value as ReservationType)}
               className="input-magical"
             >
-              {reservationTypes.map((t) => (
+              {RESERVATION_TYPES.map((t) => (
                 <option key={t} value={t}>
                   {reservationLabels[t]}
                 </option>
@@ -784,53 +704,15 @@ export default function AddReservationModal({
             />
           </div>
 
-          {/* Guests */}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Guests
             </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={newGuestName}
-                onChange={(e) => setNewGuestName(e.target.value)}
-                onKeyDown={handleGuestKeyDown}
-                placeholder="Enter guest name..."
-                className="input-magical flex-1"
-              />
-              <button
-                type="button"
-                onClick={handleAddGuest}
-                disabled={!newGuestName.trim()}
-                className="px-4 py-2 bg-[#1F2A44]/10 dark:bg-[#1F2A44]/30 text-[#1F2A44] dark:text-[#FFB957] rounded-lg font-medium hover:bg-[#FFB957]/30 dark:hover:bg-[#FFB957]/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Add
-              </button>
-            </div>
-            {guests.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {guests.map((guest) => (
-                  <span
-                    key={guest}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full text-sm"
-                  >
-                    👤 {guest}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveGuest(guest)}
-                      className="ml-1 text-slate-400 hover:text-red-500 transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Press Enter or click Add to add guests
-            </p>
+            <GuestListInput
+              guests={guests}
+              onAdd={(name) => { if (!guests.includes(name)) setGuests([...guests, name]); }}
+              onRemove={(name) => { setGuests(guests.filter((g) => g !== name)); }}
+            />
           </div>
 
           {/* Buttons */}

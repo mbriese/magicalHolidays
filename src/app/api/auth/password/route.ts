@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { MIN_PASSWORD_LENGTH } from "@/lib/constants";
 
 export async function PUT(request: NextRequest) {
   try {
@@ -19,9 +20,9 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    if (newPassword.length < 8) {
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
       return NextResponse.json(
-        { error: "New password must be at least 8 characters" },
+        { error: `New password must be at least ${MIN_PASSWORD_LENGTH} characters` },
         { status: 400 },
       );
     }

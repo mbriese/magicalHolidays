@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { StatusMessage } from "@/components/StatusMessage";
+import type { TripApiResponse } from "@/types";
 
 const CREATE_TRIP_VALUE = "__create__";
 import {
@@ -12,12 +14,6 @@ import {
   getParks,
 } from "@/data/attractions";
 
-interface Trip {
-  id: string;
-  name: string;
-  destination: string;
-}
-
 interface ItineraryBuilderProps {
   onAddToTrip?: (attraction: Attraction, tripId: string) => void;
 }
@@ -27,7 +23,7 @@ export default function ItineraryBuilder({ onAddToTrip }: ItineraryBuilderProps)
   const [selectedTheme, setSelectedTheme] = useState<AttractionTheme | null>(null);
   const [selectedPark, setSelectedPark] = useState<string>("all");
   const [attractions, setAttractions] = useState<Attraction[]>([]);
-  const [trips, setTrips] = useState<Trip[]>([]);
+  const [trips, setTrips] = useState<TripApiResponse[]>([]);
   const [addingToTrip, setAddingToTrip] = useState<string | null>(null);
   const [selectedTripId, setSelectedTripId] = useState<string>("");
   const [isAdding, setIsAdding] = useState(false);
@@ -138,8 +134,8 @@ export default function ItineraryBuilder({ onAddToTrip }: ItineraryBuilderProps)
 
       {/* Success Message */}
       {successMessage && (
-        <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-700 dark:text-green-400 text-sm flex items-center gap-2">
-          <span>✓</span> {successMessage}
+        <div className="mb-4">
+          <StatusMessage message={`✓ ${successMessage}`} isError={false} />
         </div>
       )}
 

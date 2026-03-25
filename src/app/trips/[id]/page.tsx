@@ -13,6 +13,7 @@ import {
   type ReservationApiResponse,
   type TripApiResponse,
 } from "@/types";
+import { useDeleteConfirmation } from "@/hooks/useDeleteConfirmation";
 
 // Extended trip interface with reservations array
 interface TripWithReservations extends TripApiResponse {
@@ -32,16 +33,8 @@ export default function TripDetailPage() {
   const [defaultReservationType, setDefaultReservationType] = useState<ReservationType | undefined>();
   const [editingReservation, setEditingReservation] = useState<ReservationApiResponse | null>(null);
 
-  // Delete reservation state
-  const [deleteReservation, setDeleteReservation] = useState<ReservationApiResponse | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-
   // Email modal state
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
-
-  useEffect(() => {
-    fetchTrip();
-  }, [tripId]);
 
   const fetchTrip = async () => {
     try {
@@ -59,6 +52,21 @@ export default function TripDetailPage() {
       setLoading(false);
     }
   };
+
+  // Delete reservation state
+  const {
+    itemToDelete: deleteReservation,
+    setItemToDelete: setDeleteReservation,
+    isDeleting,
+    handleConfirmDelete,
+  } = useDeleteConfirmation<ReservationApiResponse>({
+    endpoint: (r) => `/api/reservations/${r.id}`,
+    onSuccess: fetchTrip,
+  });
+
+  useEffect(() => {
+    fetchTrip();
+  }, [tripId]);
 
   const formatReservationDate = (dateStr: string, showTime: boolean = true) => {
     const date = new Date(dateStr);
@@ -89,26 +97,6 @@ export default function TripDetailPage() {
 
   const handleDeleteClick = (reservation: ReservationApiResponse) => {
     setDeleteReservation(reservation);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!deleteReservation) return;
-
-    setIsDeleting(true);
-    try {
-      const response = await fetch(`/api/reservations/${deleteReservation.id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        setDeleteReservation(null);
-        fetchTrip();
-      }
-    } catch (error) {
-      console.error("Error deleting reservation:", error);
-    } finally {
-      setIsDeleting(false);
-    }
   };
 
   const handleReservationSuccess = () => {

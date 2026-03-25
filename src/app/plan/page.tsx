@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { DESTINATIONS, RESERVATION_TYPES } from "@/lib/constants";
-import type { ReservationType } from "@/types";
+import { reservationTypeConfig, type ReservationType } from "@/types";
+import { StatusMessage } from "@/components/StatusMessage";
 
 const QUICK_PLAN_DRAFT_KEY = "quickPlanDraft";
 
@@ -17,22 +18,6 @@ interface PlannedItem {
   confirmationNumber?: string;
   notes?: string;
 }
-
-const typeIcons: Record<ReservationType, string> = {
-  PARK: "🏰",
-  RIDE: "🎢",
-  HOTEL: "🏨",
-  CAR: "🚗",
-  FLIGHT: "✈️",
-};
-
-const typeLabels: Record<ReservationType, string> = {
-  PARK: "Park Visit",
-  RIDE: "Ride / Attraction",
-  HOTEL: "Hotel",
-  CAR: "Car Rental",
-  FLIGHT: "Flight",
-};
 
 export default function QuickPlanPage() {
   const { status } = useSession();
@@ -275,9 +260,9 @@ export default function QuickPlanPage() {
                 className="card-stat p-4 text-center hover:scale-105 transition-transform"
                 style={{ "--stat-accent": type === "PARK" ? "#1F2A44" : type === "RIDE" ? "#FFB957" : type === "HOTEL" ? "#F8AFA6" : type === "CAR" ? "#A7D2B7" : "#677595" } as React.CSSProperties}
               >
-                <span className="text-3xl block mb-2">{typeIcons[type]}</span>
+                <span className="text-3xl block mb-2">{reservationTypeConfig[type].icon}</span>
                 <span className="text-sm font-medium text-[#1F2A44] dark:text-white">
-                  {typeLabels[type]}
+                  {reservationTypeConfig[type].label}
                 </span>
               </button>
             ))}
@@ -298,7 +283,7 @@ export default function QuickPlanPage() {
                     key={item.id}
                     className="card-trip p-4 flex items-center gap-4"
                   >
-                    <span className="text-2xl">{typeIcons[item.type]}</span>
+                    <span className="text-2xl">{reservationTypeConfig[item.type].icon}</span>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-[#1F2A44] dark:text-white truncate">
                         {item.title}
@@ -364,9 +349,9 @@ export default function QuickPlanPage() {
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="card-magical max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center gap-3 mb-6">
-                <span className="text-3xl">{typeIcons[selectedType]}</span>
+                <span className="text-3xl">{reservationTypeConfig[selectedType].icon}</span>
                 <h2 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-white">
-                  Add {typeLabels[selectedType]}
+                  Add {reservationTypeConfig[selectedType].label}
                 </h2>
               </div>
 
@@ -486,11 +471,7 @@ export default function QuickPlanPage() {
                 Give your trip a name and we&apos;ll save everything together.
               </p>
 
-              {saveError && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 text-red-700 dark:text-red-400 text-sm mb-4">
-                  {saveError}
-                </div>
-              )}
+              {saveError && <div className="mb-4"><StatusMessage message={saveError} isError /></div>}
 
               <div className="space-y-4">
                 <div>

@@ -2,6 +2,8 @@
 
 import type { ReservationType } from "@/types";
 
+export const MIN_PASSWORD_LENGTH = 8;
+
 /**
  * Available reservation types
  */

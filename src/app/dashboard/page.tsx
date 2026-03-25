@@ -8,8 +8,8 @@ import ConfirmModal from "@/components/modals/ConfirmModal";
 import { BadgeShowcase } from "@/components/badges";
 import ItineraryBuilder from "@/components/ItineraryBuilder";
 import BudgetTracker from "@/components/BudgetTracker";
-import type { CalendarEvent, ReservationType, BadgeWithProgress } from "@/types";
-import { reservationClassNames } from "@/types";
+import type { CalendarEvent, ReservationType, BadgeWithProgress, ReservationApiResponse, TripApiResponse } from "@/types";
+import { reservationClassNames, reservationColors } from "@/types";
 import {
   isOnline,
   getOfflineTrips,
@@ -19,33 +19,7 @@ import {
   saveReservationsOffline,
   saveBadgesOffline,
 } from "@/lib/offlineStorage";
-
-interface ApiReservation {
-  id: string;
-  tripId: string | null;
-  type: ReservationType;
-  title: string;
-  startDateTime: string;
-  endDateTime: string;
-  location: string | null;
-  confirmationNumber: string | null;
-  notes: string | null;
-  guests: string[];
-  guestCount: number | null;
-  trip?: { name: string } | null;
-}
-
-interface ApiTrip {
-  id: string;
-  name: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-  _count: {
-    reservations: number;
-    members: number;
-  };
-}
+import { useDeleteConfirmation } from "@/hooks/useDeleteConfirmation";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -53,13 +27,20 @@ export default function DashboardPage() {
   const [apiSaysUnauthenticated, setApiSaysUnauthenticated] = useState(false);
   const isUnauthenticated = status === "unauthenticated" || apiSaysUnauthenticated;
   const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [reservations, setReservations] = useState<ApiReservation[]>([]);
-  const [trips, setTrips] = useState<ApiTrip[]>([]);
+  const [reservations, setReservations] = useState<ReservationApiResponse[]>([]);
+  const [trips, setTrips] = useState<TripApiResponse[]>([]);
   const [badges, setBadges] = useState<BadgeWithProgress[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingReservation, setEditingReservation] = useState<ApiReservation | null>(null);
-  const [deleteReservation, setDeleteReservation] = useState<ApiReservation | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [editingReservation, setEditingReservation] = useState<ReservationApiResponse | null>(null);
+  const {
+    itemToDelete: deleteReservation,
+    setItemToDelete: setDeleteReservation,
+    isDeleting,
+    handleConfirmDelete,
+  } = useDeleteConfirmation<ReservationApiResponse>({
+    endpoint: (r) => `/api/reservations/${r.id}`,
+    onSuccess: () => { fetchData(); fetchBadges(); },
+  });
   const [loading, setLoading] = useState(true);
   const [isOfflineData, setIsOfflineData] = useState(false);
   const [stats, setStats] = useState({
@@ -76,7 +57,7 @@ export default function DashboardPage() {
   }, []);
 
   // Process and set data (used by both online and offline paths)
-  const processData = (tripsData: ApiTrip[], reservationsData: ApiReservation[]) => {
+  const processData = (tripsData: TripApiResponse[], reservationsData: ReservationApiResponse[]) => {
     setTrips(tripsData);
     setReservations(reservationsData);
 
@@ -138,8 +119,8 @@ export default function DashboardPage() {
 
         const isJson = (r: Response) => r.headers.get("content-type")?.includes("application/json");
         if (tripsRes.ok && reservationsRes.ok && isJson(tripsRes) && isJson(reservationsRes)) {
-          const tripsData: ApiTrip[] = await tripsRes.json();
-          const reservationsData: ApiReservation[] = await reservationsRes.json();
+          const tripsData: TripApiResponse[] = await tripsRes.json();
+          const reservationsData: ReservationApiResponse[] = await reservationsRes.json();
 
           await Promise.all([
             saveTripsOffline(tripsData),
@@ -173,8 +154,8 @@ export default function DashboardPage() {
   const loadOfflineData = async () => {
     try {
       const [tripsData, reservationsData] = await Promise.all([
-        getOfflineTrips<ApiTrip>(),
-        getOfflineReservations<ApiReservation>(),
+        getOfflineTrips<TripApiResponse>(),
+        getOfflineReservations<ReservationApiResponse>(),
       ]);
 
       if (tripsData.length > 0 || reservationsData.length > 0) {
@@ -235,36 +216,13 @@ export default function DashboardPage() {
     // TODO: Update reservation dates via API
   };
 
-  const handleEditReservation = (reservation: ApiReservation) => {
+  const handleEditReservation = (reservation: ReservationApiResponse) => {
     setEditingReservation(reservation);
     setIsModalOpen(true);
   };
 
-  const handleDeleteClick = (reservation: ApiReservation) => {
+  const handleDeleteClick = (reservation: ReservationApiResponse) => {
     setDeleteReservation(reservation);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!deleteReservation) return;
-
-    setIsDeleting(true);
-    try {
-      const response = await fetch(`/api/reservations/${deleteReservation.id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        setDeleteReservation(null);
-        fetchData();
-        fetchBadges();
-      } else {
-        console.error("Failed to delete reservation");
-      }
-    } catch (error) {
-      console.error("Error deleting reservation:", error);
-    } finally {
-      setIsDeleting(false);
-    }
   };
 
   const handleModalClose = () => {
@@ -280,29 +238,7 @@ export default function DashboardPage() {
   return (
     <div className="animate-fade-in">
       {/* Page Header */}
-      <div
-        className="relative overflow-hidden py-8"
-        style={{
-          background: `
-            radial-gradient(ellipse 70% 90% at 85% 50%, rgba(255,185,87,0.22) 0%, transparent 70%),
-            radial-gradient(ellipse 50% 70% at 15% 60%, rgba(168,130,255,0.15) 0%, transparent 70%),
-            radial-gradient(2.5px 2.5px at 8% 18%, rgba(255,255,255,0.6) 50%, transparent 50%),
-            radial-gradient(2px 2px at 25% 72%, rgba(255,255,255,0.5) 50%, transparent 50%),
-            radial-gradient(3px 3px at 52% 12%, rgba(255,220,130,0.7) 50%, transparent 50%),
-            radial-gradient(2px 2px at 72% 58%, rgba(255,255,255,0.5) 50%, transparent 50%),
-            radial-gradient(2.5px 2.5px at 92% 28%, rgba(255,220,130,0.55) 50%, transparent 50%),
-            radial-gradient(3px 3px at 42% 88%, rgba(255,255,255,0.6) 50%, transparent 50%),
-            radial-gradient(2px 2px at 63% 38%, rgba(255,220,130,0.5) 50%, transparent 50%),
-            radial-gradient(2.5px 2.5px at 88% 78%, rgba(255,255,255,0.45) 50%, transparent 50%),
-            radial-gradient(2px 2px at 18% 48%, rgba(255,220,130,0.55) 50%, transparent 50%),
-            radial-gradient(3px 3px at 38% 30%, rgba(255,255,255,0.5) 50%, transparent 50%),
-            radial-gradient(2px 2px at 78% 15%, rgba(255,255,255,0.45) 50%, transparent 50%),
-            radial-gradient(2.5px 2.5px at 5% 65%, rgba(255,220,130,0.5) 50%, transparent 50%),
-            radial-gradient(2px 2px at 58% 68%, rgba(255,255,255,0.4) 50%, transparent 50%),
-            linear-gradient(to right, #1F2A44, #2a3a5c)
-          `,
-        }}
-      >
+      <div className="relative overflow-hidden py-8 bg-starfield">
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
             {pageTitle} ✨
@@ -446,16 +382,7 @@ export default function DashboardPage() {
                     <div
                       className="w-3 h-12 rounded-full shrink-0"
                       style={{
-                        backgroundColor:
-                          reservation.type === "PARK"
-                            ? "#8b5cf6"
-                            : reservation.type === "RIDE"
-                            ? "#3b82f6"
-                            : reservation.type === "HOTEL"
-                            ? "#f59e0b"
-                            : reservation.type === "CAR"
-                            ? "#22c55e"
-                            : "#0ea5e9",
+                        backgroundColor: reservationColors[reservation.type],
                       }}
                     />
                     <div className="grow min-w-0">

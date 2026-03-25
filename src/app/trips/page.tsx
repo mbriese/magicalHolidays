@@ -7,6 +7,7 @@ import AddReservationModal from "@/components/modals/AddReservationModal";
 import EditTripModal from "@/components/modals/EditTripModal";
 import { formatDateRange, getDaysUntil } from "@/lib/formatters";
 import type { TripApiResponse } from "@/types";
+import { useDeleteConfirmation } from "@/hooks/useDeleteConfirmation";
 
 interface TripConflict {
   type: "date-overlap" | "duplicate-name";
@@ -62,18 +63,9 @@ export default function TripsPage() {
   const [editingTrip, setEditingTrip] = useState<TripApiResponse | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // Delete modal state
-  const [deleteTrip, setDeleteTrip] = useState<TripApiResponse | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-
   // Add reservation modal state
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const [selectedTripForReservation, setSelectedTripForReservation] = useState<string | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-    fetchTrips();
-  }, []);
 
   const fetchTrips = async () => {
     try {
@@ -88,6 +80,22 @@ export default function TripsPage() {
       setLoading(false);
     }
   };
+
+  // Delete modal state
+  const {
+    itemToDelete: deleteTrip,
+    setItemToDelete: setDeleteTrip,
+    isDeleting,
+    handleConfirmDelete,
+  } = useDeleteConfirmation<TripApiResponse>({
+    endpoint: (t) => `/api/trips/${t.id}`,
+    onSuccess: fetchTrips,
+  });
+
+  useEffect(() => {
+    setMounted(true);
+    fetchTrips();
+  }, []);
 
   // Edit handlers
   const handleEditClick = (e: React.MouseEvent, trip: TripApiResponse) => {
@@ -111,28 +119,6 @@ export default function TripsPage() {
     e.preventDefault();
     e.stopPropagation();
     setDeleteTrip(trip);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!deleteTrip) return;
-
-    setIsDeleting(true);
-    try {
-      const response = await fetch(`/api/trips/${deleteTrip.id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        setDeleteTrip(null);
-        fetchTrips();
-      } else {
-        console.error("Failed to delete trip");
-      }
-    } catch (error) {
-      console.error("Error deleting trip:", error);
-    } finally {
-      setIsDeleting(false);
-    }
   };
 
   // Add reservation handlers
@@ -177,29 +163,7 @@ export default function TripsPage() {
         </div>
         
         {/* Banner Section */}
-        <div
-          className="relative overflow-hidden py-6"
-          style={{
-            background: `
-              radial-gradient(ellipse 70% 90% at 85% 50%, rgba(255,185,87,0.22) 0%, transparent 70%),
-              radial-gradient(ellipse 50% 70% at 15% 60%, rgba(168,130,255,0.15) 0%, transparent 70%),
-              radial-gradient(2.5px 2.5px at 8% 18%, rgba(255,255,255,0.6) 50%, transparent 50%),
-              radial-gradient(2px 2px at 25% 72%, rgba(255,255,255,0.5) 50%, transparent 50%),
-              radial-gradient(3px 3px at 52% 12%, rgba(255,220,130,0.7) 50%, transparent 50%),
-              radial-gradient(2px 2px at 72% 58%, rgba(255,255,255,0.5) 50%, transparent 50%),
-              radial-gradient(2.5px 2.5px at 92% 28%, rgba(255,220,130,0.55) 50%, transparent 50%),
-              radial-gradient(3px 3px at 42% 88%, rgba(255,255,255,0.6) 50%, transparent 50%),
-              radial-gradient(2px 2px at 63% 38%, rgba(255,220,130,0.5) 50%, transparent 50%),
-              radial-gradient(2.5px 2.5px at 88% 78%, rgba(255,255,255,0.45) 50%, transparent 50%),
-              radial-gradient(2px 2px at 18% 48%, rgba(255,220,130,0.55) 50%, transparent 50%),
-              radial-gradient(3px 3px at 38% 30%, rgba(255,255,255,0.5) 50%, transparent 50%),
-              radial-gradient(2px 2px at 78% 15%, rgba(255,255,255,0.45) 50%, transparent 50%),
-              radial-gradient(2.5px 2.5px at 5% 65%, rgba(255,220,130,0.5) 50%, transparent 50%),
-              radial-gradient(2px 2px at 58% 68%, rgba(255,255,255,0.4) 50%, transparent 50%),
-              linear-gradient(to right, #1F2A44, #2a3a5c)
-            `,
-          }}
-        >
+        <div className="relative overflow-hidden py-6 bg-starfield">
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
               {pageTitle} ✨
@@ -247,29 +211,7 @@ export default function TripsPage() {
       </div>
       
       {/* Banner Section */}
-      <div
-        className="relative overflow-hidden py-6"
-        style={{
-          background: `
-            radial-gradient(ellipse 70% 90% at 85% 50%, rgba(255,185,87,0.22) 0%, transparent 70%),
-            radial-gradient(ellipse 50% 70% at 15% 60%, rgba(168,130,255,0.15) 0%, transparent 70%),
-            radial-gradient(2.5px 2.5px at 8% 18%, rgba(255,255,255,0.6) 50%, transparent 50%),
-            radial-gradient(2px 2px at 25% 72%, rgba(255,255,255,0.5) 50%, transparent 50%),
-            radial-gradient(3px 3px at 52% 12%, rgba(255,220,130,0.7) 50%, transparent 50%),
-            radial-gradient(2px 2px at 72% 58%, rgba(255,255,255,0.5) 50%, transparent 50%),
-            radial-gradient(2.5px 2.5px at 92% 28%, rgba(255,220,130,0.55) 50%, transparent 50%),
-            radial-gradient(3px 3px at 42% 88%, rgba(255,255,255,0.6) 50%, transparent 50%),
-            radial-gradient(2px 2px at 63% 38%, rgba(255,220,130,0.5) 50%, transparent 50%),
-            radial-gradient(2.5px 2.5px at 88% 78%, rgba(255,255,255,0.45) 50%, transparent 50%),
-            radial-gradient(2px 2px at 18% 48%, rgba(255,220,130,0.55) 50%, transparent 50%),
-            radial-gradient(3px 3px at 38% 30%, rgba(255,255,255,0.5) 50%, transparent 50%),
-            radial-gradient(2px 2px at 78% 15%, rgba(255,255,255,0.45) 50%, transparent 50%),
-            radial-gradient(2.5px 2.5px at 5% 65%, rgba(255,220,130,0.5) 50%, transparent 50%),
-            radial-gradient(2px 2px at 58% 68%, rgba(255,255,255,0.4) 50%, transparent 50%),
-            linear-gradient(to right, #1F2A44, #2a3a5c)
-          `,
-        }}
-      >
+      <div className="relative overflow-hidden py-6 bg-starfield">
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
