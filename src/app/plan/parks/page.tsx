@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { SearchPageLayout } from "@/components/SearchPageLayout";
+import { DateInput } from "@/components/DateInput";
 
 type ParkType = "theme-park" | "water-park" | "event" | "other";
 
@@ -47,7 +48,7 @@ export default function ParksPlanPage() {
 
       <div>
         <label className="block text-sm font-medium text-[#1F2A44] dark:text-[#FAF4EF]">Start date</label>
-        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="mt-1 input-magical" />
+        <DateInput value={startDate} onChange={setStartDate} className="mt-1 input-magical" />
       </div>
 
       <div>

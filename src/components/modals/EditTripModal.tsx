@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { DESTINATIONS } from "@/lib/constants";
 import type { TripApiResponse, GuestDetail } from "@/types";
+import { DateInput } from "@/components/DateInput";
 
 function emptyGuest(): GuestDetail {
   return { firstName: "", lastName: "", type: "adult" };
@@ -239,25 +240,21 @@ export default function EditTripModal({
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Start Date *
               </label>
-              <input
-                type="date"
+              <DateInput
                 required
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="input-magical"
+                onChange={setStartDate}
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 End Date *
               </label>
-              <input
-                type="date"
+              <DateInput
                 required
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={setEndDate}
                 min={startDate}
-                className="input-magical"
               />
             </div>
           </div>

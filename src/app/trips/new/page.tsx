@@ -6,6 +6,7 @@ import { DESTINATIONS } from "@/lib/constants";
 import type { GuestDetail } from "@/types";
 import { Spinner } from "@/components/Spinner";
 import { StatusMessage } from "@/components/StatusMessage";
+import { DateInput } from "@/components/DateInput";
 
 interface CreatedTrip {
   id: string;
@@ -203,13 +204,11 @@ export default function NewTripPage() {
                 >
                   Start Date *
                 </label>
-                <input
+                <DateInput
                   id="startDate"
-                  type="date"
                   required
                   value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="input-magical"
+                  onChange={setStartDate}
                 />
               </div>
               <div>
@@ -219,14 +218,12 @@ export default function NewTripPage() {
                 >
                   End Date *
                 </label>
-                <input
+                <DateInput
                   id="endDate"
-                  type="date"
                   required
                   value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
+                  onChange={setEndDate}
                   min={startDate}
-                  className="input-magical"
                 />
               </div>
             </div>

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { SearchPageLayout } from "@/components/SearchPageLayout";
+import { DateInput } from "@/components/DateInput";
 
 type BudgetRange = "any" | "0-150" | "150-300" | "300-500" | "500+";
 
@@ -60,12 +61,12 @@ export default function HotelsPlanPage() {
 
       <div>
         <label className="block text-sm font-medium text-[#1F2A44] dark:text-[#FAF4EF]">Check-in</label>
-        <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} className="mt-1 input-magical" />
+        <DateInput value={checkIn} onChange={setCheckIn} className="mt-1 input-magical" />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-[#1F2A44] dark:text-[#FAF4EF]">Check-out</label>
-        <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} className="mt-1 input-magical" />
+        <DateInput value={checkOut} onChange={setCheckOut} className="mt-1 input-magical" />
       </div>
     </SearchPageLayout>
   );

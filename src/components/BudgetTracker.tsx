@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { DateInput } from "@/components/DateInput";
 
 const CREATE_TRIP_VALUE = "__create__";
 
@@ -599,11 +600,9 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Date
                 </label>
-                <input
-                  type="date"
+                <DateInput
                   value={expenseForm.date}
-                  onChange={(e) => setExpenseForm({ ...expenseForm, date: e.target.value })}
-                  className="input-magical"
+                  onChange={(date) => setExpenseForm({ ...expenseForm, date })}
                 />
               </div>
 

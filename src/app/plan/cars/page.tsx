@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { SearchPageLayout } from "@/components/SearchPageLayout";
+import { DateInput } from "@/components/DateInput";
 
 type CarType = "any" | "compact" | "midsize" | "suv" | "minivan" | "luxury";
 
@@ -49,12 +50,12 @@ export default function CarsPlanPage() {
 
       <div>
         <label className="block text-sm font-medium text-[#1F2A44] dark:text-[#FAF4EF]">Pickup date</label>
-        <input type="date" value={pickup} onChange={(e) => setPickup(e.target.value)} className="mt-1 input-magical" />
+        <DateInput value={pickup} onChange={setPickup} className="mt-1 input-magical" />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-[#1F2A44] dark:text-[#FAF4EF]">Dropoff date</label>
-        <input type="date" value={dropoff} onChange={(e) => setDropoff(e.target.value)} className="mt-1 input-magical" />
+        <DateInput value={dropoff} onChange={setDropoff} className="mt-1 input-magical" />
       </div>
     </SearchPageLayout>
   );

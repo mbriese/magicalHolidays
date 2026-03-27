@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { SearchPageLayout } from "@/components/SearchPageLayout";
+import { DateInput } from "@/components/DateInput";
 
 type Cabin = "economy" | "premium" | "business" | "first";
 type TripType = "roundtrip" | "oneway";
@@ -66,12 +67,12 @@ export default function FlightsPlanPage() {
 
       <div>
         <label className="block text-sm font-medium text-[#1F2A44] dark:text-[#FAF4EF]">Depart</label>
-        <input type="date" value={depart} onChange={(e) => setDepart(e.target.value)} className="mt-1 input-magical" />
+        <DateInput value={depart} onChange={setDepart} className="mt-1 input-magical" />
       </div>
 
       <div className={tripType === "oneway" ? "opacity-50 pointer-events-none" : ""}>
         <label className="block text-sm font-medium text-[#1F2A44] dark:text-[#FAF4EF]">Return</label>
-        <input type="date" value={returnDate} onChange={(e) => setReturnDate(e.target.value)} className="mt-1 input-magical" />
+        <DateInput value={returnDate} onChange={setReturnDate} className="mt-1 input-magical" />
       </div>
 
       <div>
