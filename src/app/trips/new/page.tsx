@@ -377,7 +377,7 @@ export default function NewTripPage() {
                       min="0"
                       value={budgetAmount}
                       onChange={(e) => setBudgetAmount(e.target.value)}
-                      className="input-magical pl-8"
+                      className="input-magical pl-8!"
                       placeholder="0.00"
                     />
                   </div>
@@ -455,8 +455,21 @@ export default function NewTripPage() {
 
       {/* Success Modal */}
       {showSuccess && createdTrip && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="card-magical max-w-md w-full p-8 text-center animate-scale-in">
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setShowSuccess(false)}
+        >
+          <div className="card-magical max-w-md w-full p-8 text-center animate-scale-in relative" onClick={(e) => e.stopPropagation()}>
+            {/* Close button */}
+            <button
+              onClick={() => setShowSuccess(false)}
+              className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+              aria-label="Close"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
             {/* Celebration */}
             <div className="text-6xl mb-4">🎉</div>
             <h2 className="font-serif text-2xl font-bold text-[#1F2A44] dark:text-white mb-2">

@@ -396,7 +396,7 @@ export default function EditTripModal({
                     min="0"
                     value={budgetAmount}
                     onChange={(e) => setBudgetAmount(e.target.value)}
-                    className="input-magical pl-8"
+                    className="input-magical pl-8!"
                     placeholder="0.00"
                   />
                 </div>

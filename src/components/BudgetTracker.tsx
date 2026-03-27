@@ -501,7 +501,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
                       value={budgetForm.amount}
                       onChange={(e) => setBudgetForm({ ...budgetForm, amount: e.target.value })}
                       placeholder="0.00"
-                      className="input-magical pl-8"
+                      className="input-magical pl-8!"
                     />
                   </div>
                 </div>
@@ -548,7 +548,7 @@ export default function BudgetTracker({ tripId, onExpenseAdded }: BudgetTrackerP
                     value={expenseForm.amount}
                     onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })}
                     placeholder="0.00"
-                    className="input-magical pl-8"
+                    className="input-magical pl-8!"
                   />
                 </div>
               </div>
