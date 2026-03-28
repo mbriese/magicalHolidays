@@ -48,6 +48,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const existingTrips = await prisma.trip.findMany({
+      where: { ownerId: user.id },
+      select: { name: true, startDate: true, endDate: true },
+    });
+
+    const duplicateName = existingTrips.some(
+      (t) => t.name.trim().toLowerCase() === name.trim().toLowerCase()
+    );
+    if (duplicateName) {
+      return NextResponse.json(
+        { error: `You already have a trip named "${name}". Please choose a different name.` },
+        { status: 409 }
+      );
+    }
+
     const details = Array.isArray(guestDetails) ? guestDetails : null;
     const guestNames = details?.length
       ? details.map((g: { firstName?: string; lastName?: string }) => `${(g.firstName ?? "").trim()} ${(g.lastName ?? "").trim()}`.trim()).filter(Boolean)

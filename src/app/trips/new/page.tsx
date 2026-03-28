@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { DESTINATIONS } from "@/lib/constants";
-import type { GuestDetail } from "@/types";
+import type { GuestDetail, TripApiResponse } from "@/types";
 import { Spinner } from "@/components/Spinner";
 import { StatusMessage } from "@/components/StatusMessage";
 import { DateInput } from "@/components/DateInput";
@@ -35,6 +35,37 @@ export default function NewTripPage() {
   const [error, setError] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdTrip, setCreatedTrip] = useState<CreatedTrip | null>(null);
+  const [existingTrips, setExistingTrips] = useState<TripApiResponse[]>([]);
+  const [overlapConfirmed, setOverlapConfirmed] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/trips")
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setExistingTrips)
+      .catch(() => {});
+  }, []);
+
+  const isDuplicateName = useMemo(() => {
+    if (!name.trim()) return false;
+    return existingTrips.some(
+      (t) => t.name.trim().toLowerCase() === name.trim().toLowerCase()
+    );
+  }, [name, existingTrips]);
+
+  const overlappingTrips = useMemo(() => {
+    if (!startDate || !endDate) return [];
+    const s = new Date(startDate).getTime();
+    const e = new Date(endDate).getTime();
+    return existingTrips.filter((t) => {
+      const ts = new Date(t.startDate).getTime();
+      const te = new Date(t.endDate).getTime();
+      return s <= te && ts <= e;
+    });
+  }, [startDate, endDate, existingTrips]);
+
+  useEffect(() => {
+    setOverlapConfirmed(false);
+  }, [startDate, endDate]);
 
   // When count changes, resize guestList and preserve existing entries
   useEffect(() => {
@@ -74,6 +105,18 @@ export default function NewTripPage() {
 
     if (new Date(endDate) < new Date(startDate)) {
       setError("End date must be after start date.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (isDuplicateName) {
+      setError(`You already have a trip named "${name.trim()}". Please choose a different name.`);
+      setIsLoading(false);
+      return;
+    }
+
+    if (overlappingTrips.length > 0 && !overlapConfirmed) {
+      setError("Please review the date overlap warning below and confirm before creating this trip.");
       setIsLoading(false);
       return;
     }
@@ -145,9 +188,14 @@ export default function NewTripPage() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="input-magical"
+                className={`input-magical ${isDuplicateName ? "border-red-400! dark:border-red-500!" : ""}`}
                 placeholder="e.g., Summer Family Vacation 2026"
               />
+              {isDuplicateName && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-400 font-medium">
+                  You already have a trip named &ldquo;{name.trim()}&rdquo;. Please choose a different name.
+                </p>
+              )}
             </div>
 
             {/* Destination */}
@@ -227,6 +275,44 @@ export default function NewTripPage() {
                 />
               </div>
             </div>
+
+            {/* Date overlap warning */}
+            {overlappingTrips.length > 0 && (
+              <div className="rounded-xl border-2 border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-900/20 p-5">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl shrink-0">⚠️</span>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-amber-800 dark:text-amber-300 text-base mb-2">
+                      This trip might already exist!
+                    </h3>
+                    <p className="text-sm text-amber-700 dark:text-amber-400 mb-3">
+                      Your dates overlap with {overlappingTrips.length === 1 ? "an existing trip" : `${overlappingTrips.length} existing trips`}:
+                    </p>
+                    <ul className="space-y-2 mb-4">
+                      {overlappingTrips.map((t) => (
+                        <li key={t.id} className="flex items-center gap-2 text-sm bg-white/60 dark:bg-black/20 rounded-lg px-3 py-2">
+                          <span className="font-semibold text-amber-900 dark:text-amber-200">{t.name}</span>
+                          <span className="text-amber-600 dark:text-amber-400">
+                            {new Date(t.startDate).toLocaleDateString()} – {new Date(t.endDate).toLocaleDateString()}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={overlapConfirmed}
+                        onChange={(e) => setOverlapConfirmed(e.target.checked)}
+                        className="w-4 h-4 rounded border-amber-400 text-amber-600 focus:ring-amber-500"
+                      />
+                      <span className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                        I understand — this is a different trip
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Additional guests */}
             <div className="space-y-4">
@@ -410,7 +496,7 @@ export default function NewTripPage() {
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || isDuplicateName}
                 className="btn-magical flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
