@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { DESTINATIONS } from "@/lib/constants";
+import { formatDateRange } from "@/lib/formatters";
 import type { GuestDetail, TripApiResponse } from "@/types";
 import { Spinner } from "@/components/Spinner";
 import { StatusMessage } from "@/components/StatusMessage";
@@ -293,7 +294,7 @@ export default function NewTripPage() {
                         <li key={t.id} className="flex items-center gap-2 text-sm bg-white/60 dark:bg-black/20 rounded-lg px-3 py-2">
                           <span className="font-semibold text-amber-900 dark:text-amber-200">{t.name}</span>
                           <span className="text-amber-600 dark:text-amber-400">
-                            {new Date(t.startDate).toLocaleDateString()} – {new Date(t.endDate).toLocaleDateString()}
+                            {formatDateRange(t.startDate, t.endDate, { shortFormat: true })}
                           </span>
                         </li>
                       ))}

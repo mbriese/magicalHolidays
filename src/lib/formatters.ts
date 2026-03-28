@@ -1,6 +1,19 @@
 // Shared formatting utilities for Magical Holidays
 
 /**
+ * Parse a date string as a local date (not UTC).
+ * Date-only strings like "2026-04-01" are parsed as UTC by the Date constructor,
+ * which shifts them back a day in US timezones. This helper avoids that.
+ */
+export function parseLocalDate(str: string): Date {
+  const match = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (match) {
+    return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  }
+  return new Date(str);
+}
+
+/**
  * Format a date range for display
  * @param startStr - ISO date string for start date
  * @param endStr - ISO date string for end date
@@ -16,8 +29,8 @@ export const formatDateRange = (
   } = {}
 ): string => {
   const { includeWeekday = false, shortFormat = false } = options;
-  const start = new Date(startStr);
-  const end = new Date(endStr);
+  const start = parseLocalDate(startStr);
+  const end = parseLocalDate(endStr);
 
   const startOptions: Intl.DateTimeFormatOptions = shortFormat
     ? { month: "short", day: "numeric" }
@@ -48,7 +61,7 @@ export const formatDateRange = (
  * @returns Number of days until the date (negative if in past)
  */
 export const getDaysUntil = (dateStr: string): number => {
-  const date = new Date(dateStr);
+  const date = parseLocalDate(dateStr);
   const now = new Date();
   const diff = date.getTime() - now.getTime();
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
@@ -83,7 +96,7 @@ export const formatDate = (
     year: "numeric",
   }
 ): string => {
-  return new Date(dateStr).toLocaleDateString("en-US", options);
+  return parseLocalDate(dateStr).toLocaleDateString("en-US", options);
 };
 
 /**

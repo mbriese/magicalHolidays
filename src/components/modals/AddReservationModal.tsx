@@ -9,6 +9,7 @@ import { DESTINATIONS, DESTINATION_PARKS, RESERVATION_TYPES } from "@/lib/consta
 import { allAttractions } from "@/data/attractions";
 import { StatusMessage } from "@/components/StatusMessage";
 import { GuestListInput } from "@/components/GuestListInput";
+import { parseLocalDate } from "@/lib/formatters";
 
 interface AddReservationModalProps {
   isOpen: boolean;
@@ -79,8 +80,7 @@ export default function AddReservationModal({
   // Set default dates to trip start date when trip is selected (not in edit mode)
   useEffect(() => {
     if (selectedTrip && !editReservation && !startDateTime) {
-      const tripStartDate = new Date(selectedTrip.startDate);
-      // Set to 9:00 AM on the trip start date as a reasonable default
+      const tripStartDate = parseLocalDate(selectedTrip.startDate);
       tripStartDate.setHours(9, 0, 0, 0);
       setStartDateTime(tripStartDate);
       
@@ -612,7 +612,7 @@ export default function AddReservationModal({
           {/* Trip Date Range Hint */}
           {selectedTrip && tripChoice === "existing" && (
             <div className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700/50 px-3 py-2 rounded-lg">
-              📅 Trip dates: {new Date(selectedTrip.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {new Date(selectedTrip.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              📅 Trip dates: {parseLocalDate(selectedTrip.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {parseLocalDate(selectedTrip.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </div>
           )}
 
@@ -642,7 +642,7 @@ export default function AddReservationModal({
                 dateFormat={isAllDay ? "MMM d, yyyy" : "MMM d, yyyy h:mm aa"}
                 className="input-magical w-full"
                 placeholderText={isAllDay ? "Select date" : "Select date & time"}
-                openToDate={selectedTrip ? new Date(selectedTrip.startDate) : undefined}
+                openToDate={selectedTrip ? parseLocalDate(selectedTrip.startDate) : undefined}
               />
             </div>
             <div>
@@ -659,7 +659,7 @@ export default function AddReservationModal({
                 className="input-magical w-full"
                 placeholderText={isAllDay ? "Select date" : "Select date & time"}
                 minDate={startDateTime || undefined}
-                openToDate={startDateTime || (selectedTrip ? new Date(selectedTrip.startDate) : undefined)}
+                openToDate={startDateTime || (selectedTrip ? parseLocalDate(selectedTrip.startDate) : undefined)}
               />
             </div>
           </div>

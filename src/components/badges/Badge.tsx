@@ -102,10 +102,10 @@ export default function Badge({
 
       {/* Badge Details */}
       {showDetails && (
-        <div className="text-center max-w-[120px]">
+        <div className="text-center max-w-[140px]">
           <h4
             className={`
-              text-sm font-semibold truncate
+              text-sm font-semibold leading-tight
               ${earned ? rarityStyle.text : "text-gray-400 dark:text-gray-500"}
             `}
           >
