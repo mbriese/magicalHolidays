@@ -15,6 +15,7 @@ interface AddReservationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  onDelete?: (reservation: ReservationApiResponse) => void;
   editReservation?: ReservationApiResponse | null;
   defaultTripId?: string | null;
   defaultType?: ReservationType;
@@ -37,6 +38,7 @@ export default function AddReservationModal({
   isOpen,
   onClose,
   onSuccess,
+  onDelete,
   editReservation,
   defaultTripId,
   defaultType,
@@ -794,6 +796,18 @@ export default function AddReservationModal({
 
           {/* Buttons */}
           <div className="flex gap-3 pt-4">
+            {isEditMode && onDelete && editReservation && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onDelete(editReservation);
+                }}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:text-red-400 dark:bg-red-900/20 dark:hover:bg-red-900/40 transition-colors"
+              >
+                Delete
+              </button>
+            )}
             <button
               type="button"
               onClick={onClose}

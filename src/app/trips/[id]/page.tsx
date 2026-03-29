@@ -313,6 +313,7 @@ export default function TripDetailPage() {
         isOpen={isReservationModalOpen}
         onClose={handleModalClose}
         onSuccess={handleReservationSuccess}
+        onDelete={handleDeleteClick}
         editReservation={editingReservation}
         defaultTripId={tripId}
         defaultType={defaultReservationType}
