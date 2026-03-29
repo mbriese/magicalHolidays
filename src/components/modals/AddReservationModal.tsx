@@ -690,7 +690,14 @@ export default function AddReservationModal({
               </label>
               <DatePicker
                 selected={startDateTime}
-                onChange={(date: Date | null) => setStartDateTime(date)}
+                onChange={(date: Date | null) => {
+                  setStartDateTime(date);
+                  if (date && endDateTime && date >= endDateTime) {
+                    const newEnd = new Date(date);
+                    newEnd.setHours(newEnd.getHours() + 1);
+                    setEndDateTime(newEnd);
+                  }
+                }}
                 showTimeSelect={!isAllDay}
                 timeFormat="h:mm aa"
                 timeIntervals={15}
