@@ -1,20 +1,22 @@
 // Shared formatting utilities for Magical Holidays
 
 /**
- * Parse a date string as a local date (not UTC).
- * Date-only strings like "2026-04-01" are parsed as UTC by the Date constructor,
- * which shifts them back a day in US timezones. This helper avoids that.
- * Full ISO datetimes with time components (e.g. "2026-04-01T09:00:00.000Z")
- * are parsed with time preserved in local timezone.
+ * Parse a date string safely for display.
+ *
+ * - Date-only strings like "2026-04-01" are parsed as LOCAL midnight
+ *   (the native Date constructor treats these as UTC, shifting back a day in US timezones).
+ * - Full ISO datetimes with timezone info (e.g. "2026-04-01T16:00:00.000Z")
+ *   are parsed natively so the browser correctly converts UTC → local time.
  */
 export function parseLocalDate(str: string): Date {
-  const match = str.match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2})(?::(\d{2}))?)?/);
+  // If the string contains a "T" with timezone info (Z, +, -), let the browser handle UTC conversion
+  if (/T\d{2}:\d{2}/.test(str)) {
+    return new Date(str);
+  }
+  // Date-only: parse as local to avoid off-by-one day shift
+  const match = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (match) {
-    const [, y, m, d, hh, mm, ss] = match;
-    if (hh !== undefined) {
-      return new Date(Number(y), Number(m) - 1, Number(d), Number(hh), Number(mm), Number(ss || 0));
-    }
-    return new Date(Number(y), Number(m) - 1, Number(d));
+    return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
   }
   return new Date(str);
 }
