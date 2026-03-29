@@ -1,19 +1,16 @@
 // Shared formatting utilities for Magical Holidays
 
 /**
- * Parse a date string safely for display.
+ * Parse a date string as a LOCAL date (ignoring any time/timezone component).
+ * Use for trip start/end dates and any date-only values from Prisma.
  *
- * - Date-only strings like "2026-04-01" are parsed as LOCAL midnight
- *   (the native Date constructor treats these as UTC, shifting back a day in US timezones).
- * - Full ISO datetimes with timezone info (e.g. "2026-04-01T16:00:00.000Z")
- *   are parsed natively so the browser correctly converts UTC → local time.
+ * Prisma serializes Date fields as "2026-04-01T00:00:00.000Z" (midnight UTC).
+ * Native `new Date()` interprets that as UTC, shifting back a day in US timezones.
+ * This function extracts just the YYYY-MM-DD and constructs a local-midnight Date.
+ *
+ * Do NOT use for reservation datetimes where time matters — use `new Date()` directly.
  */
 export function parseLocalDate(str: string): Date {
-  // If the string contains a "T" with timezone info (Z, +, -), let the browser handle UTC conversion
-  if (/T\d{2}:\d{2}/.test(str)) {
-    return new Date(str);
-  }
-  // Date-only: parse as local to avoid off-by-one day shift
   const match = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (match) {
     return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));

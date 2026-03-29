@@ -6,7 +6,7 @@ import AddReservationModal from "@/components/modals/AddReservationModal";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import EmailItineraryModal from "@/components/modals/EmailItineraryModal";
 import { DownloadItineraryButton } from "@/components/pdf";
-import { formatDateRange, parseLocalDate } from "@/lib/formatters";
+import { formatDateRange } from "@/lib/formatters";
 import {
   reservationTypeConfig,
   type ReservationType,
@@ -71,8 +71,9 @@ export default function TripDetailPage() {
   // Optional default start date passed to modal when adding ride from a park card
   const [defaultStartDate, setDefaultStartDate] = useState<Date | undefined>();
 
+  // Reservation datetimes are real UTC timestamps — use native Date for correct local conversion
   const formatReservationDate = (dateStr: string, showTime: boolean = true) => {
-    const date = parseLocalDate(dateStr);
+    const date = new Date(dateStr);
     const dateFormatted = date.toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
@@ -466,9 +467,9 @@ function ReservationSection({
   );
 }
 
-// Helper: extract local calendar date key (timezone-safe)
+// Extract local calendar date key from a UTC datetime string
 function toLocalDateKey(dateStr: string): string {
-  const d = parseLocalDate(dateStr);
+  const d = new Date(dateStr);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
