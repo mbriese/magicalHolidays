@@ -66,6 +66,7 @@ export default function AddReservationModal({
   const [confirmationNumber, setConfirmationNumber] = useState("");
   const [notes, setNotes] = useState("");
   const [guests, setGuests] = useState<string[]>([]);
+  const [showGuests, setShowGuests] = useState(false);
 
   // Attraction selection for RIDE type
   const [selectedAttractionId, setSelectedAttractionId] = useState<string>("");
@@ -154,6 +155,7 @@ export default function AddReservationModal({
     setConfirmationNumber(reservation.confirmationNumber || "");
     setNotes(reservation.notes || "");
     setGuests(reservation.guests || []);
+    setShowGuests((reservation.guests || []).length > 0);
   };
 
   const fetchTrips = async () => {
@@ -326,6 +328,7 @@ export default function AddReservationModal({
     setConfirmationNumber("");
     setNotes("");
     setGuests([]);
+    setShowGuests(false);
     setError("");
     // Reset attraction selection
     setSelectedAttractionId("");
@@ -705,14 +708,29 @@ export default function AddReservationModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Guests
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={guests.length > 0 || showGuests}
+                onChange={(e) => {
+                  setShowGuests(e.target.checked);
+                  if (!e.target.checked) setGuests([]);
+                }}
+                className="w-4 h-4 rounded border-slate-300 text-[#1F2A44] focus:ring-[#FFB957]"
+              />
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Add Guests
+              </span>
             </label>
-            <GuestListInput
-              guests={guests}
-              onAdd={(name) => { if (!guests.includes(name)) setGuests([...guests, name]); }}
-              onRemove={(name) => { setGuests(guests.filter((g) => g !== name)); }}
-            />
+            {(showGuests || guests.length > 0) && (
+              <div className="mt-2">
+                <GuestListInput
+                  guests={guests}
+                  onAdd={(name) => { if (!guests.includes(name)) setGuests([...guests, name]); }}
+                  onRemove={(name) => { setGuests(guests.filter((g) => g !== name)); }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Buttons */}

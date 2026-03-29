@@ -6,7 +6,7 @@ import AddReservationModal from "@/components/modals/AddReservationModal";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import EmailItineraryModal from "@/components/modals/EmailItineraryModal";
 import { DownloadItineraryButton } from "@/components/pdf";
-import { formatDateRange } from "@/lib/formatters";
+import { formatDateRange, parseLocalDate } from "@/lib/formatters";
 import {
   reservationTypeConfig,
   type ReservationType,
@@ -68,8 +68,11 @@ export default function TripDetailPage() {
     fetchTrip();
   }, [tripId]);
 
+  // Optional default start date passed to modal when adding ride from a park card
+  const [defaultStartDate, setDefaultStartDate] = useState<Date | undefined>();
+
   const formatReservationDate = (dateStr: string, showTime: boolean = true) => {
-    const date = new Date(dateStr);
+    const date = parseLocalDate(dateStr);
     const dateFormatted = date.toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
@@ -83,8 +86,9 @@ export default function TripDetailPage() {
     return `${dateFormatted} at ${timeFormatted}`;
   };
 
-  const handleAddReservation = (type?: ReservationType) => {
+  const handleAddReservation = (type?: ReservationType, startDate?: Date) => {
     setDefaultReservationType(type);
+    setDefaultStartDate(startDate);
     setEditingReservation(null);
     setIsReservationModalOpen(true);
   };
@@ -107,6 +111,7 @@ export default function TripDetailPage() {
     setIsReservationModalOpen(false);
     setEditingReservation(null);
     setDefaultReservationType(undefined);
+    setDefaultStartDate(undefined);
   };
 
   // Group reservations by type
@@ -254,26 +259,15 @@ export default function TripDetailPage() {
           emptyMessage="No hotel booked yet. Where will you stay?"
         />
 
-        {/* Parks Section */}
-        <ReservationSection
-          type="PARK"
-          reservations={parkReservations}
-          onAdd={() => handleAddReservation("PARK")}
+        {/* Parks & Rides Section */}
+        <ParkWithRidesSection
+          parkReservations={parkReservations}
+          rideReservations={rideReservations}
+          onAddPark={() => handleAddReservation("PARK")}
+          onAddRide={(parkDate?: Date) => handleAddReservation("RIDE", parkDate)}
           onEdit={handleEditReservation}
           onDelete={handleDeleteClick}
           formatDate={formatReservationDate}
-          emptyMessage="No park days planned yet. Which parks will you visit?"
-        />
-
-        {/* Rides Section */}
-        <ReservationSection
-          type="RIDE"
-          reservations={rideReservations}
-          onAdd={() => handleAddReservation("RIDE")}
-          onEdit={handleEditReservation}
-          onDelete={handleDeleteClick}
-          formatDate={formatReservationDate}
-          emptyMessage="No ride reservations yet. What attractions do you want to experience?"
         />
 
         {/* Flights Section */}
@@ -317,6 +311,7 @@ export default function TripDetailPage() {
         editReservation={editingReservation}
         defaultTripId={tripId}
         defaultType={defaultReservationType}
+        defaultStartDate={defaultStartDate}
       />
 
       {/* Delete Confirmation Modal */}
@@ -415,7 +410,9 @@ function ReservationSection({
                     {reservation.title}
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {formatDate(reservation.startDateTime, type !== "HOTEL")}
+                    {type === "HOTEL"
+                      ? `${formatDate(reservation.startDateTime, false)} - ${formatDate(reservation.endDateTime, false)}`
+                      : formatDate(reservation.startDateTime)}
                   </p>
                   {reservation.location && (
                     <p className="text-sm text-slate-500 dark:text-slate-500 truncate">
@@ -458,6 +455,310 @@ function ReservationSection({
                 </div>
               </div>
             ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Helper: extract calendar date key from ISO datetime string
+function toDateKey(dateStr: string): string {
+  return dateStr.slice(0, 10);
+}
+
+// Park + Rides combined section
+interface ParkWithRidesSectionProps {
+  parkReservations: ReservationApiResponse[];
+  rideReservations: ReservationApiResponse[];
+  onAddPark: () => void;
+  onAddRide: (parkDate?: Date) => void;
+  onEdit: (reservation: ReservationApiResponse) => void;
+  onDelete: (reservation: ReservationApiResponse) => void;
+  formatDate: (date: string, showTime?: boolean) => string;
+}
+
+function ParkWithRidesSection({
+  parkReservations,
+  rideReservations,
+  onAddPark,
+  onAddRide,
+  onEdit,
+  onDelete,
+  formatDate,
+}: ParkWithRidesSectionProps) {
+  const parkConfig = reservationTypeConfig["PARK"];
+  const rideConfig = reservationTypeConfig["RIDE"];
+
+  const sortedParks = [...parkReservations].sort(
+    (a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime()
+  );
+
+  // Build a set of ride IDs that are claimed by a park
+  const claimedRideIds = new Set<string>();
+
+  // For each park, find rides on the same date whose location matches the park title
+  const getRidesForPark = (park: ReservationApiResponse): ReservationApiResponse[] => {
+    const parkDateKey = toDateKey(park.startDateTime);
+    const parkTitle = park.title.toLowerCase();
+
+    const matched = rideReservations.filter((ride) => {
+      if (claimedRideIds.has(ride.id)) return false;
+      const rideDateKey = toDateKey(ride.startDateTime);
+      if (rideDateKey !== parkDateKey) return false;
+      // Match if ride location contains the park title, or ride has no location (date-only match)
+      const rideLocation = (ride.location || "").toLowerCase();
+      return !rideLocation || rideLocation.includes(parkTitle) || parkTitle.includes(rideLocation);
+    });
+
+    matched.forEach((r) => claimedRideIds.add(r.id));
+    return matched.sort(
+      (a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime()
+    );
+  };
+
+  // Pre-compute rides per park (order matters so earlier parks claim first)
+  const parkRideGroups = sortedParks.map((park) => ({
+    park,
+    rides: getRidesForPark(park),
+  }));
+
+  // Orphan rides: matched by date to a park but different park, or no park on that date
+  const orphanRides = rideReservations
+    .filter((r) => !claimedRideIds.has(r.id))
+    .sort((a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime());
+
+  const hasParkDays = parkReservations.length > 0;
+  const hasOrphanRides = orphanRides.length > 0;
+
+  return (
+    <div className="mb-8">
+      {/* Section Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-serif text-xl font-bold text-[#1F2A44] dark:text-white flex items-center gap-2">
+          <span>{parkConfig.icon}</span>
+          Park Days & Rides
+        </h2>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onAddPark}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${parkConfig.bgColor} ${parkConfig.color} hover:opacity-80`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add Park Day
+          </button>
+          <button
+            onClick={() => onAddRide()}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${rideConfig.bgColor} ${rideConfig.color} hover:opacity-80`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add Ride
+          </button>
+        </div>
+      </div>
+
+      {/* Empty state */}
+      {!hasParkDays && !hasOrphanRides && (
+        <div className={`p-6 rounded-xl border-2 border-dashed ${parkConfig.bgColor} border-opacity-50`}>
+          <p className="text-center text-slate-500 dark:text-slate-400">
+            No park days planned yet. Which parks will you visit?
+          </p>
+          <div className="text-center mt-3">
+            <button
+              onClick={onAddPark}
+              className={`text-sm font-medium ${parkConfig.color} hover:underline`}
+            >
+              + Add your first park day
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Park cards with nested rides */}
+      {parkRideGroups.map(({ park, rides }) => (
+        <div key={park.id} className="mb-4">
+          {/* Park card */}
+          <div className="card-magical p-4 flex items-center gap-4 group">
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl ${parkConfig.bgColor}`}>
+              {parkConfig.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-[#1F2A44] dark:text-white truncate">
+                {park.title}
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                {formatDate(park.startDateTime, false)}
+              </p>
+              {park.location && (
+                <p className="text-sm text-slate-500 dark:text-slate-500 truncate">
+                  📍 {park.location}
+                </p>
+              )}
+              {park.guests && park.guests.length > 0 && (
+                <p className="text-sm text-slate-500 dark:text-slate-500 truncate">
+                  👥 {park.guests.join(", ")}
+                </p>
+              )}
+            </div>
+            {park.confirmationNumber && (
+              <div className="text-right hidden sm:block">
+                <span className="text-xs text-slate-500">Conf #</span>
+                <p className="text-sm font-mono text-slate-700 dark:text-slate-300">
+                  {park.confirmationNumber}
+                </p>
+              </div>
+            )}
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={() => onEdit(park)}
+                className="p-2 text-slate-400 hover:text-[#1F2A44] hover:bg-[#FAF4EF] dark:hover:bg-[#1F2A44]/20 rounded-lg transition-colors"
+                title="Edit"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+              <button
+                onClick={() => onDelete(park)}
+                className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                title="Delete"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Nested rides for this park */}
+          <div className="ml-6 mt-2 pl-4 border-l-2 border-blue-200 dark:border-blue-800">
+            {rides.length > 0 ? (
+              <div className="space-y-2">
+                {rides.map((ride) => (
+                  <div
+                    key={ride.id}
+                    className="card-magical p-3 flex items-center gap-3 group"
+                  >
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg ${rideConfig.bgColor}`}>
+                      {rideConfig.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-[#1F2A44] dark:text-white truncate text-sm">
+                        {ride.title}
+                      </h4>
+                      <p className="text-xs text-slate-600 dark:text-slate-400">
+                        {formatDate(ride.startDateTime)}
+                      </p>
+                      {ride.confirmationNumber && (
+                        <p className="text-xs text-slate-500">
+                          Conf # {ride.confirmationNumber}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => onEdit(ride)}
+                        className="p-1.5 text-slate-400 hover:text-[#1F2A44] hover:bg-[#FAF4EF] dark:hover:bg-[#1F2A44]/20 rounded-lg transition-colors"
+                        title="Edit"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => onDelete(ride)}
+                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        title="Delete"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400 dark:text-slate-500 italic py-1">
+                No rides reserved yet for this park day.
+              </p>
+            )}
+            <button
+              onClick={() => onAddRide(new Date(park.startDateTime))}
+              className={`mt-2 text-xs font-medium ${rideConfig.color} hover:underline flex items-center gap-1`}
+            >
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Ride at {park.title}
+            </button>
+          </div>
+        </div>
+      ))}
+
+      {/* Orphan rides (not matched to any park day) */}
+      {hasOrphanRides && (
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <span>{rideConfig.icon}</span>
+            Rides Not Linked to a Park Day
+          </h3>
+          <div className="space-y-2">
+            {orphanRides.map((ride) => (
+              <div
+                key={ride.id}
+                className="card-magical p-4 flex items-center gap-4 group"
+              >
+                <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl ${rideConfig.bgColor}`}>
+                  {rideConfig.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-[#1F2A44] dark:text-white truncate">
+                    {ride.title}
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    {formatDate(ride.startDateTime)}
+                  </p>
+                  {ride.location && (
+                    <p className="text-sm text-slate-500 dark:text-slate-500 truncate">
+                      📍 {ride.location}
+                    </p>
+                  )}
+                </div>
+                {ride.confirmationNumber && (
+                  <div className="text-right hidden sm:block">
+                    <span className="text-xs text-slate-500">Conf #</span>
+                    <p className="text-sm font-mono text-slate-700 dark:text-slate-300">
+                      {ride.confirmationNumber}
+                    </p>
+                  </div>
+                )}
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => onEdit(ride)}
+                    className="p-2 text-slate-400 hover:text-[#1F2A44] hover:bg-[#FAF4EF] dark:hover:bg-[#1F2A44]/20 rounded-lg transition-colors"
+                    title="Edit"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => onDelete(ride)}
+                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    title="Delete"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
