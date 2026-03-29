@@ -151,11 +151,20 @@ const badges = [
   // ============================================
   {
     name: "Early Bird",
-    description: "Joined the Lamplight Holidays family!",
+    description: "Planning ahead pays off!",
     icon: "🐣",
     category: BadgeCategory.SPECIAL,
     rarity: BadgeRarity.RARE,
-    requirement: "Be an early adopter",
+    requirement: "Book a reservation at least 30 days in advance",
+    threshold: 1,
+  },
+  {
+    name: "Sunrise Traveler",
+    description: "The early bird catches the ride!",
+    icon: "🌅",
+    category: BadgeCategory.SPECIAL,
+    rarity: BadgeRarity.UNCOMMON,
+    requirement: "Have a reservation for an event or ride before 9 AM",
     threshold: 1,
   },
   {
@@ -195,45 +204,22 @@ async function main() {
   console.log("\n🎖️  Seeding badges...");
   
   for (const badge of badges) {
-    const existingBadge = await prisma.badge.findUnique({
+    await prisma.badge.upsert({
       where: { name: badge.name },
-    });
-
-    if (!existingBadge) {
-      await prisma.badge.create({ data: badge });
-      console.log(`  ✅ Created badge: ${badge.icon} ${badge.name}`);
-    } else {
-      console.log(`  ℹ️  Badge exists: ${badge.icon} ${badge.name}`);
-    }
-  }
-
-  // Give Early Bird badge to user
-  const earlyBirdBadge = await prisma.badge.findUnique({
-    where: { name: "Early Bird" },
-  });
-
-  if (earlyBirdBadge) {
-    const existingUserBadge = await prisma.userBadge.findUnique({
-      where: {
-        userId_badgeId: {
-          userId: user.id,
-          badgeId: earlyBirdBadge.id,
-        },
+      create: badge,
+      update: {
+        description: badge.description,
+        icon: badge.icon,
+        category: badge.category,
+        rarity: badge.rarity,
+        requirement: badge.requirement,
+        threshold: badge.threshold,
       },
     });
-
-    if (!existingUserBadge) {
-      await prisma.userBadge.create({
-        data: {
-          userId: user.id,
-          badgeId: earlyBirdBadge.id,
-          progress: 1,
-          earnedAt: new Date(),
-        },
-      });
-      console.log("\n🐣 Awarded Early Bird badge to demo user!");
-    }
+    console.log(`  ✅ ${badge.icon} ${badge.name}`);
   }
+
+  // Early Bird and Sunrise Traveler are earned at runtime via /api/badges POST
 
   console.log("\n✨ Seeding completed!");
 }

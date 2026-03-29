@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate user stats
-    const [tripCount, reservationCount, parkDays] = await Promise.all([
+    const [tripCount, reservationCount, parkDays, allReservations] = await Promise.all([
       prisma.trip.count({ where: { ownerId: user.id } }),
       prisma.reservation.count({
         where: { userId: user.id },
@@ -64,6 +64,10 @@ export async function POST(request: NextRequest) {
           type: "PARK",
         },
       }),
+      prisma.reservation.findMany({
+        where: { userId: user.id },
+        select: { type: true, startDateTime: true, createdAt: true },
+      }),
     ]);
 
     // Get unique reservation types used
@@ -72,6 +76,19 @@ export async function POST(request: NextRequest) {
       select: { type: true },
       distinct: ["type"],
     });
+
+    // Early Bird: any reservation booked 30+ days before its start date
+    const earlyBirdCount = allReservations.filter((r) => {
+      const daysAhead = (r.startDateTime.getTime() - r.createdAt.getTime()) / (1000 * 60 * 60 * 24);
+      return daysAhead >= 30;
+    }).length;
+
+    // Sunrise Traveler: rides/parks/flights starting before 9 AM local time
+    const sunriseCount = allReservations.filter((r) => {
+      if (r.type !== "RIDE" && r.type !== "PARK" && r.type !== "FLIGHT") return false;
+      const hour = r.startDateTime.getHours();
+      return hour > 0 && hour < 9;
+    }).length;
 
     // Get all badges
     const badges = await prisma.badge.findMany();
@@ -99,6 +116,10 @@ export async function POST(request: NextRequest) {
       // Explorer badges (variety)
       "variety-seeker": reservationTypes.length,
       "complete-explorer": reservationTypes.length,
+
+      // Special badges
+      "early-bird": earlyBirdCount,
+      "sunrise-traveler": sunriseCount,
     };
 
     const newlyEarned: string[] = [];
