@@ -18,6 +18,8 @@ interface AddReservationModalProps {
   editReservation?: ReservationApiResponse | null;
   defaultTripId?: string | null;
   defaultType?: ReservationType;
+  defaultStartDate?: Date;
+  defaultParkName?: string;
 }
 
 // Simplified trip type for the dropdown
@@ -38,6 +40,8 @@ export default function AddReservationModal({
   editReservation,
   defaultTripId,
   defaultType,
+  defaultStartDate,
+  defaultParkName,
 }: AddReservationModalProps) {
   const router = useRouter();
   const isEditMode = !!editReservation;
@@ -78,25 +82,43 @@ export default function AddReservationModal({
     return trips.find((t) => t.id === selectedTripId);
   }, [trips, selectedTripId]);
 
-  // Set default dates to trip start date when trip is selected (not in edit mode)
+  // Set default dates: prefer defaultStartDate (from park card), else trip start
   useEffect(() => {
-    if (selectedTrip && !editReservation && !startDateTime) {
+    if (editReservation || startDateTime) return;
+
+    if (defaultStartDate) {
+      const start = new Date(defaultStartDate);
+      start.setHours(9, 0, 0, 0);
+      setStartDateTime(start);
+      const end = new Date(start);
+      end.setHours(10, 0, 0, 0);
+      setEndDateTime(end);
+    } else if (selectedTrip) {
       const tripStartDate = parseLocalDate(selectedTrip.startDate);
       tripStartDate.setHours(9, 0, 0, 0);
       setStartDateTime(tripStartDate);
-      
-      // Set end time to 10:00 AM (1 hour later) as default
       const defaultEndDate = new Date(tripStartDate);
       defaultEndDate.setHours(10, 0, 0, 0);
       setEndDateTime(defaultEndDate);
     }
-  }, [selectedTrip, editReservation, startDateTime]);
+  }, [selectedTrip, editReservation, startDateTime, defaultStartDate]);
 
   // Get available parks for the destination
   const availableParks = useMemo(() => {
     if (!selectedTrip) return [];
     return DESTINATION_PARKS[selectedTrip.destination] || [];
   }, [selectedTrip]);
+
+  // Auto-select park when opened from a park card's "Add Ride" button
+  useEffect(() => {
+    if (!defaultParkName || editReservation || selectedPark) return;
+    const match = availableParks.find(
+      (p) => p.toLowerCase() === defaultParkName.toLowerCase()
+    );
+    if (match) {
+      setSelectedPark(match);
+    }
+  }, [defaultParkName, availableParks, editReservation, selectedPark]);
 
   // Get attractions for the selected park
   const availableAttractions = useMemo(() => {

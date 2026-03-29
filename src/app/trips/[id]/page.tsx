@@ -86,9 +86,12 @@ export default function TripDetailPage() {
     return `${dateFormatted} at ${timeFormatted}`;
   };
 
-  const handleAddReservation = (type?: ReservationType, startDate?: Date) => {
+  const [defaultParkName, setDefaultParkName] = useState<string | undefined>();
+
+  const handleAddReservation = (type?: ReservationType, startDate?: Date, parkName?: string) => {
     setDefaultReservationType(type);
     setDefaultStartDate(startDate);
+    setDefaultParkName(parkName);
     setEditingReservation(null);
     setIsReservationModalOpen(true);
   };
@@ -112,6 +115,7 @@ export default function TripDetailPage() {
     setEditingReservation(null);
     setDefaultReservationType(undefined);
     setDefaultStartDate(undefined);
+    setDefaultParkName(undefined);
   };
 
   // Group reservations by type
@@ -264,7 +268,7 @@ export default function TripDetailPage() {
           parkReservations={parkReservations}
           rideReservations={rideReservations}
           onAddPark={() => handleAddReservation("PARK")}
-          onAddRide={(parkDate?: Date) => handleAddReservation("RIDE", parkDate)}
+          onAddRide={(parkDate?: Date, parkName?: string) => handleAddReservation("RIDE", parkDate, parkName)}
           onEdit={handleEditReservation}
           onDelete={handleDeleteClick}
           formatDate={formatReservationDate}
@@ -312,6 +316,7 @@ export default function TripDetailPage() {
         defaultTripId={tripId}
         defaultType={defaultReservationType}
         defaultStartDate={defaultStartDate}
+        defaultParkName={defaultParkName}
       />
 
       {/* Delete Confirmation Modal */}
@@ -461,9 +466,10 @@ function ReservationSection({
   );
 }
 
-// Helper: extract calendar date key from ISO datetime string
-function toDateKey(dateStr: string): string {
-  return dateStr.slice(0, 10);
+// Helper: extract local calendar date key (timezone-safe)
+function toLocalDateKey(dateStr: string): string {
+  const d = parseLocalDate(dateStr);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 // Park + Rides combined section
@@ -471,7 +477,7 @@ interface ParkWithRidesSectionProps {
   parkReservations: ReservationApiResponse[];
   rideReservations: ReservationApiResponse[];
   onAddPark: () => void;
-  onAddRide: (parkDate?: Date) => void;
+  onAddRide: (parkDate?: Date, parkName?: string) => void;
   onEdit: (reservation: ReservationApiResponse) => void;
   onDelete: (reservation: ReservationApiResponse) => void;
   formatDate: (date: string, showTime?: boolean) => string;
@@ -496,18 +502,19 @@ function ParkWithRidesSection({
   // Build a set of ride IDs that are claimed by a park
   const claimedRideIds = new Set<string>();
 
-  // For each park, find rides on the same date whose location matches the park title
+  // For each park, find rides on the same local date whose location/context matches
   const getRidesForPark = (park: ReservationApiResponse): ReservationApiResponse[] => {
-    const parkDateKey = toDateKey(park.startDateTime);
+    const parkDateKey = toLocalDateKey(park.startDateTime);
     const parkTitle = park.title.toLowerCase();
 
     const matched = rideReservations.filter((ride) => {
       if (claimedRideIds.has(ride.id)) return false;
-      const rideDateKey = toDateKey(ride.startDateTime);
+      const rideDateKey = toLocalDateKey(ride.startDateTime);
       if (rideDateKey !== parkDateKey) return false;
-      // Match if ride location contains the park title, or ride has no location (date-only match)
       const rideLocation = (ride.location || "").toLowerCase();
-      return !rideLocation || rideLocation.includes(parkTitle) || parkTitle.includes(rideLocation);
+      // Match by: no location set, location contains park name, or park name contains location
+      if (!rideLocation) return true;
+      return rideLocation.includes(parkTitle) || parkTitle.includes(rideLocation);
     });
 
     matched.forEach((r) => claimedRideIds.add(r.id));
@@ -687,7 +694,7 @@ function ParkWithRidesSection({
               </p>
             )}
             <button
-              onClick={() => onAddRide(new Date(park.startDateTime))}
+              onClick={() => onAddRide(new Date(park.startDateTime), park.title)}
               className={`mt-2 text-xs font-medium ${rideConfig.color} hover:underline flex items-center gap-1`}
             >
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
