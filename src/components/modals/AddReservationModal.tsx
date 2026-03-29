@@ -84,7 +84,7 @@ export default function AddReservationModal({
 
   // Set default dates: prefer defaultStartDate (from park card), else trip start
   useEffect(() => {
-    if (editReservation || startDateTime) return;
+    if (!isOpen || editReservation || startDateTime) return;
 
     if (defaultStartDate) {
       const start = new Date(defaultStartDate);
@@ -101,7 +101,7 @@ export default function AddReservationModal({
       defaultEndDate.setHours(10, 0, 0, 0);
       setEndDateTime(defaultEndDate);
     }
-  }, [selectedTrip, editReservation, startDateTime, defaultStartDate]);
+  }, [isOpen, selectedTrip, editReservation, startDateTime, defaultStartDate]);
 
   // Get available parks for the destination
   const availableParks = useMemo(() => {
@@ -111,14 +111,14 @@ export default function AddReservationModal({
 
   // Auto-select park when opened from a park card's "Add Ride" button
   useEffect(() => {
-    if (!defaultParkName || editReservation || selectedPark) return;
+    if (!isOpen || !defaultParkName || editReservation || selectedPark) return;
     const match = availableParks.find(
       (p) => p.toLowerCase() === defaultParkName.toLowerCase()
     );
     if (match) {
       setSelectedPark(match);
     }
-  }, [defaultParkName, availableParks, editReservation, selectedPark]);
+  }, [isOpen, defaultParkName, availableParks, editReservation, selectedPark]);
 
   // Get attractions for the selected park
   const availableAttractions = useMemo(() => {
