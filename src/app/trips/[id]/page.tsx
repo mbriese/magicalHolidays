@@ -507,12 +507,18 @@ function ParkWithRidesSection({
     const parkDateKey = toLocalDateKey(park.startDateTime);
     const parkTitle = park.title.toLowerCase();
 
+    // Count how many parks share this date (if only one, all rides on that date belong to it)
+    const parksOnSameDate = sortedParks.filter(
+      (p) => toLocalDateKey(p.startDateTime) === parkDateKey
+    ).length;
+
     const matched = rideReservations.filter((ride) => {
       if (claimedRideIds.has(ride.id)) return false;
       const rideDateKey = toLocalDateKey(ride.startDateTime);
       if (rideDateKey !== parkDateKey) return false;
+      // If only one park on this date, claim all rides on that date
+      if (parksOnSameDate === 1) return true;
       const rideLocation = (ride.location || "").toLowerCase();
-      // Match by: no location set, location contains park name, or park name contains location
       if (!rideLocation) return true;
       return rideLocation.includes(parkTitle) || parkTitle.includes(rideLocation);
     });

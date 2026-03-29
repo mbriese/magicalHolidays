@@ -132,7 +132,7 @@ export default function AddReservationModal({
     const attraction = allAttractions.find((a) => a.id === attractionId);
     if (attraction) {
       setTitle(attraction.name);
-      setLocation(attraction.location);
+      setLocation(attraction.location ? `${attraction.park} - ${attraction.location}` : attraction.park);
     }
   };
 
