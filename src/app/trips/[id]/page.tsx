@@ -416,7 +416,7 @@ function ReservationSection({
                     {reservation.title}
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {type === "HOTEL"
+                    {type === "HOTEL" || type === "CAR"
                       ? `${formatDate(reservation.startDateTime, false)} - ${formatDate(reservation.endDateTime, false)}`
                       : formatDate(reservation.startDateTime)}
                   </p>
