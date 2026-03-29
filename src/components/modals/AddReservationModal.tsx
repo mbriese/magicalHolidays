@@ -546,6 +546,36 @@ export default function AddReservationModal({
             </select>
           </div>
 
+          {/* Park Name Selector - for PARK type with supported destinations */}
+          {type === "PARK" && availableParks.length > 0 && !useCustomTitle && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Select Park *
+                </label>
+                <select
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="input-magical"
+                >
+                  <option value="">Choose a park...</option>
+                  {availableParks.map((park) => (
+                    <option key={park} value={park}>
+                      {park}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="button"
+                onClick={() => setUseCustomTitle(true)}
+                className="text-sm text-[#1F2A44] dark:text-[#FFB957] hover:underline"
+              >
+                Or enter a custom park name...
+              </button>
+            </>
+          )}
+
           {/* Ride/Attraction Selector - only for RIDE type with supported destinations */}
           {type === "RIDE" && availableParks.length > 0 && !useCustomTitle && (
             <>
@@ -605,12 +635,12 @@ export default function AddReservationModal({
             </>
           )}
 
-          {/* Title - shown for non-RIDE types, or when using custom title, or unsupported destinations */}
-          {(type !== "RIDE" || useCustomTitle || availableParks.length === 0) && (
+          {/* Title - shown when not using a dropdown selector, or in custom mode */}
+          {((type !== "RIDE" && type !== "PARK") || useCustomTitle || availableParks.length === 0) && (
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Title *
-                {type === "RIDE" && useCustomTitle && (
+                {(type === "RIDE" || type === "PARK") && useCustomTitle && (
                   <button
                     type="button"
                     onClick={() => {
