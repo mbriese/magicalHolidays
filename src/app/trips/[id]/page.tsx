@@ -6,7 +6,7 @@ import AddReservationModal from "@/components/modals/AddReservationModal";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import EmailItineraryModal from "@/components/modals/EmailItineraryModal";
 import { DownloadItineraryButton } from "@/components/pdf";
-import { formatDateRange } from "@/lib/formatters";
+import { formatDateRange, parseLocalDate } from "@/lib/formatters";
 import {
   reservationTypeConfig,
   type ReservationType,
@@ -701,7 +701,7 @@ function ParkWithRidesSection({
               </p>
             )}
             <button
-              onClick={() => onAddRide(new Date(park.startDateTime), park.title)}
+              onClick={() => onAddRide(parseLocalDate(park.startDateTime), park.title)}
               className={`mt-2 text-xs font-medium ${rideConfig.color} hover:underline flex items-center gap-1`}
             >
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
